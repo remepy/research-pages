@@ -363,11 +363,11 @@
             controlsContainer.appendChild(nextActivityButton);
 
             // New toggle button for the debug section
-            toggleDebugButton = document.createElement('button');
-            toggleDebugButton.id = 'toggleDebugButton';
-            toggleDebugButton.className = 'game-button toggle-debug-button';
-            toggleDebugButton.textContent = isDebugVisible ? 'Hide Debug Section' : 'Show Debug Section';
-            body.appendChild(toggleDebugButton);
+            // toggleDebugButton = document.createElement('button');
+            // toggleDebugButton.id = 'toggleDebugButton';
+            // toggleDebugButton.className = 'game-button toggle-debug-button';
+            // toggleDebugButton.textContent = isDebugVisible ? 'Hide Debug Section' : 'Show Debug Section';
+            // body.appendChild(toggleDebugButton);
 
             debugSection = document.createElement('div');
             debugSection.className = 'debug-section';
@@ -428,31 +428,31 @@
             canvas.addEventListener('touchmove', handleMove, { passive: false });
             canvas.addEventListener('touchend', handleEnd);
             resetButton.addEventListener('click', resetGame);
-            toggleDebugButton.addEventListener('click', toggleDebugSection);
+            // toggleDebugButton.addEventListener('click', toggleDebugSection);
             window.addEventListener('resize', resizeCanvas);
 
             // Initial setup
             resizeCanvas();
             drawGame();
-            // notifyClientToShowBackButton();
+            notifyClientToShowBackButton();
         }
         
         /**
          * Toggles the visibility of the entire debug section.
          */
-        function toggleDebugSection() {
-            isDebugVisible = !isDebugVisible;
-            if (isDebugVisible) {
-                debugSection.classList.remove('hidden');
-                toggleDebugButton.textContent = 'Hide Debug Section';
-                // Redraw the graph and game canvas when it becomes visible
-                drawGame();
-            } else {
-                debugSection.classList.add('hidden');
-                toggleDebugButton.textContent = 'Show Debug Section';
-                drawGame();
-            }
-        }
+        // function toggleDebugSection() {
+        //     isDebugVisible = !isDebugVisible;
+        //     if (isDebugVisible) {
+        //         debugSection.classList.remove('hidden');
+        //         toggleDebugButton.textContent = 'Hide Debug Section';
+        //         // Redraw the graph and game canvas when it becomes visible
+        //         drawGame();
+        //     } else {
+        //         debugSection.classList.add('hidden');
+        //         toggleDebugButton.textContent = 'Show Debug Section';
+        //         drawGame();
+        //     }
+        // }
 
         /**
          * Resizes the canvas to fit the window and regenerates the spiral path.
@@ -832,7 +832,7 @@
             };
             
             jsonDataPre.textContent = JSON.stringify(results, null, 2);
-            // notifyClientToSendPayload(results);
+            notifyClientToSendPayload(results);
         }
 
         /**
@@ -1054,7 +1054,7 @@
             nextActivityButton.classList.add('hidden');
             gameInstructions.classList.remove('hidden');
             drawGame();
-            // notifyClientToResetGame();
+            notifyClientToResetGame();
         }
         
         // Run the initialization function when the page loads
