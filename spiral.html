@@ -434,7 +434,7 @@
             // Initial setup
             resizeCanvas();
             drawGame();
-            notifyClientToShowBackButton();
+            // notifyClientToShowBackButton();
         }
         
         /**
@@ -832,7 +832,7 @@
             };
             
             jsonDataPre.textContent = JSON.stringify(results, null, 2);
-            notifyClientToSendPayload(results);
+            // notifyClientToSendPayload(results);
         }
 
         /**
@@ -1054,7 +1054,7 @@
             nextActivityButton.classList.add('hidden');
             gameInstructions.classList.remove('hidden');
             drawGame();
-            notifyClientToResetGame();
+            // notifyClientToResetGame();
         }
         
         // Run the initialization function when the page loads
