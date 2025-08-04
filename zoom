@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hocus Pocus</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /*
+         * This is the CSS section.
+         * All styling is located here, separated from the code logic and HTML structure.
+         */
+        body {
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f4f8;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .game-container {
+            background-color: #ffffff;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            max-width: 98vw;
+            width: 98vw;
+            box-sizing: border-box;
+        }
+
+        canvas {
+            border: 2px solid #cbd5e1;
+            border-radius: 1rem;
+            background-color: #e2e8f0;
+            display: block;
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            touch-action: none;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            min-height: 48px;
+            align-items: center;
+            width: 100%;
+        }
+
+        /* Container for the buttons to stack them vertically */
+        .button-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            width: 100%;
+            max-width: 100%;
+            align-items: center;
+        }
+
+        #resetButton, #toggleDebugButton {
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 1rem;
+            font-weight: 700;
+            font-size: 2rem;
+            line-height: 1;
+            transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease, opacity 0.3s ease;
+            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.4);
+            border: none;
+            cursor: pointer;
+            outline: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 100%;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        
+        #resetButton {
+            direction: rtl; /* Keep right-to-left for the Hebrew text on this button */
+        }
+
+        #toggleDebugButton {
+            direction: ltr; /* Set left-to-right for English text */
+        }
+
+        #resetButton:hover, #toggleDebugButton:hover {
+            background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(79, 70, 229, 0.5);
+        }
+
+        #resetButton:active, #toggleDebugButton:active {
+            background: linear-gradient(135deg, #3730a3 0%, #4f46e5 100%);
+            transform: translateY(0);
+            box-shadow: 0 5px 10px rgba(79, 70, 229, 0.4);
+        }
+
+        #resetButton svg, #toggleDebugButton svg {
+            margin-right: 1rem;
+            width: 2rem;
+            height: 2rem;
+            flex-shrink: 0;
+            fill: currentColor;
+        }
+        
+        #toggleDebugButton {
+            background: linear-gradient(135deg, #4299e1 0%, #2b6cb0 100%); /* Blue gradient for a different look */
+            box-shadow: 0 8px 20px rgba(43, 108, 176, 0.4);
+        }
+
+        #toggleDebugButton:hover {
+            background: linear-gradient(135deg, #2b6cb0 0%, #2c5282 100%);
+            box-shadow: 0 10px 25px rgba(43, 108, 176, 0.5);
+        }
+
+        .hidden-but-takes-space {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .message-box {
+            background-color: #dbeafe;
+            color: #1e40af;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+            text-align: center;
+            font-weight: 600;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .progress-container {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.25rem;
+            background-color: #e2e8f0;
+            border-radius: 0.5rem;
+            padding: 0.25rem;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-segment {
+            flex-grow: 1;
+            height: 1rem;
+            background-color: #cbd5e1;
+            border-radius: 0.25rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .progress-segment.active {
+            background-color: #4f46e5;
+        }
+
+        .pinch-data-container {
+            margin-top: 2rem;
+            width: 100%;
+            min-height: 20rem;
+            box-sizing: border-box;
+            transition: min-height 0.3s ease;
+        }
+        
+        .json-display {
+            background-color: #2d3748;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            overflow-x: auto;
+            direction: ltr;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.875rem;
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+        .json-display h2 {
+            color: #cbd5e1;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- 
+     * This is the HTML area.
+     * It contains the structure of the application, with elements like headers, canvas, and buttons.
+     -->
+    <div class="game-container">
+        <h1 class="text-5xl font-bold text-gray-800 mb-4">הוקוס פוקוס</h1>
+        <div id="instructionTextContainer" class="text-gray-600 text-center mb-4 min-h-[3rem] flex items-center justify-center">
+            <p id="instructionText">
+                השתמשו בתנועת צביטה כדי לחשוף את התמונה הנסתרת מהר ככל שתוכלו.
+            </p></div>
+        <canvas id="gameCanvas"></canvas>
+        <div class="progress-container" id="progressBar">
+            <!-- Progress segments will be dynamically added here -->
+        </div>
+        <div class="controls">
+            <div class="button-stack">
+                <!-- כפתור לאתחול המשחק -->
+                <a href="#" id="resetButton" class="hidden-but-takes-space">
+                    שחק שוב
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.41 0-7.99 3.58-7.99 8s3.58 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+                    </svg>
+                </a>
+                
+                <!-- New button to toggle debug data, now in English -->
+                <a href="#" id="toggleDebugButton">
+                    Show Data
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path fill-rule="evenodd" d="M12 1.5a.75.75 0 01.75.75V4.5a.75.75 0 01-1.5 0V2.25a.75.75 0 01.75-.75zM5.626 4.31a.75.75 0 10-1.06 1.06L6.5 7.258a.75.75 0 001.06-1.06L5.626 4.31zM3 10.5a.75.75 0 01.75-.75H6a.75.75 0 010 1.5H3.75a.75.75 0 01-.75-.75zM12 22.5a.75.75 0 01-.75-.75V19.5a.75.75 0 011.5 0v2.25a.75.75 0 01-.75.75zM17.25 10.5a.75.75 0 01.75-.75h2.25a.75.75 0 010 1.5H18a.75.75 0 01-.75-.75zM15.495 17.65l-1.061 1.06a.75.75 0 01-1.06-1.06l1.06-1.061a.75.75 0 011.061 1.06zM18.375 18.375a.75.75 0 000-1.06L16.5 15.496a.75.75 0 10-1.06 1.06l1.875 1.879a.75.75 0 001.06 0zM12 6a6 6 0 11-4.006 10.593A6 6 0 0112 6z" clip-rule="evenodd" />
+                    </svg>
+                </a>
+            </div>
+        </div>
+        <div id="pinchTableContainer" class="pinch-data-container">
+            <div id="jsonDisplay" class="json-display hidden-but-takes-space">
+                <h2>Pinch Data (JSON)</h2>
+                <pre id="jsonDataPre"></pre>
+            </div>
+        </div>
+        <div id="messageBox" class="message-box hidden"></div>
+    </div>
+
+    <script>
+        //
+        // This is the JavaScript section.
+        // The code is now separated into readable, well-defined functions.
+        //
+
+        // Global constants and variables
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const resetButton = document.getElementById('resetButton');
+        const toggleDebugButton = document.getElementById('toggleDebugButton');
+        const messageBox = document.getElementById('messageBox');
+        const progressBar = document.getElementById('progressBar');
+        const instructionTextElement = document.getElementById('instructionText');
+        const jsonDisplay = document.getElementById('jsonDisplay');
+        const jsonDataPre = document.getElementById('jsonDataPre');
+
+        let image = new Image();
+        let isImageLoaded = false;
+        let currentImageIndex = 0;
+        let currentProgressBarLevel = 0;
+        let canAdvanceStep = true;
+        let pinchEvents = [];
+        let currentPinch = {};
+        let lastTouchPoints = [];
+
+        // Game settings
+        const imageSources = [
+            'https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Red_Apple.jpg/1130px-Red_Apple.jpg',
+            'https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Labrador_Retriever_portrait.jpg/1200px-Labrador_Retriever_portrait.jpg',
+            'https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Bachelor%27s_button%2C_Basket_flower%2C_Boutonniere_flower%2C_Cornflower_-_3.jpg/1200px-Bachelor_27s_button%2C_Basket_flower%2C_Boutonniere_flower%2C_Cornflower_-_3.jpg',
+            'https://upload.wikimedia.org/wikipedia/commons/4/40/Panor%C3%A1mica_Oto%C3%B1o_Alc%C3%A1zar_de_Segovia.jpg',
+            'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Louisbourg_Lighthouse.jpg/500px-Louisbourg_Lighthouse.jpg',
+            'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/1915_%C3%87anakkale_Bridge_20220327.jpg/1200px-1915_%C3%87anakkale_Bridge_20220327.jpg',
+            'https://upload.wikimedia.org/wikipedia/commons/7/73/Monarch_Butterfly_Danaus_plexippus_Male_2664px.jpg',
+            'https://upload.wikimedia.org/wikipedia/commons/a/aa/LA2_Skultuna_kontorsljusstake.jpg',
+            'https://upload.wikimedia.org/wikipedia/commons/e/e7/Everest_North_Face_toward_Base_Camp_Tibet_Luca_Galuzzi_2006.jpg',
+            'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Double-alaskan-rainbow.jpg/1200px-Double-alaskan-rainbow.jpg',
+            'https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Shaki_Waterfall2.jpg/1280px-Shaki_Waterfall2.jpg',
+            'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Peacock_Plumage.jpg/2880px-Peacock_Plumage.jpg',
+        ];
+        const START_SCALE_FACTOR = 10.0;
+        const END_SCALE_FACTOR = 1.0;
+        const TOTAL_PROGRESS_LEVELS = 10;
+        const stepCooldown = 300;
+
+        /**
+         * Displays a message to the user in a dedicated box.
+         * @param {string} message - The message to display.
+         * @param {string} type - The type of message ('info', 'success', 'error').
+         */
+        function showMessage(message, type = 'info') {
+            messageBox.textContent = message;
+            messageBox.classList.remove('hidden');
+            if (type === 'success') {
+                messageBox.style.backgroundColor = '#d1fae5';
+                messageBox.style.color = '#065f46';
+            } else if (type === 'error') {
+                messageBox.style.backgroundColor = '#fee2e2';
+                messageBox.style.color = '#991b1b';
+            } else {
+                messageBox.style.backgroundColor = '#dbeafe';
+                messageBox.style.color = '#1e40af';
+            }
+        }
+
+        /**
+         * Hides the message box.
+         */
+        function hideMessage() {
+            messageBox.classList.add('hidden');
+        }
+
+        /**
+         * Draws the loading screen on the canvas.
+         */
+        function drawLoadingScreen() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#64748b';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#f8fafc';
+            ctx.font = '20px Inter';
+            ctx.textAlign = 'center';
+            ctx.fillText('טוען תמונה...', canvas.width / 2, canvas.height / 2);
+        }
+
+        /**
+         * Updates the visual progress bar and triggers a redraw.
+         * @param {number} newLevel - The new progress level.
+         */
+        function updateProgressBar(newLevel) {
+            newLevel = Math.min(TOTAL_PROGRESS_LEVELS, Math.max(0, newLevel));
+            currentProgressBarLevel = newLevel;
+
+            const segments = progressBar.children;
+            for (let i = 0; i < segments.length; i++) {
+                if (i < currentProgressBarLevel) {
+                    segments[i].classList.add('active');
+                } else {
+                    segments[i].classList.remove('active');
+                }
+            }
+            drawImage();
+
+            if (currentProgressBarLevel === TOTAL_PROGRESS_LEVELS) {
+                resetButton.classList.remove('hidden-but-takes-space');
+                instructionTextElement.innerHTML = "<strong>הצלחתם! התמונה נחשפה.</strong>";
+                displayPinchData();
+            } else {
+                resetButton.classList.add('hidden-but-takes-space');
+                instructionTextElement.textContent = "השתמשו בתנועת צביטה כדי לחשוף את התמונה הנסתרת מהר ככל שתוכלו.";
+            }
+        }
+
+        /**
+         * Safely advances the progress step, using a cooldown.
+         */
+        function advanceProgressStep() {
+            if (canAdvanceStep && currentProgressBarLevel < TOTAL_PROGRESS_LEVELS) {
+                updateProgressBar(currentProgressBarLevel + 1);
+                canAdvanceStep = false;
+                setTimeout(() => {
+                    canAdvanceStep = true;
+                }, stepCooldown);
+            }
+        }
+
+        /**
+         * Draws the image on the canvas with the current zoom level.
+         */
+        function drawImage() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (!isImageLoaded) {
+                drawLoadingScreen();
+                return;
+            }
+
+            const progressRatio = currentProgressBarLevel / TOTAL_PROGRESS_LEVELS;
+            const currentScaleFactor = START_SCALE_FACTOR - (START_SCALE_FACTOR - END_SCALE_FACTOR) * progressRatio;
+
+            const imageSquareSize = Math.min(image.naturalWidth, image.naturalHeight);
+            const croppedSourceWidth = imageSquareSize / currentScaleFactor;
+            const croppedSourceHeight = imageSquareSize / currentScaleFactor;
+
+            const sx = (image.naturalWidth - imageSquareSize) / 2 + (imageSquareSize - croppedSourceWidth) / 2;
+            const sy = (image.naturalHeight - imageSquareSize) / 2 + (imageSquareSize - croppedSourceHeight) / 2;
+
+            ctx.drawImage(image, sx, sy, croppedSourceWidth, croppedSourceHeight, 0, 0, canvas.width, canvas.height);
+        }
+
+        /**
+         * Initializes a new game by loading the next image.
+         */
+        function startNewGame() {
+            currentImageIndex = (currentImageIndex + 1) % imageSources.length;
+            pinchEvents = [];
+            isImageLoaded = false;
+            
+            drawLoadingScreen();
+            
+            image.src = imageSources[currentImageIndex];
+        }
+
+        /**
+         * Initializes the progress bar segments.
+         */
+        function initializeProgressBar() {
+            progressBar.innerHTML = '';
+            for (let i = 0; i < TOTAL_PROGRESS_LEVELS; i++) {
+                const segment = document.createElement('div');
+                segment.classList.add('progress-segment');
+                progressBar.appendChild(segment);
+            }
+        }
+
+        /**
+         * Calculates the angle between two points.
+         * @param {object} p1 - Point 1.
+         * @param {object} p2 - Point 2.
+         * @returns {number} The angle in degrees (0-360).
+         */
+        function calculateAngle(p1, p2) {
+            const pointingFinger = p1.clientY < p2.clientY ? p1 : p2;
+            const thumb = p1.clientY < p2.clientY ? p2 : p1;
+            const deltaX = thumb.clientX - pointingFinger.clientX;
+            const deltaY = thumb.clientY - pointingFinger.clientY;
+            let angleRad = Math.atan2(deltaX, -deltaY);
+            let angleDeg = angleRad * 180 / Math.PI;
+            if (angleDeg < 0) {
+                angleDeg += 360;
+            }
+            return angleDeg;
+        }
+
+        /**
+         * Displays pinch data in JSON format.
+         */
+        function displayPinchData() {
+            if (pinchEvents.length === 0) {
+                jsonDataPre.textContent = 'No pinch data available. Pinch data is only recorded with touchscreen use.';
+                return;
+            }
+            const jsonData = JSON.stringify(pinchEvents, null, 2);
+            jsonDataPre.textContent = jsonData;
+        }
+
+        /**
+         * Handles the click on the debug data toggle button.
+         */
+        function toggleDebugVisibility() {
+            const isHidden = jsonDisplay.classList.toggle('hidden-but-takes-space');
+            if (isHidden) {
+                toggleDebugButton.innerHTML = `Show Data <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M12 1.5a.75.75 0 01.75.75V4.5a.75.75 0 01-1.5 0V2.25a.75.75 0 01.75-.75zM5.626 4.31a.75.75 0 10-1.06 1.06L6.5 7.258a.75.75 0 001.06-1.06L5.626 4.31zM3 10.5a.75.75 0 01.75-.75H6a.75.75 0 010 1.5H3.75a.75.75 0 01-.75-.75zM12 22.5a.75.75 0 01-.75-.75V19.5a.75.75 0 011.5 0v2.25a.75.75 0 01-.75.75zM17.25 10.5a.75.75 0 01.75-.75h2.25a.75.75 0 010 1.5H18a.75.75 0 01-.75-.75zM15.495 17.65l-1.061 1.06a.75.75 0 01-1.06-1.06l1.06-1.061a.75.75 0 011.061 1.06zM18.375 18.375a.75.75 0 000-1.06L16.5 15.496a.75.75 0 10-1.06 1.06l1.875 1.879a.75.75 0 001.06 0zM12 6a6 6 0 11-4.006 10.593A6 6 0 0112 6z" clip-rule="evenodd" /></svg>`;
+            } else {
+                toggleDebugButton.innerHTML = `Hide Data <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M18.375 16.875a1.875 1.875 0 000-3.75h-7.5a1.875 1.875 0 000 3.75h7.5zM15 12a.75.75 0 01-.75-.75h-1.5a.75.75 0 010-1.5h1.5a.75.75 0 01.75.75v1.5zM12 7.5a.75.75 0 01-.75-.75v-1.5a.75.75 0 011.5 0v1.5a.75.75 0 01-.75.75zM12 18a.75.75 0 01-.75-.75v-1.5a.75.75 0 011.5 0v1.5a.75.75 0 01-.75.75zM9 12a.75.75 0 01-.75-.75v-1.5a.75.75 0 011.5 0v1.5a.75.75 0 01-.75.75zM21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+            }
+        }
+        
+        /**
+         * Initializes all game functionality.
+         */
+        function initializeGame() {
+            // Set canvas size
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetWidth;
+
+            // Event listeners
+            window.addEventListener('resize', () => {
+                canvas.width = canvas.offsetWidth;
+                canvas.height = canvas.offsetWidth;
+                drawImage();
+            });
+            resetButton.addEventListener('click', (event) => {
+                event.preventDefault();
+                startNewGame();
+                hideMessage();
+                canAdvanceStep = true;
+            });
+            toggleDebugButton.addEventListener('click', (event) => {
+                event.preventDefault();
+                toggleDebugVisibility();
+            });
+            canvas.addEventListener('wheel', (event) => {
+                event.preventDefault();
+                if (canAdvanceStep && event.deltaY > 0) {
+                    pinchEvents.push({
+                        startTimestamp: Date.now(),
+                        startDistance: 'N/A',
+                        startAngle: 'N/A',
+                        endTimestamp: Date.now(),
+                        endDistance: 'N/A',
+                        endAngle: 'N/A'
+                    });
+                    advanceProgressStep();
+                }
+            });
+            canvas.addEventListener('touchstart', (event) => {
+                if (event.touches.length === 2) {
+                    currentPinch = {
+                        startTimestamp: Date.now(),
+                        startDistance: Math.hypot(
+                            event.touches[1].clientX - event.touches[0].clientX,
+                            event.touches[1].clientY - event.touches[0].clientY
+                        ),
+                        startAngle: calculateAngle(event.touches[0], event.touches[1]),
+                        endTimestamp: null,
+                        endDistance: null,
+                        endAngle: null
+                    };
+                }
+                event.preventDefault();
+            }, { passive: false });
+            canvas.addEventListener('touchmove', (event) => {
+                if (event.touches.length === 2) {
+                    lastTouchPoints = [event.touches[0], event.touches[1]];
+                }
+                event.preventDefault();
+            }, { passive: false });
+            canvas.addEventListener('touchend', (event) => {
+                if (currentPinch.startTimestamp && lastTouchPoints.length === 2) {
+                    currentPinch.endTimestamp = Date.now();
+                    currentPinch.endDistance = Math.hypot(
+                        lastTouchPoints[1].clientX - lastTouchPoints[0].clientX,
+                        lastTouchPoints[1].clientY - lastTouchPoints[0].clientY
+                    );
+                    currentPinch.endAngle = calculateAngle(lastTouchPoints[0], lastTouchPoints[1]);
+                    if (currentPinch.endDistance < currentPinch.startDistance) {
+                        pinchEvents.push(currentPinch);
+                        advanceProgressStep();
+                    }
+                    currentPinch = {};
+                } else {
+                    currentPinch = {};
+                    lastTouchPoints = [];
+                }
+            });
+            canvas.addEventListener('touchcancel', () => {
+                currentPinch = {};
+                lastTouchPoints = [];
+            });
+
+            // Initialize progress bar
+            initializeProgressBar();
+
+            // Load the first image
+            image.onload = () => {
+                isImageLoaded = true;
+                updateProgressBar(0);
+            };
+            image.onerror = () => {
+                isImageLoaded = false;
+                showMessage("טעינת התמונה נכשלה. אנא בדוק את כתובת ה-URL של התמונה.", 'error');
+                ctx.fillStyle = '#ef4444';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#f8fafc';
+                ctx.font = '20px Inter';
+                ctx.textAlign = 'center';
+                ctx.fillText('שגיאת טעינת תמונה', canvas.width / 2, canvas.height / 2);
+            };
+
+            image.src = imageSources[currentImageIndex];
+            drawLoadingScreen();
+        }
+
+        // Entry point for the application, triggered after the page loads.
+        window.onload = initializeGame;
+    </script>
+</body>
+</html>
