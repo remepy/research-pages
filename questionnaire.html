@@ -17,10 +17,10 @@
         }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+<body class="bg-gray-100 min-h-screen flex items-center p-4">
 
-    <!-- Main application container -->
-    <div id="app" class="bg-white p-4 sm:p-8 rounded-2xl shadow-xl max-w-lg w-full app-container flex flex-col">
+    <!-- Main application container. The mx-auto class will center the container. -->
+    <div id="app" class="bg-white p-4 sm:p-8 rounded-2xl shadow-xl max-w-lg w-full app-container flex flex-col mx-auto">
         <!-- Content will be dynamically inserted here by JavaScript -->
     </div>
 
@@ -38,7 +38,7 @@
             welcome: {
                 id: 'welcome',
                 title: 'ברוכים הבאים',
-                text: 'מטרת המחקר היא לבנות מודל המסוגל לאמוד את השפעת הטיפול התרופתי בפרקינסון בצורה קלה ואמינה.\nמיד נשאל 4 שאלות על השפעת התרופות.\nלאחר מכן תתבקשו לבצע כמה מטלות פשוטות. הפעילות כולה אמורה לארוך 5-2 דקות, נשמח אם תזכרו עליה החודש כמה שיותר פעמים - פעם במצב Off ופעם במצב On.',
+                text: 'מטרת הפעילות היא לבנות מודל המסוגל לאמוד את השפעת הטיפול התרופתי בפרקינסון בצורה קלה ואמינה.\n\nמיד נשאל ארבע שאלות על השפעת התרופות. \nלאחר מכן תתבקשו לבצע כמה מטלות פשוטות. הפעילות כולה אמורה לארוך כ-5 דקות, נשמח אם תחזרו עליה החודש כמה שיותר פעמים - פעם במצב Off ופעם במצב On.',
                 buttonText: 'מעבר לשאלות',
             },
             onOffQuestion: {
@@ -143,7 +143,7 @@
             // Render Back button if not on the welcome page
             if (currentPage !== 'welcome') {
                 backButtonHTML = `
-                    <div class="flex justify-between items-center px-4 py-2 text-purple-700 font-bold text-xl">
+                    <div class="flex justify-start items-center px-4 py-2 text-purple-700 font-bold text-xl">
                         <button id="back-button" class="flex items-center text-gray-500 hover:text-gray-700">
                             ${getChevronRightIcon()}
                             <span>חזרה</span>
@@ -152,13 +152,19 @@
                 `;
             }
 
+            // Function to render multiline text as separate paragraphs
+            const renderMultiLineText = (text) => {
+                const lines = text.split('\n');
+                return lines.map(line => `<p class="text-gray-600 leading-relaxed">${line}</p>`).join('');
+            };
+
             // Render the main content for the current page
             switch (currentPage) {
                 case 'welcome':
                     contentHTML = `
-                        <div class="flex flex-col items-center text-right space-y-4">
+                        <div class="p-6 flex flex-col items-center text-right space-y-4">
                             <h1 class="text-3xl font-bold text-gray-800">${pageData.title}</h1>
-                            <p class="text-gray-600 leading-relaxed whitespace-pre-wrap">${pageData.text}</p>
+                            ${renderMultiLineText(pageData.text)}
                         </div>
                     `;
                     nextButtonHTML = `
@@ -178,15 +184,15 @@
                 case 'eatingQuestion_2_more':
                 case 'finalQuestion':
                     contentHTML = `
-                        <div class="flex flex-col space-y-4 h-full">
-                            <p class="text-xl text-gray-800 text-right font-semibold whitespace-pre-wrap flex-grow">
-                                ${pageData.text}
-                            </p>
-                            <div class="flex flex-col space-y-4" id="options-container">
+                        <div class="p-6 flex flex-col space-y-4 h-full text-right">
+                            ${pageData.text.split('\n').map(line => `
+                                <p class="text-xl text-gray-800 font-semibold">${line}</p>
+                            `).join('')}
+                            <div class="flex flex-col space-y-4 flex-grow w-full" id="options-container">
                                 ${pageData.options.map(option => `
                                     <button
                                         data-value="${option.value}"
-                                        class="option-button w-full py-4 px-6 text-right rounded-xl shadow-md transition-all bg-gray-100 border-2 border-transparent hover:bg-gray-200 text-gray-800"
+                                        class="option-button w-full py-4 px-6 text-right rounded-xl shadow-md transition-all bg-white border-2 border-gray-200 hover:bg-gray-100 text-gray-800"
                                     >
                                         ${option.text}
                                     </button>
@@ -205,31 +211,53 @@
                     }
                     break;
                 case 'debug':
+                    let debugVisible = false;
+
+                    const getDebugHtml = () => {
+                        // Filter out the intermediate questions
+                        const relevantAnswers = Object.entries(userAnswers).filter(([key, value]) => {
+                            return !key.includes('_1');
+                        });
+                        
+                        return `
+                            ${relevantAnswers.map(([key, value], index) => {
+                                const questionPage = pages[key];
+                                if (!questionPage || !questionPage.options) return '';
+                                const selectedOptionText = questionPage.options.find(opt => opt.value === value)?.text || value;
+                                return `
+                                    <div class="flex flex-col space-y-1 p-3 border-b border-gray-700 last:border-b-0">
+                                        <p class="font-semibold text-lg">${questionPage.text.split('\n')[0]}</p>
+                                        <p class="text-gray-300 pr-4">תשובה: ${selectedOptionText}</p>
+                                    </div>
+                                `;
+                            }).join('')}
+                        `;
+                    };
+
                     contentHTML = `
-                        <div class="flex-grow p-6 bg-black text-white rounded-lg overflow-auto">
-                            <h2 class="text-3xl font-bold mb-4 text-center">${pageData.title}</h2>
-                            <div class="flex flex-col space-y-4">
-                                ${Object.entries(userAnswers).map(([key, value], index) => {
-                                    const questionPage = pages[key];
-                                    if (!questionPage || !questionPage.options) return '';
-                                    const selectedOptionText = questionPage.options.find(opt => opt.value === value)?.text || value;
-                                    return `
-                                        <div class="flex flex-col space-y-1 p-3 border-b border-gray-700 last:border-b-0">
-                                            <p class="font-semibold text-lg">${questionPage.text.split('\n')[0]}</p>
-                                            <p class="text-gray-300 pr-4">תשובה: ${selectedOptionText}</p>
-                                        </div>
-                                    `;
-                                }).join('')}
+                        <div class="flex-grow p-6 flex flex-col items-center">
+                            <h2 class="text-3xl font-bold mb-4 text-center">תודה!</h2>
+                            <button hidden id="debug-toggle" class="mb-4 text-purple-600 hover:text-purple-800 font-semibold underline">הצג פרטים</button>
+                            <div id="debug-summary-container" class="w-full flex-grow p-6 bg-black text-white rounded-lg overflow-auto hidden">
+                                ${getDebugHtml()}
                             </div>
                         </div>
                     `;
-                     nextButtonHTML = `
-                        <div class="p-6">
-                            <button id="next-button" class="w-full text-white font-bold py-4 px-6 rounded-2xl transition-colors bg-purple-600 hover:bg-purple-700">
-                                ${pageData.buttonText}
-                            </button>
-                        </div>
-                    `;
+                    
+                    // No next button for the debug page, as requested.
+                    nextButtonHTML = ``;
+                    
+                    setTimeout(() => {
+                        const debugToggleBtn = document.getElementById('debug-toggle');
+                        const debugSummaryContainer = document.getElementById('debug-summary-container');
+                        if (debugToggleBtn && debugSummaryContainer) {
+                            debugToggleBtn.addEventListener('click', () => {
+                                debugVisible = !debugVisible;
+                                debugSummaryContainer.classList.toggle('hidden', !debugVisible);
+                                debugToggleBtn.textContent = debugVisible ? 'הסתר פרטים' : 'הצג פרטים';
+                            });
+                        }
+                    }, 0);
                     break;
             }
 
@@ -237,7 +265,7 @@
             appContainer.innerHTML = `
                 <div class="flex flex-col h-full">
                     ${backButtonHTML}
-                    <div class="flex-grow p-6 flex flex-col justify-between">
+                    <div class="flex-grow flex flex-col justify-between">
                         ${contentHTML}
                     </div>
                     ${nextButtonHTML}
@@ -369,9 +397,9 @@
                         // Update button styles
                         optionsContainer.querySelectorAll('.option-button').forEach(btn => {
                             btn.classList.remove('bg-purple-200', 'border-purple-600', 'text-purple-800', 'font-bold');
-                            btn.classList.add('bg-gray-100', 'border-transparent', 'hover:bg-gray-200', 'text-gray-800');
+                            btn.classList.add('bg-white', 'border-gray-200', 'hover:bg-gray-100', 'text-gray-800');
                         });
-                        event.target.classList.remove('bg-gray-100', 'border-transparent', 'hover:bg-gray-200', 'text-gray-800');
+                        event.target.classList.remove('bg-white', 'border-gray-200', 'hover:bg-gray-100', 'text-gray-800');
                         event.target.classList.add('bg-purple-200', 'border-purple-600', 'text-purple-800', 'font-bold');
 
                         // Enable next button
