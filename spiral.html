@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>  ברל'ה מירוץ🐌</title>
+    <title>ברל'ה 🐌</title>
     <style>
         /* General body styling */
         body {
@@ -109,6 +109,16 @@
             color: #94a3b8;
         }
 
+        /* Container for controls (buttons and main timer) */
+        .controls-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
         /* Styling for buttons */
         .game-button {
             padding: 0.75rem 2rem;
@@ -119,7 +129,6 @@
             font-size: 1.1rem;
             font-weight: 600;
             transition: background-color 0.3s ease, transform 0.1s ease;
-            margin-top: 1.5rem;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         .game-button:hover {
@@ -135,6 +144,7 @@
             background-color: #dc2626;
         }
         .toggle-debug-button {
+            display: none;
             background-color: #4f46e5;
         }
         .toggle-debug-button:hover {
@@ -142,6 +152,14 @@
         }
         .hidden {
             display: none;
+        }
+
+        /* Styling for the main Hebrew timer display */
+        .hebrew-timer-display {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #334155;
+            text-align: center;
         }
 
         /* Instructions text styling */
@@ -179,6 +197,8 @@
         let discDragging = false;
         let gameEnded = false;
         let isDebugVisible = false; // New flag to control debug section visibility
+        let redSpiralProgress = 0; // New variable for the red spiral animation progress
+        let redSpiralInterval; // Interval for the red spiral animation
 
         // Data collection for JSON export
         let playerPathCoordinates = [];
@@ -193,7 +213,7 @@
         let canvas, ctx;
         let rThetaCanvas, rThetaCtx;
         let messageBox, timerDisplay, accuracyDisplay, tremorScore1Display, tremorScore3Display;
-        let resetButton, gameInstructions, jsonDataDisplay, jsonDataPre;
+        let resetButton, gameInstructions, jsonDataDisplay, jsonDataPre, hebrewTimerDisplay;
         let debugSection, toggleDebugButton;
 
         // Configuration for the spiral and colors
@@ -204,8 +224,9 @@
             pathWidth: 10,
             discColor: '#3b82f6',
             pathColor: '#94a3b8',
-            endDiscColor: '#ef4444',
-            startDiscColor: '#22c54e'
+            endDiscColor: '#22c54e', // Changed to green
+            startDiscColor: '#22c54e',
+            redPathColor: '#22c54e' // Changed to green
         };
         
         // Configuration for the r-theta graph
@@ -214,7 +235,7 @@
             maxR: 200,
             axisColor: '#ffffff',
             idealPathColor: '#ffffff',
-            userPathColor: '#22c54e',
+            userPathColor: '#ef4444', // Changed to red
             axisLabelColor: '#ffffff',
             dotRadius: 2,
         };
@@ -238,7 +259,7 @@
 
             const h1 = document.createElement('h1');
             h1.className = 'text-3xl sm:text-4xl font-bold text-gray-800 mb-4';
-            h1.textContent = 'ברל\'ה ' + String.fromCodePoint(0x1f40c); // Snail emoji using code point
+            h1.textContent = "ברל'ה " + String.fromCodePoint(0x1f40c); // Snail emoji using code point
             body.appendChild(h1);
 
             const canvasContainer = document.createElement('div');
@@ -261,12 +282,23 @@
             messageBox.className = 'message-box';
             messageBox.textContent = 'לחצו על הכדור כדי להתחיל!';
             body.appendChild(messageBox);
+            
+            // Container for buttons and the new Hebrew timer
+            const controlsContainer = document.createElement('div');
+            controlsContainer.className = 'controls-container';
+            body.appendChild(controlsContainer);
+
+            hebrewTimerDisplay = document.createElement('span');
+            hebrewTimerDisplay.id = 'hebrewTimerDisplay';
+            hebrewTimerDisplay.className = 'hebrew-timer-display hidden';
+            hebrewTimerDisplay.textContent = 'זמן: 0.00s';
+            controlsContainer.appendChild(hebrewTimerDisplay);
 
             resetButton = document.createElement('button');
             resetButton.id = 'resetButton';
             resetButton.className = 'game-button reset-button hidden';
             resetButton.textContent = 'איפוס משחק';
-            body.appendChild(resetButton);
+            controlsContainer.appendChild(resetButton);
 
             // New toggle button for the debug section
             toggleDebugButton = document.createElement('button');
@@ -350,11 +382,12 @@
             if (isDebugVisible) {
                 debugSection.classList.remove('hidden');
                 toggleDebugButton.textContent = 'Hide Debug Section';
-                // Redraw the graph when it becomes visible
-                drawRThetaGraph();
+                // Redraw the graph and game canvas when it becomes visible
+                drawGame();
             } else {
                 debugSection.classList.add('hidden');
                 toggleDebugButton.textContent = 'Show Debug Section';
+                drawGame();
             }
         }
 
@@ -425,6 +458,7 @@
         function drawGame() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+            // Draw the default gray spiral path
             ctx.beginPath();
             if (spiralPoints.length > 0) {
                 ctx.moveTo(spiralPoints[0].x, spiralPoints[0].y);
@@ -437,9 +471,27 @@
             ctx.lineCap = 'round';
             ctx.stroke();
 
-            if (gameEnded && playerPathCoordinates.length > 1) {
+            // Draw the red spiral path animated
+            if (gameEnded) {
                 ctx.beginPath();
-                ctx.strokeStyle = '#22c54e';
+                // We draw from the inner point (index 0) outwards, so we iterate from 0 to redSpiralProgress
+                if (spiralPoints.length > 0) {
+                    ctx.moveTo(spiralPoints[0].x, spiralPoints[0].y);
+                    const drawUntil = Math.min(redSpiralProgress, spiralPoints.length);
+                    for (let i = 1; i < drawUntil; i++) {
+                        ctx.lineTo(spiralPoints[i].x, spiralPoints[i].y);
+                    }
+                }
+                ctx.lineWidth = spiralConfig.pathWidth;
+                ctx.strokeStyle = spiralConfig.redPathColor;
+                ctx.lineCap = 'round';
+                ctx.stroke();
+            }
+            
+            // Draw the user's path only when the game has ended AND debug is visible
+            if (gameEnded && isDebugVisible && playerPathCoordinates.length > 1) {
+                ctx.beginPath();
+                ctx.strokeStyle = '#ef4444'; // Changed to red
                 ctx.lineWidth = 2;
                 ctx.lineCap = 'round';
                 ctx.moveTo(playerPathCoordinates[0].userCoords.x, playerPathCoordinates[0].userCoords.y);
@@ -500,11 +552,11 @@
             rThetaCtx.font = '12px Inter, sans-serif';
             rThetaCtx.textAlign = 'center';
             rThetaCtx.textBaseline = 'middle';
-            rThetaCtx.fillText(`Theta (θ)`, rThetaCanvas.width / 2, rThetaCanvas.height - 5);
+            rThetaCtx.fillText('Theta (θ)', rThetaCanvas.width / 2, rThetaCanvas.height - 5);
             rThetaCtx.save();
             rThetaCtx.translate(10, rThetaCanvas.height / 2);
             rThetaCtx.rotate(-Math.PI / 2);
-            rThetaCtx.fillText(`Radius (r)`, 0, 0);
+            rThetaCtx.fillText('Radius (r)', 0, 0);
             rThetaCtx.restore();
 
             rThetaCtx.textAlign = 'right';
@@ -560,7 +612,9 @@
             if (gameStarted && !gameEnded) {
                 const currentTime = Date.now();
                 const elapsedTime = (currentTime - startTime) / 1000;
-                timerDisplay.textContent = `Time: ${elapsedTime.toFixed(2)}s`;
+                const timeString = 'זמן: ' + elapsedTime.toFixed(2) + 's';
+                hebrewTimerDisplay.textContent = timeString;
+                timerDisplay.textContent = 'Time: ' + elapsedTime.toFixed(2) + 's';
             }
         }
 
@@ -752,6 +806,7 @@
                     timerInterval = setInterval(updateTimer, 100);
                     gameInstructions.classList.add('hidden');
                     messageBox.textContent = gameDirectionOutwards ? 'גררו את הכדור החוצה לקצה הספירלה!' : 'גררו את הכדור פנימה לקצה הספירלה!';
+                    hebrewTimerDisplay.classList.remove('hidden');
                 }
                 discDragging = true;
                 currentInterval++;
@@ -861,19 +916,38 @@
                 discDragging = false;
                 endTime = Date.now();
                 clearInterval(timerInterval);
+                currentDiscIndex = 0; // Snap the disc to the inner end
+                startRedSpiralAnimation();
+                
                 const finalTime = (endTime - startTime) / 1000;
                 messageBox.textContent = gameDirectionOutwards ? 'כל הכבוד! המסלול לקצה הספירלה הושלם!' : 'כל הכבוד! המסלול למרכז הספירלה הושלם!';
-                timerDisplay.textContent = `Final Time: ${finalTime.toFixed(2)}s`;
+                hebrewTimerDisplay.textContent = 'זמן: ' + finalTime.toFixed(2) + 's';
+                timerDisplay.textContent = 'Final Time: ' + finalTime.toFixed(2) + 's';
                 const finalAccuracy = calculateAccuracy(playerPathCoordinates);
                 const finalTremorSpikes = calculateTremor_spikes(playerPathCoordinates);
                 const finalTremorMagnitude = calculateTremor_magnitude(playerPathCoordinates);
-                accuracyDisplay.textContent = `Accuracy: ${finalAccuracy.toFixed(2)}%`;
-                tremorScore1Display.innerHTML = `Tremor (changes): ${finalTremorSpikes} spikes`;
-                tremorScore3Display.innerHTML = `Tremor (magnitude): ${finalTremorMagnitude.toFixed(2)}`;
+                accuracyDisplay.textContent = 'Accuracy: ' + finalAccuracy.toFixed(2) + '%';
+                tremorScore1Display.innerHTML = 'Tremor (changes): ' + finalTremorSpikes + ' spikes';
+                tremorScore3Display.innerHTML = 'Tremor (magnitude): ' + finalTremorMagnitude.toFixed(2);
                 generateAndDisplayJson();
                 resetButton.classList.remove('hidden');
-                drawGame();
             }
+        }
+        
+        /**
+         * Starts the red spiral animation.
+         */
+        function startRedSpiralAnimation() {
+            redSpiralProgress = 0;
+            clearInterval(redSpiralInterval);
+            redSpiralInterval = setInterval(() => {
+                redSpiralProgress += 10; // Adjust speed here, changed from 5 to 10
+                if (redSpiralProgress >= spiralPoints.length) {
+                    redSpiralProgress = spiralPoints.length;
+                    clearInterval(redSpiralInterval);
+                }
+                drawGame();
+            }, 1000 / 60); // 60 FPS animation
         }
 
         /**
@@ -900,6 +974,10 @@
             playerPathCoordinates = [];
             currentInterval = 0;
             clearInterval(timerInterval);
+            clearInterval(redSpiralInterval); // Clear the red spiral animation interval
+            redSpiralProgress = 0;
+            hebrewTimerDisplay.textContent = 'זמן: 0.00s';
+            hebrewTimerDisplay.classList.add('hidden');
             timerDisplay.textContent = 'Time: 0.00s';
             accuracyDisplay.textContent = 'Accuracy: N/A';
             tremorScore1Display.textContent = 'Tremor (changes): N/A';
@@ -910,7 +988,7 @@
             gameInstructions.classList.remove('hidden');
             drawGame();
         }
-
+        
         // Run the initialization function when the page loads
         window.onload = init;
     </script>
