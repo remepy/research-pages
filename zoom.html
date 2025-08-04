@@ -47,6 +47,12 @@
             width: 100%;
             aspect-ratio: 1 / 1;
             touch-action: none;
+            transition: border-color 0.5s ease-in-out, border-width 0.5s ease-in-out, box-shadow 0.5s ease-in-out; /* Add transition for border-width and box-shadow */
+        }
+        
+        .game-complete {
+            border: 8px solid #10b981; /* Thicker and more vibrant green border */
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.75); /* Add a glowing effect */
         }
 
         .controls {
@@ -69,7 +75,31 @@
             align-items: center;
         }
 
-        #resetButton, #toggleDebugButton {
+        #toggleDebugButton {
+            direction: ltr;
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 1rem;
+            font-weight: 700;
+            font-size: 2rem;
+            line-height: 1;
+            transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease, opacity 0.3s ease;
+            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.4);
+            border: none;
+            cursor: pointer;
+            outline: none;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 100%;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        
+        #resetButton {
+            direction: rtl; /* Keep right-to-left for the Hebrew text on this button */
             background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
             color: white;
             padding: 1rem 2rem;
@@ -89,14 +119,6 @@
             max-width: 100%;
             text-decoration: none;
             white-space: nowrap;
-        }
-        
-        #resetButton {
-            direction: rtl; /* Keep right-to-left for the Hebrew text on this button */
-        }
-
-        #toggleDebugButton {
-            direction: ltr; /* Set left-to-right for English text */
         }
 
         #resetButton:hover, #toggleDebugButton:hover {
@@ -350,6 +372,7 @@
             if (currentProgressBarLevel === TOTAL_PROGRESS_LEVELS) {
                 resetButton.classList.remove('hidden-but-takes-space');
                 instructionTextElement.innerHTML = "<strong>הצלחתם! התמונה נחשפה.</strong>";
+                canvas.classList.add('game-complete'); // Add the green frame class
                 displayPinchData();
             } else {
                 resetButton.classList.add('hidden-but-takes-space');
@@ -404,6 +427,7 @@
             
             drawLoadingScreen();
             
+            canvas.classList.remove('game-complete'); // Remove the green frame class for a new game
             image.src = imageSources[currentImageIndex];
         }
 
