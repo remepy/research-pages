@@ -120,35 +120,47 @@
         }
 
         /* Styling for buttons */
-        .game-button {
-            padding: 0.75rem 2rem;
-            color: white;
+                .game-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1rem 1.5rem;
             border: none;
-            border-radius: 0.5rem;
+            border-radius: 1rem;
             cursor: pointer;
             font-size: 1.1rem;
-            font-weight: 600;
+            font-weight: 700;
+            color: white;
             transition: background-color 0.3s ease, transform 0.1s ease;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         .game-button:hover {
-            transform: translateY(-1px);
+            transform: translateY(-2px);
         }
         .game-button:active {
             transform: translateY(0);
         }
+        
+        /* Specific colors for reset button */
         .reset-button {
-            background-color: #ef4444;
+            background-color: #ef4444; /* Red color */
         }
         .reset-button:hover {
-            background-color: #dc2626;
+            background-color: #dc2626; /* Darker red on hover */
         }
-        .toggle-debug-button {
-            display: none;
-            background-color: #4f46e5;
+
+        /* Specific colors for next activity button */
+        .next-activity-button {
+            background-color: #8b5cf6; /* Purple color */
         }
-        .toggle-debug-button:hover {
-            background-color: #4338ca;
+        .next-activity-button:hover {
+            background-color: #7c3aed; /* Darker purple on hover */
+        }
+        .game-button svg {
+            fill: currentColor;
+            width: 1.5rem;
+            height: 1.5rem;
         }
         .hidden {
             display: none;
