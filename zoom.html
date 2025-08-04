@@ -75,31 +75,7 @@
             align-items: center;
         }
 
-        #toggleDebugButton {
-            direction: ltr;
-            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-            color: white;
-            padding: 1rem 2rem;
-            border-radius: 1rem;
-            font-weight: 700;
-            font-size: 2rem;
-            line-height: 1;
-            transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease, opacity 0.3s ease;
-            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.4);
-            border: none;
-            cursor: pointer;
-            outline: none;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            max-width: 100%;
-            text-decoration: none;
-            white-space: nowrap;
-        }
-        
-        #resetButton {
-            direction: rtl; /* Keep right-to-left for the Hebrew text on this button */
+        #resetButton, #toggleDebugButton {
             background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
             color: white;
             padding: 1rem 2rem;
@@ -121,24 +97,59 @@
             white-space: nowrap;
         }
 
-        #resetButton:hover, #toggleDebugButton:hover {
+        #nextActivityButton {
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 1rem;
+            font-weight: 700;
+            font-size: 2rem;
+            line-height: 1;
+            transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease, opacity 0.3s ease;
+            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.4);
+            border: none;
+            cursor: pointer;
+            outline: none;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 100%;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        #resetButton, #nextActivityButton {
+            direction: rtl; /* Keep right-to-left for the Hebrew text on these buttons */
+        }
+
+        #toggleDebugButton {
+            direction: ltr; /* Set left-to-right for English text */
+        }
+
+        #resetButton:hover, #toggleDebugButton:hover, #nextActivityButton:hover {
             background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
             transform: translateY(-4px);
             box-shadow: 0 10px 25px rgba(79, 70, 229, 0.5);
         }
 
-        #resetButton:active, #toggleDebugButton:active {
+        #resetButton:active, #toggleDebugButton:active, #nextActivityButton:active {
             background: linear-gradient(135deg, #3730a3 0%, #4f46e5 100%);
             transform: translateY(0);
             box-shadow: 0 5px 10px rgba(79, 70, 229, 0.4);
         }
 
-        #resetButton svg, #toggleDebugButton svg {
-            margin-right: 1rem;
+        #resetButton svg, #toggleDebugButton svg, #nextActivityButton svg {
+            margin-left: 1rem;
             width: 2rem;
             height: 2rem;
             flex-shrink: 0;
             fill: currentColor;
+        }
+
+        #resetButton svg {
+            margin-right: 1rem;
+            margin-left: 0;
         }
         
         #toggleDebugButton {
@@ -149,6 +160,17 @@
         #toggleDebugButton:hover {
             background: linear-gradient(135deg, #2b6cb0 0%, #2c5282 100%);
             box-shadow: 0 10px 25px rgba(43, 108, 176, 0.5);
+        }
+        
+        #nextActivityButton {
+            background: linear-gradient(135deg, #9333ea 0%, #7e22ce 100%); /* Purple gradient for next activity button */
+            box-shadow: 0 8px 20px rgba(126, 34, 206, 0.4);
+            direction: rtl;
+        }
+
+        #nextActivityButton:hover {
+            background: linear-gradient(135deg, #7e22ce 0%, #5b21b6 100%);
+            box-shadow: 0 10px 25px rgba(126, 34, 206, 0.5);
         }
 
         .hidden-but-takes-space {
@@ -247,6 +269,14 @@
                     </svg>
                 </a>
                 
+                <!-- New button for next activity -->
+                <a href="#" id="nextActivityButton" class="hidden-but-takes-space">
+                    לפעילות הבאה
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path fill-rule="evenodd" d="M7.72 12.53a.75.75 0 010-1.06l7.5-7.5a.75.75 0 011.06 1.06L9.31 12l6.97 6.97a.75.75 0 11-1.06 1.06l-7.5-7.5z" clip-rule="evenodd" />
+                    </svg>
+                </a>
+                
                 <!-- New button to toggle debug data, now in English -->
                 <a href="#" id="toggleDebugButton">
                     Show Data
@@ -275,6 +305,7 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const resetButton = document.getElementById('resetButton');
+        const nextActivityButton = document.getElementById('nextActivityButton');
         const toggleDebugButton = document.getElementById('toggleDebugButton');
         const messageBox = document.getElementById('messageBox');
         const progressBar = document.getElementById('progressBar');
@@ -371,11 +402,13 @@
 
             if (currentProgressBarLevel === TOTAL_PROGRESS_LEVELS) {
                 resetButton.classList.remove('hidden-but-takes-space');
+                nextActivityButton.classList.remove('hidden-but-takes-space');
                 instructionTextElement.innerHTML = "<strong>הצלחתם! התמונה נחשפה.</strong>";
                 canvas.classList.add('game-complete'); // Add the green frame class
                 displayPinchData();
             } else {
                 resetButton.classList.add('hidden-but-takes-space');
+                nextActivityButton.classList.add('hidden-but-takes-space');
                 instructionTextElement.textContent = "השתמשו בתנועת צביטה כדי לחשוף את התמונה הנסתרת מהר ככל שתוכלו.";
             }
         }
@@ -505,6 +538,10 @@
                 startNewGame();
                 hideMessage();
                 canAdvanceStep = true;
+            });
+            nextActivityButton.addEventListener('click', (event) => {
+                event.preventDefault();
+                showMessage('הכפתור "לפעילות הבאה" נלחץ. כאן יהיה קוד המעבר לפעילות הבאה.');
             });
             toggleDebugButton.addEventListener('click', (event) => {
                 event.preventDefault();
