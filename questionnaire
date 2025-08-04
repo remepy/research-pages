@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Quiz App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Set the font for the entire application */
+        body {
+            font-family: 'Inter', sans-serif;
+            direction: rtl; /* Set overall direction to RTL */
+        }
+        /* Custom styles for the app container */
+        .app-container {
+            height: 90vh; /* Set a consistent height as requested */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+
+    <!-- Main application container -->
+    <div id="app" class="bg-white p-4 sm:p-8 rounded-2xl shadow-xl max-w-lg w-full app-container flex flex-col">
+        <!-- Content will be dynamically inserted here by JavaScript -->
+    </div>
+
+    <script>
+        // Use a content fetcher to get the Heroicons SVG
+        // This is a common way to use icons in pure JS
+        const getChevronRightIcon = () => `
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-5 w-5 rtl:-scale-x-100">
+                <path fill-rule="evenodd" d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.5 4.5a.75.75 0 0 1 0 1.06l-4.5 4.5a.75.75 0 0 1-1.06-1.06L12.94 10 8.22 5.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+            </svg>
+        `;
+
+        // Question data objects for each page
+        const pages = {
+            welcome: {
+                id: 'welcome',
+                title: 'ברוכים הבאים',
+                text: 'מטרת המחקר היא לבנות מודל המסוגל לאמוד את השפעת הטיפול התרופתי בפרקינסון בצורה קלה ואמינה.\nמיד נשאל 4 שאלות על השפעת התרופות.\nלאחר מכן תתבקשו לבצע כמה מטלות פשוטות. הפעילות כולה אמורה לארוך 5-2 דקות, נשמח אם תזכרו עליה החודש כמה שיותר פעמים - פעם במצב Off ופעם במצב On.',
+                buttonText: 'מעבר לשאלות',
+            },
+            onOffQuestion: {
+                id: 'onOffQuestion',
+                text: 'מה הרגשתך?\nבאיזו מידה את/ה חש/ה כרגע במצב OFF?',
+                options: [
+                    { text: 'כלל לא', value: 'a' },
+                    { text: 'במידה מועטה', value: 'b' },
+                    { text: 'במידה מסוימת', value: 'c' },
+                    { text: 'במידה רבה', value: 'd' },
+                    { text: 'לחלוטין', value: 'e' },
+                ],
+            },
+            levodopaQuestion_1: {
+                id: 'levodopaQuestion_1',
+                text: 'כמה זמן בערך עבר מאז לקחת Levodopa בפעם האחרונה?',
+                options: [
+                    { text: 'עד שעה', value: 'lessThanHour' },
+                    { text: 'שעה או יותר', value: 'moreThanHour' },
+                ],
+                oneClick: true,
+            },
+            levodopaQuestion_2_less: {
+                id: 'levodopaQuestion_2_less',
+                text: 'כמה זמן בערך עבר מאז לקחת Levodopa בפעם האחרונה?',
+                options: [
+                    { text: 'פחות מ-15 דקות', value: 'a' },
+                    { text: 'בין 15 דקות ל-30 דקות', value: 'b' },
+                    { text: 'בין 30 דקות ל-45 דקות', value: 'c' },
+                    { text: 'בין 45 דקות לשעה', value: 'd' },
+                ],
+            },
+            levodopaQuestion_2_more: {
+                id: 'levodopaQuestion_2_more',
+                text: 'כמה זמן בערך עבר מאז לקחת Levodopa בפעם האחרונה?',
+                options: [
+                    { text: 'בין שעה לשעתיים', value: 'a' },
+                    { text: 'בין שעתיים לשלוש שעות', value: 'b' },
+                    { text: 'בין שלוש לארבע שעות', value: 'c' },
+                    { text: 'ארבע שעות או יותר', value: 'd' },
+                ],
+            },
+            eatingQuestion_1: {
+                id: 'eatingQuestion_1',
+                text: 'כמה זמן עבר מאז אכלת בפעם האחרונה?',
+                options: [
+                    { text: 'עד שעה', value: 'lessThanHour' },
+                    { text: 'שעה או יותר', value: 'moreThanHour' },
+                ],
+                oneClick: true,
+            },
+            eatingQuestion_2_less: {
+                id: 'eatingQuestion_2_less',
+                text: 'כמה זמן עבר מאז אכלת בפעם האחרונה?',
+                options: [
+                    { text: 'פחות מ-15 דקות', value: 'a' },
+                    { text: 'בין 15 דקות ל-30 דקות', value: 'b' },
+                    { text: 'בין 30 דקות ל-45 דקות', value: 'c' },
+                    { text: 'בין 45 דקות לשעה', value: 'd' },
+                ],
+            },
+            eatingQuestion_2_more: {
+                id: 'eatingQuestion_2_more',
+                text: 'כמה זמן עבר מאז אכלת בפעם האחרונה?',
+                options: [
+                    { text: 'בין שעה לשעתיים', value: 'a' },
+                    { text: 'בין שעתיים לשלוש שעות', value: 'b' },
+                    { text: 'בין שלוש לארבע שעות', value: 'c' },
+                    { text: 'ארבע שעות או יותר', value: 'd' },
+                ],
+            },
+            finalQuestion: {
+                id: 'finalQuestion',
+                text: 'האם מאז הבוקר חווית קושי בקימה מהמיטה או מכיסא?',
+                options: [
+                    { text: 'לא', value: 'no' },
+                    { text: 'כן', value: 'yes' },
+                ],
+            },
+            debug: {
+                id: 'debug',
+                title: 'תשובות',
+                buttonText: 'התחל מחדש',
+            }
+        };
+
+        let currentPage = 'welcome';
+        let selectedOption = null;
+        let userAnswers = {};
+        const appContainer = document.getElementById('app');
+
+        // Function to render the current page
+        const renderPage = (pageId) => {
+            appContainer.innerHTML = ''; // Clear previous content
+            currentPage = pageId;
+
+            let contentHTML = '';
+            let backButtonHTML = '';
+            let nextButtonHTML = '';
+            const pageData = pages[currentPage];
+
+            // Render Back button if not on the welcome page
+            if (currentPage !== 'welcome') {
+                backButtonHTML = `
+                    <div class="flex justify-between items-center px-4 py-2 text-purple-700 font-bold text-xl">
+                        <button id="back-button" class="flex items-center text-gray-500 hover:text-gray-700">
+                            ${getChevronRightIcon()}
+                            <span>חזרה</span>
+                        </button>
+                    </div>
+                `;
+            }
+
+            // Render the main content for the current page
+            switch (currentPage) {
+                case 'welcome':
+                    contentHTML = `
+                        <div class="flex flex-col items-center text-right space-y-4">
+                            <h1 class="text-3xl font-bold text-gray-800">${pageData.title}</h1>
+                            <p class="text-gray-600 leading-relaxed whitespace-pre-wrap">${pageData.text}</p>
+                        </div>
+                    `;
+                    nextButtonHTML = `
+                        <div class="p-6">
+                            <button id="next-button" class="w-full text-white font-bold py-4 px-6 rounded-2xl transition-colors bg-purple-600 hover:bg-purple-700">
+                                ${pageData.buttonText}
+                            </button>
+                        </div>
+                    `;
+                    break;
+                case 'onOffQuestion':
+                case 'levodopaQuestion_1':
+                case 'levodopaQuestion_2_less':
+                case 'levodopaQuestion_2_more':
+                case 'eatingQuestion_1':
+                case 'eatingQuestion_2_less':
+                case 'eatingQuestion_2_more':
+                case 'finalQuestion':
+                    contentHTML = `
+                        <div class="flex flex-col space-y-4 h-full">
+                            <p class="text-xl text-gray-800 text-right font-semibold whitespace-pre-wrap flex-grow">
+                                ${pageData.text}
+                            </p>
+                            <div class="flex flex-col space-y-4" id="options-container">
+                                ${pageData.options.map(option => `
+                                    <button
+                                        data-value="${option.value}"
+                                        class="option-button w-full py-4 px-6 text-right rounded-xl shadow-md transition-all bg-gray-100 border-2 border-transparent hover:bg-gray-200 text-gray-800"
+                                    >
+                                        ${option.text}
+                                    </button>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                    if (!pageData.oneClick) {
+                        nextButtonHTML = `
+                            <div class="p-6">
+                                <button id="next-button" disabled class="w-full text-white font-bold py-4 px-6 rounded-2xl transition-colors bg-gray-400 cursor-not-allowed">
+                                    הבא
+                                </button>
+                            </div>
+                        `;
+                    }
+                    break;
+                case 'debug':
+                    contentHTML = `
+                        <div class="flex-grow p-6 bg-black text-white rounded-lg overflow-auto">
+                            <h2 class="text-3xl font-bold mb-4 text-center">${pageData.title}</h2>
+                            <div class="flex flex-col space-y-4">
+                                ${Object.entries(userAnswers).map(([key, value], index) => {
+                                    const questionPage = pages[key];
+                                    if (!questionPage || !questionPage.options) return '';
+                                    const selectedOptionText = questionPage.options.find(opt => opt.value === value)?.text || value;
+                                    return `
+                                        <div class="flex flex-col space-y-1 p-3 border-b border-gray-700 last:border-b-0">
+                                            <p class="font-semibold text-lg">${questionPage.text.split('\n')[0]}</p>
+                                            <p class="text-gray-300 pr-4">תשובה: ${selectedOptionText}</p>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                    `;
+                     nextButtonHTML = `
+                        <div class="p-6">
+                            <button id="next-button" class="w-full text-white font-bold py-4 px-6 rounded-2xl transition-colors bg-purple-600 hover:bg-purple-700">
+                                ${pageData.buttonText}
+                            </button>
+                        </div>
+                    `;
+                    break;
+            }
+
+            // Assemble the final HTML and inject it
+            appContainer.innerHTML = `
+                <div class="flex flex-col h-full">
+                    ${backButtonHTML}
+                    <div class="flex-grow p-6 flex flex-col justify-between">
+                        ${contentHTML}
+                    </div>
+                    ${nextButtonHTML}
+                </div>
+            `;
+            
+            // Re-attach event listeners after DOM update
+            addEventListeners();
+        };
+
+        // Function to handle moving to the next page
+        const handleNext = () => {
+            // Save the current answer before moving on, if it's a question page
+            if (pages[currentPage].options && selectedOption) {
+                userAnswers[currentPage] = selectedOption;
+            }
+
+            // Reset selected option for the next page
+            selectedOption = null;
+
+            // Conditional navigation logic
+            switch (currentPage) {
+                case 'welcome':
+                    renderPage('onOffQuestion');
+                    break;
+                case 'onOffQuestion':
+                    renderPage('levodopaQuestion_1');
+                    break;
+                case 'levodopaQuestion_1':
+                    if (userAnswers.levodopaQuestion_1 === 'lessThanHour') {
+                        renderPage('levodopaQuestion_2_less');
+                    } else {
+                        renderPage('levodopaQuestion_2_more');
+                    }
+                    break;
+                case 'levodopaQuestion_2_less':
+                case 'levodopaQuestion_2_more':
+                    renderPage('eatingQuestion_1');
+                    break;
+                case 'eatingQuestion_1':
+                    if (userAnswers.eatingQuestion_1 === 'lessThanHour') {
+                        renderPage('eatingQuestion_2_less');
+                    } else {
+                        renderPage('eatingQuestion_2_more');
+                    }
+                    break;
+                case 'eatingQuestion_2_less':
+                case 'eatingQuestion_2_more':
+                    renderPage('finalQuestion');
+                    break;
+                case 'finalQuestion':
+                    renderPage('debug');
+                    break;
+                case 'debug':
+                    // Reset the quiz
+                    userAnswers = {};
+                    renderPage('welcome');
+                    break;
+                default:
+                    renderPage('welcome');
+            }
+        };
+
+        // Function to handle moving to the previous page
+        const handleBack = () => {
+            selectedOption = null;
+            delete userAnswers[currentPage];
+            
+            switch (currentPage) {
+                case 'onOffQuestion':
+                    renderPage('welcome');
+                    break;
+                case 'levodopaQuestion_1':
+                    // Restore the previous selected option
+                    selectedOption = userAnswers.onOffQuestion;
+                    renderPage('onOffQuestion');
+                    break;
+                case 'levodopaQuestion_2_less':
+                case 'levodopaQuestion_2_more':
+                    // Restore the selection for the previous page
+                    selectedOption = userAnswers.levodopaQuestion_1;
+                    renderPage('levodopaQuestion_1');
+                    break;
+                case 'eatingQuestion_1':
+                    const prevLevodopaPage = userAnswers.levodopaQuestion_1 === 'lessThanHour' ? 'levodopaQuestion_2_less' : 'levodopaQuestion_2_more';
+                    selectedOption = userAnswers[prevLevodopaPage];
+                    renderPage(prevLevodopaPage);
+                    break;
+                case 'eatingQuestion_2_less':
+                case 'eatingQuestion_2_more':
+                    selectedOption = userAnswers.eatingQuestion_1;
+                    renderPage('eatingQuestion_1');
+                    break;
+                case 'finalQuestion':
+                    const prevEatingPage = userAnswers.eatingQuestion_1 === 'lessThanHour' ? 'eatingQuestion_2_less' : 'eatingQuestion_2_more';
+                    selectedOption = userAnswers[prevEatingPage];
+                    renderPage(prevEatingPage);
+                    break;
+                case 'debug':
+                    selectedOption = userAnswers.finalQuestion;
+                    renderPage('finalQuestion');
+                    break;
+                default:
+                    renderPage('welcome');
+            }
+        };
+
+        // Function to attach all event listeners
+        const addEventListeners = () => {
+            const nextButton = document.getElementById('next-button');
+            if (nextButton) {
+                nextButton.addEventListener('click', handleNext);
+            }
+
+            const backButton = document.getElementById('back-button');
+            if (backButton) {
+                backButton.addEventListener('click', handleBack);
+            }
+
+            const optionsContainer = document.getElementById('options-container');
+            if (optionsContainer) {
+                optionsContainer.querySelectorAll('.option-button').forEach(button => {
+                    button.addEventListener('click', (event) => {
+                        const value = event.target.dataset.value;
+                        
+                        // Update selected option
+                        selectedOption = value;
+
+                        // Update button styles
+                        optionsContainer.querySelectorAll('.option-button').forEach(btn => {
+                            btn.classList.remove('bg-purple-200', 'border-purple-600', 'text-purple-800', 'font-bold');
+                            btn.classList.add('bg-gray-100', 'border-transparent', 'hover:bg-gray-200', 'text-gray-800');
+                        });
+                        event.target.classList.remove('bg-gray-100', 'border-transparent', 'hover:bg-gray-200', 'text-gray-800');
+                        event.target.classList.add('bg-purple-200', 'border-purple-600', 'text-purple-800', 'font-bold');
+
+                        // Enable next button
+                        if (nextButton) {
+                            nextButton.disabled = false;
+                            nextButton.classList.remove('bg-gray-400', 'cursor-not-allowed');
+                            nextButton.classList.add('bg-purple-600', 'hover:bg-purple-700');
+                        }
+
+                        // Handle one-click pages
+                        const pageData = pages[currentPage];
+                        if (pageData.oneClick) {
+                             setTimeout(() => handleNext(), 100);
+                        }
+                    });
+                });
+            }
+        };
+
+        // Initialize the app on window load
+        window.onload = () => {
+            renderPage('welcome');
+        };
+
+    </script>
+</body>
+</html>
