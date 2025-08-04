@@ -193,7 +193,7 @@
             CallInApp.postMessage(message);
           }
 
-        function sendPayload(payload) {
+        function notifyClientToSendPayload(payload) {
             const message = {
               type: 'sendData',
               data: {
@@ -204,20 +204,25 @@
             sendMessage(JSON.stringify(message))
         }
 
-        function showBackButton() {
+        function notifyClientToShowBackButton() {
             sendMessage(JSON.stringify({ 
                 type: 'showBackButton',
                 data: 'true' }));
         }
 
-        function toNext()
+        function notifyClientToNext()
         {
             sendMessage(JSON.stringify({ 
                              type: 'toNext',
                              data: 'true' }));
         }
 
-        
+        function notifyClientToResetGame() {
+             sendMessage(JSON.stringify({ 
+                             type: 'resetGame',
+                             data: 'true' }));
+        }
+
         // Game state variables
         let spiralPoints = [];
         let discRadius = 18;
@@ -402,7 +407,7 @@
             resizeCanvas();
             drawGame();
 
-            showBackButton();
+            notifyClientToShowBackButton();
         }
         
         /**
@@ -800,7 +805,7 @@
             };
             
             jsonDataPre.textContent = JSON.stringify(results, null, 2);
-            sendPayload(results);            
+            notifyClientToSendPayload(results);            
         }
 
         /**
@@ -962,7 +967,7 @@
                 tremorScore1Display.innerHTML = 'Tremor (changes): ' + finalTremorSpikes + ' spikes';
                 tremorScore3Display.innerHTML = 'Tremor (magnitude): ' + finalTremorMagnitude.toFixed(2);
                 generateAndDisplayJson();
-                toNext();
+                // notifyClientToNext();
                 resetButton.classList.remove('hidden');
             }
         }
@@ -1020,6 +1025,7 @@
             resetButton.classList.add('hidden');
             gameInstructions.classList.remove('hidden');
             drawGame();
+            notifyClientToResetGame();
         }
         
         // Run the initialization function when the page loads
