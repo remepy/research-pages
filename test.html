@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>WebView Test</title>
+    <script type="text/javascript">
+      function sendMessage(message) {
+        CallInApp.postMessage(message);
+      }
+
+      function generateLargeDataPayload() {
+        const payload = {};
+        for (let i = 0; i < 1000000; i++) {
+          payload['key_' + i] = 'value_' + i;
+        }
+
+        const message = {
+          type: 'sendData',
+          data: {
+            payload: payload
+          }
+        };
+
+        sendMessage(JSON.stringify(message));
+      }
+    </script>
+  </head>
+  <body>
+    <h1>Flutter WebView Communication</h1>
+
+    <button onclick="sendMessage(JSON.stringify({ 
+                     type: 'showBackButton',
+                     data: 'true' }))">
+      Send back to client
+    </button>
+
+    <button onclick="sendMessage(JSON.stringify({ 
+                     type: 'showNextButton',
+                     data: 'true' }))">
+      Send next to client
+    </button>
+
+    <button onclick="generateLargeDataPayload()">
+      Send data to client
+    </button>
+  </body>
+</html>
