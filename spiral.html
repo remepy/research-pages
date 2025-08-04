@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ברל'ה 🐌</title>
+    <style>
+        /* General body styling */
+        body {
+            font-family: "Inter", sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f4f8;
+            margin: 0;
+            overflow-x: hidden;
+            padding: 1rem;
+            box-sizing: border-box;
+        }
+
+        /* Main game canvas styling */
+        canvas {
+            background-color: #ffffff;
+            border: 2px solid #cbd5e1;
+            display: block;
+            margin: 0 auto;
+            border-radius: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            touch-action: none;
+        }
+        
+        /* Container for the game canvas */
+        .canvas-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            width: 100%;
+            align-items: center;
+        }
+
+        /* Debug section styling */
+        .debug-section {
+            background-color: #000000;
+            padding: 1rem;
+            border-radius: 1rem;
+            margin-top: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            direction: ltr; /* Set direction for debug section */
+        }
+        
+        .debug-section h2 {
+            color: #f8fafc;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        /* R-Theta canvas styling */
+        #rThetaCanvas {
+            background-color: #000000;
+        }
+
+        /* Styling for the info display area inside debug */
+        .info-display-debug {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 1rem;
+            width: 100%;
+            flex-wrap: wrap;
+            gap: 1rem;
+            color: #f8fafc;
+        }
+
+        /* Styling for the message box */
+        .message-box {
+            margin-top: 1rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #334155;
+            text-align: center;
+            width: 100%;
+        }
+
+        /* Styling for timer, accuracy, and tremor text */
+        .timer-display, .accuracy-display, .tremor-score {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #d1d5db; /* Lighter color for debug section */
+        }
+        
+        .tremor-score {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .tremor-score span {
+            font-size: 0.9rem;
+            font-weight: 400;
+            color: #94a3b8;
+        }
+
+        /* Styling for buttons */
+        .game-button {
+            padding: 0.75rem 2rem;
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            margin-top: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .game-button:hover {
+            transform: translateY(-1px);
+        }
+        .game-button:active {
+            transform: translateY(0);
+        }
+        .reset-button {
+            background-color: #ef4444;
+        }
+        .reset-button:hover {
+            background-color: #dc2626;
+        }
+        .toggle-debug-button {
+            background-color: #4f46e5;
+        }
+        .toggle-debug-button:hover {
+            background-color: #4338ca;
+        }
+        .hidden {
+            display: none;
+        }
+
+        /* Instructions text styling */
+        .instructions {
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 1rem;
+            color: #475569;
+            max-width: 80%;
+        }
+
+        /* JSON data display styling */
+        .json-data-display {
+            margin-top: 1.5rem;
+            width: 100%;
+            background-color: #1a202c;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            color: #e2e8f0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-y: auto;
+            max-height: 250px;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // Game state variables
+        let spiralPoints = [];
+        let discRadius = 18;
+        let currentDiscIndex = 0;
+        let gameStarted = false;
+        let discDragging = false;
+        let gameEnded = false;
+        let isDebugVisible = false; // New flag to control debug section visibility
+
+        // Data collection for JSON export
+        let playerPathCoordinates = [];
+        let currentInterval = 0;
+        
+        // Timer variables
+        let startTime = 0;
+        let endTime = 0;
+        let timerInterval;
+
+        // UI element references
+        let canvas, ctx;
+        let rThetaCanvas, rThetaCtx;
+        let messageBox, timerDisplay, accuracyDisplay, tremorScore1Display, tremorScore3Display;
+        let resetButton, gameInstructions, jsonDataDisplay, jsonDataPre;
+        let debugSection, toggleDebugButton;
+
+        // Configuration for the spiral and colors
+        const spiralConfig = {
+            spiralTightnessConstant: 24,
+            initialRadiusOffset: 24,
+            thetaStep: 0.01,
+            pathWidth: 10,
+            discColor: '#3b82f6',
+            pathColor: '#94a3b8',
+            endDiscColor: '#ef4444',
+            startDiscColor: '#22c54e'
+        };
+        
+        // Configuration for the r-theta graph
+        const rThetaConfig = {
+            maxTheta: 5 * Math.PI,
+            maxR: 200,
+            axisColor: '#ffffff',
+            idealPathColor: '#ffffff',
+            userPathColor: '#22c54e',
+            axisLabelColor: '#ffffff',
+            dotRadius: 2,
+        };
+
+        // Define game direction: true for outwards (normal), false for inwards (reversed)
+        let gameDirectionOutwards = false;
+
+        // New tolerance values for directional snapping
+        const orthogonalTolerance = 30;
+        const tangentialTolerance = 10;
+        
+        // New constants for tremor calculation
+        const tremorThreshold = 2; // Threshold in pixels for a change in r to be considered a tremor spike
+        
+        /**
+         * Initializes the entire application, creating and appending all DOM elements.
+         */
+        function init() {
+            // Create and append all HTML elements dynamically
+            const body = document.body;
+
+            const h1 = document.createElement('h1');
+            h1.className = 'text-3xl sm:text-4xl font-bold text-gray-800 mb-4';
+            h1.textContent = 'ברל\'ה ' + String.fromCodePoint(0x1f40c); // Snail emoji using code point
+            body.appendChild(h1);
+
+            const canvasContainer = document.createElement('div');
+            canvasContainer.className = 'canvas-container';
+            body.appendChild(canvasContainer);
+
+            canvas = document.createElement('canvas');
+            canvas.id = 'gameCanvas';
+            canvasContainer.appendChild(canvas);
+            ctx = canvas.getContext('2d');
+
+            gameInstructions = document.createElement('p');
+            gameInstructions.id = 'gameInstructions';
+            gameInstructions.className = 'instructions';
+            gameInstructions.textContent = 'השתמשו ביד שבה קיים יותר קושי. העבירו את הכדור מתחילת הספירלה עד סופה מהר ככל האפשר.';
+            canvasContainer.appendChild(gameInstructions);
+
+            messageBox = document.createElement('div');
+            messageBox.id = 'messageBox';
+            messageBox.className = 'message-box';
+            messageBox.textContent = 'לחצו על הכדור כדי להתחיל!';
+            body.appendChild(messageBox);
+
+            resetButton = document.createElement('button');
+            resetButton.id = 'resetButton';
+            resetButton.className = 'game-button reset-button hidden';
+            resetButton.textContent = 'איפוס משחק';
+            body.appendChild(resetButton);
+
+            // New toggle button for the debug section
+            toggleDebugButton = document.createElement('button');
+            toggleDebugButton.id = 'toggleDebugButton';
+            toggleDebugButton.className = 'game-button toggle-debug-button';
+            toggleDebugButton.textContent = isDebugVisible ? 'Hide Debug Section' : 'Show Debug Section';
+            body.appendChild(toggleDebugButton);
+
+            debugSection = document.createElement('div');
+            debugSection.className = 'debug-section';
+            if (!isDebugVisible) debugSection.classList.add('hidden');
+            body.appendChild(debugSection);
+
+            const debugTitle = document.createElement('h2');
+            debugTitle.textContent = 'Debug & Analysis';
+            debugSection.appendChild(debugTitle);
+            
+            // New info display container for the statistics within the debug section
+            const infoDisplayDebug = document.createElement('div');
+            infoDisplayDebug.className = 'info-display-debug';
+            debugSection.appendChild(infoDisplayDebug);
+
+            timerDisplay = document.createElement('div');
+            timerDisplay.id = 'timerDisplay';
+            timerDisplay.className = 'timer-display';
+            timerDisplay.textContent = 'Time: 0.00s';
+            infoDisplayDebug.appendChild(timerDisplay);
+
+            accuracyDisplay = document.createElement('div');
+            accuracyDisplay.id = 'accuracyDisplay';
+            accuracyDisplay.className = 'accuracy-display';
+            accuracyDisplay.textContent = 'Accuracy: N/A';
+            infoDisplayDebug.appendChild(accuracyDisplay);
+
+            tremorScore1Display = document.createElement('div');
+            tremorScore1Display.id = 'tremorScore1Display';
+            tremorScore1Display.className = 'tremor-score';
+            tremorScore1Display.innerHTML = 'Tremor (changes): N/A';
+            infoDisplayDebug.appendChild(tremorScore1Display);
+            
+            tremorScore3Display = document.createElement('div');
+            tremorScore3Display.id = 'tremorScore3Display';
+            tremorScore3Display.className = 'tremor-score';
+            tremorScore3Display.innerHTML = 'Tremor (magnitude): N/A';
+            infoDisplayDebug.appendChild(tremorScore3Display);
+
+            rThetaCanvas = document.createElement('canvas');
+            rThetaCanvas.id = 'rThetaCanvas';
+            debugSection.appendChild(rThetaCanvas);
+            rThetaCtx = rThetaCanvas.getContext('2d');
+            
+            jsonDataDisplay = document.createElement('div');
+            jsonDataDisplay.id = 'jsonDataDisplay';
+            jsonDataDisplay.className = 'json-data-display';
+            debugSection.appendChild(jsonDataDisplay);
+            
+            jsonDataPre = document.createElement('pre');
+            jsonDataDisplay.appendChild(jsonDataPre);
+            
+            // Attach event listeners
+            canvas.addEventListener('mousedown', handleStart);
+            canvas.addEventListener('mousemove', handleMove);
+            canvas.addEventListener('mouseup', handleEnd);
+            canvas.addEventListener('touchstart', handleStart, { passive: false });
+            canvas.addEventListener('touchmove', handleMove, { passive: false });
+            canvas.addEventListener('touchend', handleEnd);
+            resetButton.addEventListener('click', resetGame);
+            toggleDebugButton.addEventListener('click', toggleDebugSection);
+            window.addEventListener('resize', resizeCanvas);
+
+            // Initial setup
+            resizeCanvas();
+            drawGame();
+        }
+        
+        /**
+         * Toggles the visibility of the entire debug section.
+         */
+        function toggleDebugSection() {
+            isDebugVisible = !isDebugVisible;
+            if (isDebugVisible) {
+                debugSection.classList.remove('hidden');
+                toggleDebugButton.textContent = 'Hide Debug Section';
+                // Redraw the graph when it becomes visible
+                drawRThetaGraph();
+            } else {
+                debugSection.classList.add('hidden');
+                toggleDebugButton.textContent = 'Show Debug Section';
+            }
+        }
+
+        /**
+         * Resizes the canvas to fit the window and regenerates the spiral path.
+         */
+        function resizeCanvas() {
+            canvas.width = window.innerWidth - (2 * 16);
+            canvas.height = Math.min(window.innerHeight * 0.437325, 374.85);
+            
+            rThetaCanvas.width = (window.innerWidth - (2 * 16)) * 0.75;
+            rThetaCanvas.height = canvas.height * 0.5;
+            
+            generateSpiralPath();
+            drawGame();
+        }
+
+        /**
+         * Generates the points for an Archimedean spiral.
+         */
+        function generateSpiralPath() {
+            spiralPoints = [];
+            const canvasCenterX = canvas.width / 2;
+            const canvasCenterY = canvas.height / 2;
+            let maxSpiralLineRadius = Math.min(canvas.width, canvas.height) / 2 - discRadius;
+            const numberOfRounds = 2.5;
+            let dynamicMaxTheta = numberOfRounds * 2 * Math.PI;
+            let actualInitialOffset = spiralConfig.initialRadiusOffset;
+
+            if (maxSpiralLineRadius < actualInitialOffset + discRadius) {
+                actualInitialOffset = Math.max(0, maxSpiralLineRadius - discRadius - (spiralConfig.pathWidth / 2));
+                if (actualInitialOffset < 0) actualInitialOffset = 0;
+            }
+
+            const initialR = actualInitialOffset;
+            const initialX = canvasCenterX + initialR * Math.cos(0);
+            const initialY = canvasCenterY + initialR * Math.sin(0);
+            spiralPoints.push({ x: initialX, y: initialY, r: initialR, theta: 0 });
+
+            for (let theta = spiralConfig.thetaStep; theta <= dynamicMaxTheta + spiralConfig.thetaStep / 2; theta += spiralConfig.thetaStep) {
+                const r = (spiralConfig.spiralTightnessConstant / Math.PI) * theta + actualInitialOffset;
+                const x = canvasCenterX + r * Math.cos(theta);
+                const y = canvasCenterY + r * Math.sin(theta);
+                const distanceToCenter = getDistance({x, y}, {x: canvasCenterX, y: canvasCenterY});
+
+                if (distanceToCenter + discRadius > Math.min(canvas.width, canvas.height) / 2) {
+                    break;
+                }
+                spiralPoints.push({ x, y, r, theta });
+            }
+
+            if (gameDirectionOutwards) {
+                currentDiscIndex = 0;
+            } else {
+                currentDiscIndex = spiralPoints.length - 1;
+            }
+
+            currentDiscIndex = Math.min(Math.max(0, currentDiscIndex), spiralPoints.length - 1);
+            if (spiralPoints.length === 0) {
+                spiralPoints.push({ x: canvasCenterX, y: canvasCenterY, r: 0, theta: 0 });
+                currentDiscIndex = 0;
+            }
+        }
+
+        /**
+         * Clears the canvas and redraws the spiral path and the disc.
+         */
+        function drawGame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ctx.beginPath();
+            if (spiralPoints.length > 0) {
+                ctx.moveTo(spiralPoints[0].x, spiralPoints[0].y);
+                for (let i = 1; i < spiralPoints.length; i++) {
+                    ctx.lineTo(spiralPoints[i].x, spiralPoints[i].y);
+                }
+            }
+            ctx.lineWidth = spiralConfig.pathWidth;
+            ctx.strokeStyle = spiralConfig.pathColor;
+            ctx.lineCap = 'round';
+            ctx.stroke();
+
+            if (gameEnded && playerPathCoordinates.length > 1) {
+                ctx.beginPath();
+                ctx.strokeStyle = '#22c54e';
+                ctx.lineWidth = 2;
+                ctx.lineCap = 'round';
+                ctx.moveTo(playerPathCoordinates[0].userCoords.x, playerPathCoordinates[0].userCoords.y);
+                for (let i = 1; i < playerPathCoordinates.length; i++) {
+                    if (playerPathCoordinates[i].userCoords) {
+                        ctx.lineTo(playerPathCoordinates[i].userCoords.x, playerPathCoordinates[i].userCoords.y);
+                    }
+                }
+                ctx.stroke();
+            }
+
+            const discPos = spiralPoints[currentDiscIndex];
+            if (discPos) {
+                ctx.beginPath();
+                ctx.arc(discPos.x, discPos.y, discRadius, 0, Math.PI * 2);
+                if (gameEnded) {
+                    ctx.fillStyle = spiralConfig.endDiscColor;
+                } else if (gameStarted) {
+                    ctx.fillStyle = spiralConfig.discColor;
+                } else {
+                    ctx.fillStyle = spiralConfig.startDiscColor;
+                }
+                ctx.fill();
+                ctx.strokeStyle = '#334155';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+            
+            if (isDebugVisible) {
+              drawRThetaGraph();
+            }
+        }
+
+        /**
+         * Draws the r-theta graph.
+         */
+        function drawRThetaGraph() {
+            rThetaCtx.clearRect(0, 0, rThetaCanvas.width, rThetaCanvas.height);
+            rThetaCtx.fillStyle = '#000000';
+            rThetaCtx.fillRect(0, 0, rThetaCanvas.width, rThetaCanvas.height);
+
+            const padding = 20;
+            const graphWidth = rThetaCanvas.width - 2 * padding;
+            const graphHeight = rThetaCanvas.height - 2 * padding;
+
+            const mapToCanvas = (theta, r) => {
+                let mappedTheta = theta;
+                if (!gameDirectionOutwards) {
+                    mappedTheta = rThetaConfig.maxTheta - theta;
+                }
+                
+                const canvasX = padding + graphWidth * (mappedTheta / rThetaConfig.maxTheta);
+                const canvasY = padding + graphHeight * (1 - (r / rThetaConfig.maxR));
+                return { x: canvasX, y: canvasY };
+            };
+            
+            rThetaCtx.fillStyle = rThetaConfig.axisLabelColor;
+            rThetaCtx.font = '12px Inter, sans-serif';
+            rThetaCtx.textAlign = 'center';
+            rThetaCtx.textBaseline = 'middle';
+            rThetaCtx.fillText(`Theta (θ)`, rThetaCanvas.width / 2, rThetaCanvas.height - 5);
+            rThetaCtx.save();
+            rThetaCtx.translate(10, rThetaCanvas.height / 2);
+            rThetaCtx.rotate(-Math.PI / 2);
+            rThetaCtx.fillText(`Radius (r)`, 0, 0);
+            rThetaCtx.restore();
+
+            rThetaCtx.textAlign = 'right';
+            rThetaCtx.textBaseline = 'middle';
+            for (let r = 0; r <= rThetaConfig.maxR; r += 50) {
+                 const mapped = mapToCanvas(0, r);
+                 rThetaCtx.fillText(r, mapped.x - 5, mapped.y);
+            }
+            rThetaCtx.textAlign = 'center';
+            rThetaCtx.textBaseline = 'top';
+            for (let i = 0; i <= 5; i++) {
+                const theta = i * Math.PI;
+                const mapped = mapToCanvas(theta, 0);
+                rThetaCtx.fillText(`${i}π`, mapped.x, mapped.y + 5);
+            }
+
+            rThetaCtx.beginPath();
+            rThetaCtx.strokeStyle = rThetaConfig.idealPathColor;
+            rThetaCtx.lineWidth = 2;
+            rThetaCtx.setLineDash([5, 5]);
+
+            let isFirstPoint = true;
+            for (const point of spiralPoints) {
+                const mapped = mapToCanvas(point.theta, point.r);
+                if (isFirstPoint) {
+                    rThetaCtx.moveTo(mapped.x, mapped.y);
+                    isFirstPoint = false;
+                } else {
+                    rThetaCtx.lineTo(mapped.x, mapped.y);
+                }
+            }
+            rThetaCtx.stroke();
+            rThetaCtx.setLineDash([]);
+
+            if (playerPathCoordinates.length > 0) {
+                rThetaCtx.fillStyle = rThetaConfig.userPathColor;
+                for (const pathPoint of playerPathCoordinates) {
+                    if (pathPoint.userPolarCoords) {
+                        const mapped = mapToCanvas(pathPoint.userPolarCoords.theta, pathPoint.userPolarCoords.r);
+                        
+                        rThetaCtx.beginPath();
+                        rThetaCtx.arc(mapped.x, mapped.y, rThetaConfig.dotRadius, 0, Math.PI * 2);
+                        rThetaCtx.fill();
+                    }
+                }
+            }
+        }
+        
+        /**
+         * Updates the timer display.
+         */
+        function updateTimer() {
+            if (gameStarted && !gameEnded) {
+                const currentTime = Date.now();
+                const elapsedTime = (currentTime - startTime) / 1000;
+                timerDisplay.textContent = `Time: ${elapsedTime.toFixed(2)}s`;
+            }
+        }
+
+        /**
+         * Calculates the Euclidean distance between two points.
+         */
+        function getDistance(p1, p2) {
+            return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
+        }
+        
+        /**
+         * Converts Cartesian coordinates to polar coordinates.
+         */
+        function toPolar(coords) {
+            const canvasCenterX = canvas.width / 2;
+            const canvasCenterY = canvas.height / 2;
+            const relativeX = coords.x - canvasCenterX;
+            const relativeY = coords.y - canvasCenterY;
+            const r = Math.sqrt(relativeX * relativeX + relativeY * relativeY);
+            let theta = Math.atan2(relativeY, relativeX);
+            const lastPoint = playerPathCoordinates.length > 0 ? playerPathCoordinates[playerPathCoordinates.length - 1] : null;
+
+            if (lastPoint && lastPoint.userPolarCoords) {
+                 const lastTheta = lastPoint.userPolarCoords.theta;
+                 while (theta < lastTheta - Math.PI) theta += 2 * Math.PI;
+                 while (theta > lastTheta + Math.PI) theta -= 2 * Math.PI;
+            } else {
+                if (gameDirectionOutwards) {
+                    const spiralStartTheta = spiralPoints[0].theta;
+                    while (theta < spiralStartTheta - Math.PI) theta += 2 * Math.PI;
+                    while (theta > spiralStartTheta + Math.PI) theta -= 2 * Math.PI;
+                } else {
+                    const spiralEndTheta = spiralPoints[spiralPoints.length - 1].theta;
+                    while (theta < spiralEndTheta - Math.PI) theta += 2 * Math.PI;
+                    while (theta > spiralEndTheta + Math.PI) theta -= 2 * Math.PI;
+                }
+            }
+
+            return { r, theta };
+        }
+
+        /**
+         * Calculates accuracy for a given set of points.
+         */
+        function calculateAccuracy(points) {
+            if (points.length === 0) return 0;
+            let totalDeviation = 0;
+            let count = 0;
+
+            for (const pathPoint of points) {
+                if (pathPoint.userPolarCoords) {
+                    const userR = pathPoint.userPolarCoords.r;
+                    const userTheta = pathPoint.userPolarCoords.theta;
+                    const idealR = (spiralConfig.spiralTightnessConstant / Math.PI) * userTheta + spiralConfig.initialRadiusOffset;
+                    const deviation = Math.abs(userR - idealR);
+                    totalDeviation += deviation;
+                    count++;
+                }
+            }
+
+            if (count === 0) return 0;
+            const averageDeviation = totalDeviation / count;
+            let accuracy = 100 * (1 - (averageDeviation / rThetaConfig.maxR));
+            return Math.max(0, accuracy);
+        }
+
+        /**
+         * Calculates tremor by counting direction changes in the user's radial distance.
+         */
+        function calculateTremor_spikes(points) {
+            const rValues = points.map(p => p.userPolarCoords ? p.userPolarCoords.r : null).filter(r => r !== null);
+            if (rValues.length < 2) return 0;
+            let tremorSpikeCount = 0;
+            let lastDirection = 0;
+            for (let i = 1; i < rValues.length; i++) {
+                const deltaR = rValues[i] - rValues[i-1];
+                const currentDirection = (Math.abs(deltaR) > tremorThreshold) ? Math.sign(deltaR) : 0;
+                if (currentDirection !== 0 && lastDirection !== 0 && currentDirection !== lastDirection) {
+                    tremorSpikeCount++;
+                }
+                if (currentDirection !== 0) {
+                    lastDirection = currentDirection;
+                }
+            }
+            return tremorSpikeCount;
+        }
+
+        /**
+         * Calculates a continuous tremor score based on the total magnitude of radial changes.
+         */
+        function calculateTremor_magnitude(points) {
+            const rValues = points.map(p => p.userPolarCoords ? p.userPolarCoords.r : null).filter(r => r !== null);
+            if (rValues.length < 2) return 0;
+            let totalMagnitude = 0;
+            for (let i = 1; i < rValues.length; i++) {
+                totalMagnitude += Math.abs(rValues[i] - rValues[i-1]);
+            }
+            return totalMagnitude;
+        }
+
+        /**
+         * Generates and displays the detailed JSON data.
+         */
+        function generateAndDisplayJson() {
+            const finalTime = (endTime - startTime) / 1000;
+            const finalAccuracy = calculateAccuracy(playerPathCoordinates);
+            const finalTremorSpikes = calculateTremor_spikes(playerPathCoordinates);
+            const finalTremorMagnitude = calculateTremor_magnitude(playerPathCoordinates);
+            const intervals = [];
+            let lastIntervalEndTime = startTime;
+            const pointsByInterval = playerPathCoordinates.reduce((acc, point) => {
+                (acc[point.interval] = acc[point.interval] || []).push(point);
+                return acc;
+            }, {});
+
+            for (const intervalId in pointsByInterval) {
+                const intervalPoints = pointsByInterval[intervalId];
+                if (intervalPoints.length === 0) continue;
+                const firstPoint = intervalPoints[0];
+                const lastPoint = intervalPoints[intervalPoints.length - 1];
+                const intervalStartTime = firstPoint.timestamp;
+                const intervalEndTime = lastPoint.timestamp;
+                const timeFromPrevious = (intervalStartTime - lastIntervalEndTime) / 1000;
+                const totalIntervalTime = (intervalEndTime - intervalStartTime) / 1000;
+                const intervalAccuracy = calculateAccuracy(intervalPoints);
+                const intervalTremorSpikes = calculateTremor_spikes(intervalPoints);
+                const intervalTremorMagnitude = calculateTremor_magnitude(intervalPoints);
+
+                intervals.push({
+                    intervalId: parseInt(intervalId),
+                    timeFromPreviousInterval: timeFromPrevious.toFixed(2),
+                    totalTimeForInterval: totalIntervalTime.toFixed(2),
+                    accuracyForInterval: intervalAccuracy.toFixed(2),
+                    tremorChangesForInterval: intervalTremorSpikes,
+                    tremorAccumulatedForInterval: intervalTremorMagnitude.toFixed(2),
+                    points: intervalPoints.map(p => ({
+                        timestamp: p.timestamp,
+                        r: p.userPolarCoords.r.toFixed(2),
+                        theta: p.userPolarCoords.theta.toFixed(2),
+                        touchStrength: p.touchStrength || null
+                    }))
+                });
+                lastIntervalEndTime = intervalEndTime;
+            }
+
+            const results = {
+                totalTime: finalTime.toFixed(2),
+                accuracy: finalAccuracy.toFixed(2),
+                tremorChanges: finalTremorSpikes,
+                tremorAccumulated: finalTremorMagnitude.toFixed(2),
+                intervals: intervals
+            };
+            
+            jsonDataPre.textContent = JSON.stringify(results, null, 2);
+        }
+
+        /**
+         * Handles the start of a touch/mouse interaction.
+         */
+        function handleStart(event) {
+            event.preventDefault();
+            if (gameEnded) return;
+            let clientX, clientY;
+            if (event.touches && event.touches.length > 0) {
+                clientX = event.touches[0].clientX;
+                clientY = event.touches[0].clientY;
+            } else {
+                clientX = event.clientX;
+                clientY = event.clientY;
+            }
+            const rect = canvas.getBoundingClientRect();
+            const inputX = clientX - rect.left;
+            const inputY = clientY - rect.top;
+            if (spiralPoints.length === 0) {
+                generateSpiralPath();
+                if (spiralPoints.length === 0) {
+                    console.error("Spiral points array is empty even after regeneration. Cannot start game.");
+                    return;
+                }
+                currentDiscIndex = Math.min(Math.max(0, currentDiscIndex), spiralPoints.length - 1);
+            }
+            const discPos = spiralPoints[currentDiscIndex];
+            const distanceToDisc = getDistance({ x: inputX, y: inputY }, discPos);
+
+            if (distanceToDisc < discRadius * 1.5) {
+                if (!gameStarted) {
+                    gameStarted = true;
+                    startTime = Date.now();
+                    timerInterval = setInterval(updateTimer, 100);
+                    gameInstructions.classList.add('hidden');
+                    messageBox.textContent = gameDirectionOutwards ? 'גררו את הכדור החוצה לקצה הספירלה!' : 'גררו את הכדור פנימה לקצה הספירלה!';
+                }
+                discDragging = true;
+                currentInterval++;
+                playerPathCoordinates.push({
+                    userCoords: { x: inputX, y: inputY },
+                    userPolarCoords: toPolar({ x: inputX, y: inputY }),
+                    timestamp: Date.now(),
+                    interval: currentInterval,
+                    touchStrength: event.touches?.[0]?.force || null
+                });
+                drawGame();
+            }
+        }
+        
+        /**
+         * Handles ongoing touch/mouse movement.
+         */
+        function handleMove(event) {
+            event.preventDefault();
+            if (!discDragging || gameEnded) return;
+            let clientX, clientY;
+            if (event.touches && event.touches.length > 0) {
+                clientX = event.touches[0].clientX;
+                clientY = event.touches[0].clientY;
+            } else {
+                clientX = event.clientX;
+                clientY = event.clientY;
+            }
+            const rect = canvas.getBoundingClientRect();
+            const inputX = clientX - rect.left;
+            const inputY = clientY - rect.top;
+            playerPathCoordinates.push({
+                userCoords: { x: inputX, y: inputY },
+                userPolarCoords: toPolar({ x: inputX, y: inputY }),
+                timestamp: Date.now(),
+                interval: currentInterval,
+                touchStrength: event.touches?.[0]?.force || null
+            });
+            let bestNewIndex = currentDiscIndex;
+            let closestOrthoDeviation = Infinity;
+            let startIndex, endIndex, step;
+            if (gameDirectionOutwards) {
+                startIndex = currentDiscIndex + 1;
+                endIndex = Math.min(spiralPoints.length, currentDiscIndex + 100);
+                step = 1;
+            } else {
+                startIndex = currentDiscIndex - 1;
+                endIndex = Math.max(-1, currentDiscIndex - 100);
+                step = -1;
+            }
+            for (let i = startIndex; i !== endIndex; i += step) {
+                if (!spiralPoints[i]) continue;
+                const targetPoint = spiralPoints[i];
+                let tangentVec = { x: 0, y: 0 };
+                if (i > 0 && i < spiralPoints.length - 1) {
+                    tangentVec = {
+                        x: spiralPoints[i + 1].x - spiralPoints[i - 1].x,
+                        y: spiralPoints[i + 1].y - spiralPoints[i - 1].y
+                    };
+                } else if (i === 0 && spiralPoints.length > 1) {
+                    tangentVec = {
+                        x: spiralPoints[1].x - spiralPoints[0].x,
+                        y: spiralPoints[1].y - spiralPoints[0].y
+                    };
+                } else if (i === spiralPoints.length - 1 && spiralPoints.length > 1) {
+                    tangentVec = {
+                        x: spiralPoints[i].x - spiralPoints[i - 1].x,
+                        y: spiralPoints[i].y - spiralPoints[i - 1].y
+                    };
+                } else {
+                    continue;
+                }
+                const normalizedTangent = {
+                    x: tangentVec.x / Math.sqrt(tangentVec.x**2 + tangentVec.y**2),
+                    y: tangentVec.y / Math.sqrt(tangentVec.x**2 + tangentVec.y**2)
+                };
+                const normalizedNormal = { x: -normalizedTangent.y, y: normalizedTangent.x };
+                const inputToTargetVec = { x: inputX - targetPoint.x, y: inputY - targetPoint.y };
+                const tangentialDeviation = inputToTargetVec.x * normalizedTangent.x + inputToTargetVec.y * normalizedTangent.y;
+                const orthogonalDeviation = inputToTargetVec.x * normalizedNormal.x + inputToTargetVec.y * normalizedNormal.y;
+                const isWithinOrthogonalTolerance = Math.abs(orthogonalDeviation) <= orthogonalTolerance;
+                const isWithinTangentialTolerance = Math.abs(tangentialDeviation) <= tangentialTolerance;
+                const isMovingForward = (gameDirectionOutwards && tangentialDeviation >= 0) ||
+                                         (!gameDirectionOutwards && tangentialDeviation <= 0);
+                if (isWithinOrthogonalTolerance && isWithinTangentialTolerance && isMovingForward) {
+                    if (Math.abs(orthogonalDeviation) < closestOrthoDeviation) {
+                        closestOrthoDeviation = Math.abs(orthogonalDeviation);
+                        bestNewIndex = i;
+                    }
+                }
+            }
+            if ((gameDirectionOutwards && bestNewIndex > currentDiscIndex) || (!gameDirectionOutwards && bestNewIndex < currentDiscIndex)) {
+                currentDiscIndex = bestNewIndex;
+                drawGame();
+            }
+            let gameShouldEnd = false;
+            const endPathPoint = gameDirectionOutwards ? spiralPoints[spiralPoints.length - 1] : spiralPoints[0];
+            const discCurrentPoint = spiralPoints[currentDiscIndex];
+            const distDiscCenterToEndPoint = getDistance(discCurrentPoint, endPathPoint);
+            if (gameDirectionOutwards) {
+                gameShouldEnd = distDiscCenterToEndPoint <= discRadius;
+            } else {
+                gameShouldEnd = distDiscCenterToEndPoint <= discRadius;
+            }
+            if (gameShouldEnd) {
+                gameEnded = true;
+                discDragging = false;
+                endTime = Date.now();
+                clearInterval(timerInterval);
+                const finalTime = (endTime - startTime) / 1000;
+                messageBox.textContent = gameDirectionOutwards ? 'כל הכבוד! המסלול לקצה הספירלה הושלם!' : 'כל הכבוד! המסלול למרכז הספירלה הושלם!';
+                timerDisplay.textContent = `Final Time: ${finalTime.toFixed(2)}s`;
+                const finalAccuracy = calculateAccuracy(playerPathCoordinates);
+                const finalTremorSpikes = calculateTremor_spikes(playerPathCoordinates);
+                const finalTremorMagnitude = calculateTremor_magnitude(playerPathCoordinates);
+                accuracyDisplay.textContent = `Accuracy: ${finalAccuracy.toFixed(2)}%`;
+                tremorScore1Display.innerHTML = `Tremor (changes): ${finalTremorSpikes} spikes`;
+                tremorScore3Display.innerHTML = `Tremor (magnitude): ${finalTremorMagnitude.toFixed(2)}`;
+                generateAndDisplayJson();
+                resetButton.classList.remove('hidden');
+                drawGame();
+            }
+        }
+
+        /**
+         * Handles the end of a touch/mouse interaction.
+         */
+        function handleEnd() {
+            discDragging = false;
+        }
+
+        /**
+         * Resets the game to its initial state.
+         */
+        function resetGame() {
+            gameStarted = false;
+            discDragging = false;
+            gameEnded = false;
+            if (gameDirectionOutwards) {
+                currentDiscIndex = 0;
+            } else {
+                currentDiscIndex = spiralPoints.length - 1;
+            }
+            startTime = 0;
+            endTime = 0;
+            playerPathCoordinates = [];
+            currentInterval = 0;
+            clearInterval(timerInterval);
+            timerDisplay.textContent = 'Time: 0.00s';
+            accuracyDisplay.textContent = 'Accuracy: N/A';
+            tremorScore1Display.textContent = 'Tremor (changes): N/A';
+            tremorScore3Display.textContent = 'Tremor (magnitude): N/A';
+            jsonDataPre.textContent = '';
+            messageBox.textContent = 'לחצו על הכדור כדי להתחיל!';
+            resetButton.classList.add('hidden');
+            gameInstructions.classList.remove('hidden');
+            drawGame();
+        }
+
+        // Run the initialization function when the page loads
+        window.onload = init;
+    </script>
+</body>
+</html>
