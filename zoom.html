@@ -54,7 +54,7 @@
             align-items: center;
             justify-content: center;
             gap: 2rem;
-            flex-wrap: wrap;
+            /* The flex-wrap: wrap; property has been removed to keep elements in one row */
         }
         
         /* Heading styling */
@@ -81,6 +81,11 @@
             border-radius: 1rem;
             padding: 1rem;
             box-sizing: border-box;
+            flex-shrink: 0; /* Prevents the canvas from shrinking and wrapping */
+        }
+        
+        #pinch-png {
+            flex-shrink: 0; /* Prevents the image from shrinking and wrapping */
         }
 
         /* Game canvas styling */
