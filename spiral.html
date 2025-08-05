@@ -112,11 +112,12 @@
         /* Container for controls (buttons and main timer) */
         .controls-container {
             display: flex;
+            flex-wrap: wrap;
             justify-content: center;
             align-items: center;
-            flex-wrap: wrap;
             gap: 1rem;
             margin-top: 1.5rem;
+            width: 100%;
         }
 
         /* General styling for action buttons */
@@ -134,7 +135,18 @@
             color: white;
             transition: background-color 0.3s ease, transform 0.1s ease;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%; /* Default width for mobile */
         }
+        
+        @media (min-width: 640px) {
+            .controls-container {
+                flex-direction: row;
+            }
+            .game-button {
+                width: 45%;
+            }
+        }
+
         .game-button:hover {
             transform: translateY(-2px);
         }
@@ -237,18 +249,18 @@
             pathWidth: 10,
             discColor: '#3b82f6',
             pathColor: '#94a3b8',
-            endDiscColor: '#22c54e', // Changed to green
+            endDiscColor: '#22c54e',
             startDiscColor: '#22c54e',
-            redPathColor: '#22c54e' // Changed to green
+            redPathColor: '#22c54e'
         };
         
         // Configuration for the r-theta graph
         const rThetaConfig = {
             maxTheta: 5 * Math.PI,
-            maxR: 200,
+            maxR: 0, // This will be calculated dynamically now
             axisColor: '#ffffff',
             idealPathColor: '#ffffff',
-            userPathColor: '#ef4444', // Changed to red
+            userPathColor: '#ef4444',
             axisLabelColor: '#ffffff',
             dotRadius: 2,
         };
@@ -329,12 +341,12 @@
             `;
             controlsContainer.appendChild(nextActivityButton);
 
-            // New toggle button for the debug section
-            // toggleDebugButton = document.createElement('button');
-            // toggleDebugButton.id = 'toggleDebugButton';
-            // toggleDebugButton.className = 'game-button toggle-debug-button';
-            // toggleDebugButton.textContent = isDebugVisible ? 'Hide Debug Section' : 'Show Debug Section';
-            // body.appendChild(toggleDebugButton);
+            // New toggle button for the debug section, now hidden by default
+            toggleDebugButton = document.createElement('button');
+            toggleDebugButton.id = 'toggleDebugButton';
+            toggleDebugButton.className = 'game-button toggle-debug-button hidden';
+            toggleDebugButton.textContent = isDebugVisible ? 'Hide Debug Section' : 'Show Debug Section';
+            body.appendChild(toggleDebugButton);
 
             debugSection = document.createElement('div');
             debugSection.className = 'debug-section';
@@ -395,7 +407,7 @@
             canvas.addEventListener('touchmove', handleMove, { passive: false });
             canvas.addEventListener('touchend', handleEnd);
             resetButton.addEventListener('click', resetGame);
-            // toggleDebugButton.addEventListener('click', toggleDebugSection);
+            toggleDebugButton.addEventListener('click', toggleDebugSection);
             window.addEventListener('resize', resizeCanvas);
 
             // Initial setup
@@ -407,26 +419,31 @@
         /**
          * Toggles the visibility of the entire debug section.
          */
-        // function toggleDebugSection() {
-        //     isDebugVisible = !isDebugVisible;
-        //     if (isDebugVisible) {
-        //         debugSection.classList.remove('hidden');
-        //         toggleDebugButton.textContent = 'Hide Debug Section';
-        //         // Redraw the graph and game canvas when it becomes visible
-        //         drawGame();
-        //     } else {
-        //         debugSection.classList.add('hidden');
-        //         toggleDebugButton.textContent = 'Show Debug Section';
-        //         drawGame();
-        //     }
-        // }
+        function toggleDebugSection() {
+            isDebugVisible = !isDebugVisible;
+            if (isDebugVisible) {
+                debugSection.classList.remove('hidden');
+                toggleDebugButton.textContent = 'Hide Debug Section';
+                // Redraw the graph and game canvas when it becomes visible
+                drawGame();
+            } else {
+                debugSection.classList.add('hidden');
+                toggleDebugButton.textContent = 'Show Debug Section';
+                drawGame();
+            }
+        }
 
         /**
          * Resizes the canvas to fit the window and regenerates the spiral path.
          */
         function resizeCanvas() {
-            canvas.width = window.innerWidth - (2 * 16);
-            canvas.height = Math.min(window.innerHeight * 0.437325, 374.85);
+            // Define the constant dimensions required for the spiral
+            const spiralMaxRadius = (spiralConfig.spiralTightnessConstant / Math.PI) * (5 * Math.PI) + spiralConfig.initialRadiusOffset;
+            const requiredCanvasSize = 2 * (spiralMaxRadius + discRadius + 10);
+            
+            // Set canvas dimensions based on the calculated size, ensuring it's not too wide for mobile
+            canvas.width = Math.min(window.innerWidth - (2 * 16), requiredCanvasSize);
+            canvas.height = Math.min(window.innerWidth - (2 * 16), requiredCanvasSize);
             
             rThetaCanvas.width = (window.innerWidth - (2 * 16)) * 0.75;
             rThetaCanvas.height = canvas.height * 0.5;
@@ -442,33 +459,27 @@
             spiralPoints = [];
             const canvasCenterX = canvas.width / 2;
             const canvasCenterY = canvas.height / 2;
-            let maxSpiralLineRadius = Math.min(canvas.width, canvas.height) / 2 - discRadius;
+            
             const numberOfRounds = 2.5;
-            let dynamicMaxTheta = numberOfRounds * 2 * Math.PI;
-            let actualInitialOffset = spiralConfig.initialRadiusOffset;
+            const dynamicMaxTheta = numberOfRounds * 2 * Math.PI;
 
-            if (maxSpiralLineRadius < actualInitialOffset + discRadius) {
-                actualInitialOffset = Math.max(0, maxSpiralLineRadius - discRadius - (spiralConfig.pathWidth / 2));
-                if (actualInitialOffset < 0) actualInitialOffset = 0;
-            }
+            // Use the fixed values for the spiral formula
+            const initialRadiusOffset = spiralConfig.initialRadiusOffset;
+            const spiralTightnessConstant = spiralConfig.spiralTightnessConstant;
 
-            const initialR = actualInitialOffset;
+            // Generate points based on the fixed formula
+            const initialR = initialRadiusOffset;
             const initialX = canvasCenterX + initialR * Math.cos(0);
             const initialY = canvasCenterY + initialR * Math.sin(0);
             spiralPoints.push({ x: initialX, y: initialY, r: initialR, theta: 0 });
 
-            for (let theta = spiralConfig.thetaStep; theta <= dynamicMaxTheta + spiralConfig.thetaStep / 2; theta += spiralConfig.thetaStep) {
-                const r = (spiralConfig.spiralTightnessConstant / Math.PI) * theta + actualInitialOffset;
+            for (let theta = spiralConfig.thetaStep; theta <= dynamicMaxTheta; theta += spiralConfig.thetaStep) {
+                const r = (spiralTightnessConstant / Math.PI) * theta + initialRadiusOffset;
                 const x = canvasCenterX + r * Math.cos(theta);
                 const y = canvasCenterY + r * Math.sin(theta);
-                const distanceToCenter = getDistance({x, y}, {x: canvasCenterX, y: canvasCenterY});
-
-                if (distanceToCenter + discRadius > Math.min(canvas.width, canvas.height) / 2) {
-                    break;
-                }
                 spiralPoints.push({ x, y, r, theta });
             }
-
+            
             if (gameDirectionOutwards) {
                 currentDiscIndex = 0;
             } else {
@@ -480,6 +491,10 @@
                 spiralPoints.push({ x: canvasCenterX, y: canvasCenterY, r: 0, theta: 0 });
                 currentDiscIndex = 0;
             }
+
+            // Update r-theta graph config with the new maxR value based on the fixed spiral
+            const spiralMaxRadius = (spiralTightnessConstant / Math.PI) * (5 * Math.PI) + initialRadiusOffset;
+            rThetaConfig.maxR = spiralMaxRadius;
         }
 
         /**
@@ -693,12 +708,14 @@
             if (points.length === 0) return 0;
             let totalDeviation = 0;
             let count = 0;
+            const spiralTightnessConstant = spiralConfig.spiralTightnessConstant;
+            const initialRadiusOffset = spiralConfig.initialRadiusOffset;
 
             for (const pathPoint of points) {
                 if (pathPoint.userPolarCoords) {
                     const userR = pathPoint.userPolarCoords.r;
                     const userTheta = pathPoint.userPolarCoords.theta;
-                    const idealR = (spiralConfig.spiralTightnessConstant / Math.PI) * userTheta + spiralConfig.initialRadiusOffset;
+                    const idealR = (spiralTightnessConstant / Math.PI) * userTheta + initialRadiusOffset;
                     const deviation = Math.abs(userR - idealR);
                     totalDeviation += deviation;
                     count++;
@@ -951,8 +968,8 @@
                 startRedSpiralAnimation();
                 
                 const finalTime = (endTime - startTime) / 1000;
-                messageBox.textContent = gameDirectionOutwards ? 'כל הכבוד! המסלול לקצה הספירלה הושלם!' : 'כל הכבוד! המסלול למרכז הספירלה הושלם!';
-                hebrewTimerDisplay.textContent = 'זמן: ' + finalTime.toFixed(2) + 's';
+                messageBox.textContent = 'כל הכבוד! המסלול הושלם ב-' + finalTime.toFixed(2) + ' שניות!';
+                hebrewTimerDisplay.classList.add('hidden'); // Hide the standalone timer
                 timerDisplay.textContent = 'Final Time: ' + finalTime.toFixed(2) + 's';
                 const finalAccuracy = calculateAccuracy(playerPathCoordinates);
                 const finalTremorSpikes = calculateTremor_spikes(playerPathCoordinates);
