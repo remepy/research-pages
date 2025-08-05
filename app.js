@@ -1,8 +1,8 @@
 function sendMessage(message) {
-    if (CallInApp)
-      CallInApp.postMessage(message);
-    else
+    if (typeof CallInApp === 'undefined') 
       console.log(message);
+    else
+      CallInApp.postMessage(message);
   }
 
 function notifyClientToSendPayload(payload) {
