@@ -219,48 +219,6 @@
                     }
                     break;
                 case 'debug':
-                    // This function generates the JSON summary. The user requested to keep this logic but hide the output.
-                    const generateJsonSummary = () => {
-                        const summary = {};
-                        
-                        // Likert Scale Question
-                        if (userAnswers.onOffQuestion) {
-                            summary.onOffFeeling = parseInt(userAnswers.onOffQuestion);
-                        }
-
-                        // Levodopa Time Questions
-                        if (userAnswers.levodopaQuestion_1 === 'lessThanHour') {
-                            if (userAnswers.levodopaQuestion_2_less) {
-                                summary.timeSinceLevodopaMinutes = parseInt(userAnswers.levodopaQuestion_2_less);
-                            }
-                        } else if (userAnswers.levodopaQuestion_1 === 'moreThanHour') {
-                            if (userAnswers.levodopaQuestion_2_more) {
-                                summary.timeSinceLevodopaMinutes = parseInt(userAnswers.levodopaQuestion_2_more);
-                            }
-                        }
-
-                        // Eating Time Questions
-                        if (userAnswers.eatingQuestion_1 === 'lessThanHour') {
-                            if (userAnswers.eatingQuestion_2_less) {
-                                summary.timeSinceEatingMinutes = parseInt(userAnswers.eatingQuestion_2_less);
-                            }
-                        } else if (userAnswers.eatingQuestion_1 === 'moreThanHour') {
-                            if (userAnswers.eatingQuestion_2_more) {
-                                summary.timeSinceEatingMinutes = parseInt(userAnswers.eatingQuestion_2_more);
-                            }
-                        }
-
-                        // Final Boolean Question (now called gettingUpQuestion)
-                        if (userAnswers.gettingUpQuestion) {
-                            summary.gettingUpDifficulty = userAnswers.gettingUpQuestion === 'True' ? true : false;
-                        }
-
-                        return JSON.stringify(summary, null, 2);
-                    };
-                    
-                    const jsonSummary = generateJsonSummary();
-                    notifyClientToSendPayload(jsonSummary);
-                    
                     // The debug-toggle button and the summary container have been removed as requested.
                     contentHTML = `
                         <div class="flex-grow p-6 flex flex-col items-center">
@@ -337,6 +295,47 @@
                     renderPage('debug');
                     break;
                 case 'debug':
+                    // This function generates the JSON summary. The user requested to keep this logic but hide the output.
+                    const generateJsonSummary = () => {
+                        const summary = {};
+                        
+                        // Likert Scale Question
+                        if (userAnswers.onOffQuestion) {
+                            summary.onOffFeeling = parseInt(userAnswers.onOffQuestion);
+                        }
+
+                        // Levodopa Time Questions
+                        if (userAnswers.levodopaQuestion_1 === 'lessThanHour') {
+                            if (userAnswers.levodopaQuestion_2_less) {
+                                summary.timeSinceLevodopaMinutes = parseInt(userAnswers.levodopaQuestion_2_less);
+                            }
+                        } else if (userAnswers.levodopaQuestion_1 === 'moreThanHour') {
+                            if (userAnswers.levodopaQuestion_2_more) {
+                                summary.timeSinceLevodopaMinutes = parseInt(userAnswers.levodopaQuestion_2_more);
+                            }
+                        }
+
+                        // Eating Time Questions
+                        if (userAnswers.eatingQuestion_1 === 'lessThanHour') {
+                            if (userAnswers.eatingQuestion_2_less) {
+                                summary.timeSinceEatingMinutes = parseInt(userAnswers.eatingQuestion_2_less);
+                            }
+                        } else if (userAnswers.eatingQuestion_1 === 'moreThanHour') {
+                            if (userAnswers.eatingQuestion_2_more) {
+                                summary.timeSinceEatingMinutes = parseInt(userAnswers.eatingQuestion_2_more);
+                            }
+                        }
+
+                        // Final Boolean Question (now called gettingUpQuestion)
+                        if (userAnswers.gettingUpQuestion) {
+                            summary.gettingUpDifficulty = userAnswers.gettingUpQuestion === 'True' ? true : false;
+                        }
+
+                        return JSON.stringify(summary, null, 2);
+                    };
+                    
+                    const jsonSummary = generateJsonSummary();
+                    notifyClientToSendPayload(jsonSummary);
                     // Finished with quiz
                     notifyClientToNext();
                     break;
