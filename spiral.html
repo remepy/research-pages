@@ -198,43 +198,9 @@
             max-height: 250px;
         }
     </style>
+    <script src="app.js"></script>
 </head>
 <body>
-    <script>
-        function sendMessage(message) {
-            CallInApp.postMessage(message);
-          }
-
-        function notifyClientToSendPayload(payload) {
-            const message = {
-              type: 'sendData',
-              data: {
-                payload: payload
-              }
-            };
-
-            sendMessage(JSON.stringify(message))
-        }
-
-        function notifyClientToShowBackButton() {
-            sendMessage(JSON.stringify({ 
-                type: 'showBackButton',
-                data: 'true' }));
-        }
-
-        function notifyClientToNext()
-        {
-            sendMessage(JSON.stringify({ 
-                             type: 'toNext',
-                             data: 'true' }));
-        }
-
-        function notifyClientToResetGame() {
-             sendMessage(JSON.stringify({ 
-                             type: 'resetGame',
-                             data: 'true' }));
-        }
-
         // Game state variables
         let spiralPoints = [];
         let discRadius = 18;
@@ -434,7 +400,7 @@
             // Initial setup
             resizeCanvas();
             drawGame();
-            // notifyClientToShowBackButton();
+            notifyClientToShowBackButton();
         }
         
         /**
@@ -832,7 +798,7 @@
             };
             
             jsonDataPre.textContent = JSON.stringify(results, null, 2);
-            // notifyClientToSendPayload(results);
+            notifyClientToSendPayload(results);
         }
 
         /**
