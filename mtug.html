@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>צעד-צעד (mTUG)</title>
+    <style>
+        /* Global styles for the app container */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: #333;
+        }
+
+        /* Container for the entire app, ensuring it takes up the full viewport */
+        .app-container {
+            width: 100%;
+            max-width: 500px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background-color: #fff;
+            box-sizing: border-box;
+            padding: 20px;
+            overflow: hidden; /* Prevent scrolling */
+        }
+
+        /* Style for the main content area */
+        .content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* Style for headings */
+        h1, h2 {
+            color: #4b0082;
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+        
+        /* Style for instructions list */
+        ol {
+            list-style: none;
+            counter-reset: my-awesome-counter;
+            padding-right: 0;
+            margin: 0;
+        }
+
+        li {
+            counter-increment: my-awesome-counter;
+            margin-bottom: 20px;
+            text-align: right;
+            padding-right: 30px;
+            font-size: 1.2rem;
+            position: relative;
+        }
+
+        li::before {
+            content: counter(my-awesome-counter) ".";
+            color: #4b0082;
+            font-weight: bold;
+            position: absolute;
+            right: 0;
+        }
+
+        /* Style for the illustration images */
+        .illustration {
+            max-width: 100%;
+            height: auto;
+            margin-top: 20px;
+        }
+
+        /* Style for buttons */
+        .button {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Primary button style (purple) */
+        .button.primary {
+            background-color: #4b0082;
+        }
+
+        /* Secondary button style (gray) */
+        .button.secondary {
+            background-color: #a9a9a9;
+        }
+        
+        .button:active {
+            transform: scale(0.98);
+        }
+
+        /* Small link button style */
+        .link-button {
+            color: #4b0082;
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        
+        .link-button.back {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            margin-top: 0;
+        }
+
+        /* Stopwatch display style */
+        .stopwatch {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #4b0082;
+            font-family: monospace; /* Use a monospace font to prevent width changes */
+            width: 300px; /* Set a fixed width to prevent layout shifts */
+            display: inline-block;
+        }
+
+        /* Hide elements by default */
+        .hidden {
+            display: none;
+        }
+
+        /* Specific container for the final results screen */
+        .result-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+
+        /* Specific container for the timer screen */
+        .timer-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 50px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="app-container">
+
+        <!-- Splash/Initial Screen -->
+        <div id="splashScreen" class="screen">
+            <div class="content">
+                <h1>צעד-צעד</h1>
+                <p>כך תבצעו את הפעילות :</p>
+                <ol>
+                    <li>בחרו בחדר או מסדרון שקט, ללא הפרעות. לאחר שמיקמתם את הכסא וסימנתם מרחק של 3 מטרים ממנו:</li>
+                    <li>לחצו על "התחל הליכה"</li>
+                    <li>הניחו את הטלפון בכיס הקדמי של המכנסיים.</li>
+                </ol>
+                <img src="https://placehold.co/300x400/fff/4b0082?text=phone+in+pocket" alt="phone in pocket illustration" class="illustration" />
+            </div>
+            <button id="nextBtn" class="button primary">הבא</button>
+            <button class="link-button">דלג על הפעולות</button>
+        </div>
+
+        <!-- Instructions Screen -->
+        <div id="instructionsScreen" class="screen hidden">
+            <button id="backBtn" class="link-button back">חזרה</button>
+            <div class="content">
+                <h1>צעד-צעד</h1>
+                <ol start="4">
+                    <li>התיישבו על הכיסא.</li>
+                    <li>קומו, לכו 3 מטרים, הסתובבו וחזרו לשבת.</li>
+                    <li>הוציאו את הטלפון מהכיס ולחצו על "סיום".</li>
+                </ol>
+                <img src="https://placehold.co/400x300/fff/4b0082?text=walking+illustration" alt="walking illustration" class="illustration" />
+            </div>
+            <button id="startBtn" class="button primary">התחל הליכה</button>
+        </div>
+
+        <!-- Activity Screen with Stopwatch -->
+        <div id="activityScreen" class="screen hidden">
+            <div class="content timer-container">
+                <h1>התחילו!</h1>
+                <p>הניחו את הטלפון בכיס הקדמי והתיישבו.</p>
+                <div id="stopwatchDisplay" class="stopwatch">00:00.00</div>
+            </div>
+            <button id="stopBtn" class="button secondary">סיום</button>
+        </div>
+
+        <!-- Results Screen -->
+        <div id="resultScreen" class="screen hidden">
+            <div class="content result-container">
+                <h1>זה הכל!</h1>
+                <p>זמן כולל:</p>
+                <div id="finalTime" class="stopwatch">00:00.00</div>
+            </div>
+            <button id="finishBtn" class="button primary">סיום</button>
+        </div>
+    </div>
+
+    <script>
+        // Get references to all the screens and buttons
+        const splashScreen = document.getElementById('splashScreen');
+        const instructionsScreen = document.getElementById('instructionsScreen');
+        const activityScreen = document.getElementById('activityScreen');
+        const resultScreen = document.getElementById('resultScreen');
+
+        const nextBtn = document.getElementById('nextBtn');
+        const backBtn = document.getElementById('backBtn');
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const finishBtn = document.getElementById('finishBtn');
+
+        const stopwatchDisplay = document.getElementById('stopwatchDisplay');
+        const finalTime = document.getElementById('finalTime');
+
+        let timer;
+        let startTime;
+        let elapsedTime = 0;
+
+        // Function to show a specific screen and hide others
+        function showScreen(screenToShow) {
+            // Hide all screens first
+            splashScreen.classList.add('hidden');
+            instructionsScreen.classList.add('hidden');
+            activityScreen.classList.add('hidden');
+            resultScreen.classList.add('hidden');
+            
+            // Show the selected screen
+            screenToShow.classList.remove('hidden');
+        }
+
+        // Function to start the stopwatch
+        function startStopwatch() {
+            startTime = Date.now() - elapsedTime;
+            timer = setInterval(() => {
+                elapsedTime = Date.now() - startTime;
+                updateStopwatchDisplay();
+            }, 10); // Update every 10 milliseconds for precision
+        }
+
+        // Function to stop the stopwatch
+        function stopStopwatch() {
+            clearInterval(timer);
+        }
+
+        // Function to update the stopwatch display
+        function updateStopwatchDisplay() {
+            const totalMilliseconds = elapsedTime;
+            const minutes = Math.floor(totalMilliseconds / 60000);
+            const seconds = Math.floor((totalMilliseconds % 60000) / 1000);
+            const milliseconds = Math.floor((totalMilliseconds % 1000) / 10);
+            
+            // Format minutes, seconds, and milliseconds with leading zeros
+            const formattedMinutes = String(minutes).padStart(2, '0');
+            const formattedSeconds = String(seconds).padStart(2, '0');
+            const formattedMilliseconds = String(milliseconds).padStart(2, '0');
+            
+            stopwatchDisplay.textContent = `${formattedMinutes}:${formattedSeconds}.${formattedMilliseconds}`;
+        }
+
+        // Event listener for the "Next" button on the splash screen
+        nextBtn.addEventListener('click', () => {
+            showScreen(instructionsScreen);
+        });
+
+        // Event listener for the "Back" button on the instructions screen
+        backBtn.addEventListener('click', () => {
+            showScreen(splashScreen);
+        });
+
+        // Event listener for the "Start" button on the instructions screen
+        startBtn.addEventListener('click', () => {
+            showScreen(activityScreen);
+            // Reset and start the stopwatch
+            elapsedTime = 0;
+            startStopwatch();
+        });
+
+        // Event listener for the "Stop" button on the activity screen
+        stopBtn.addEventListener('click', () => {
+            stopStopwatch();
+            // Display the final time
+            finalTime.textContent = stopwatchDisplay.textContent;
+            showScreen(resultScreen);
+        });
+        
+        // Event listener for the "Finish" button on the results screen
+        finishBtn.addEventListener('click', () => {
+            // For now, we'll just go back to the splash screen.
+            // In a real app, this might close the app or navigate to a new page.
+            showScreen(splashScreen);
+        });
+        
+        // Initial screen on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            showScreen(splashScreen);
+        });
+
+    </script>
+</body>
+</html>
