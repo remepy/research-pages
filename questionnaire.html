@@ -52,11 +52,11 @@
                 id: 'onOffQuestion',
                 text: 'מה הרגשתך?\nבאיזו מידה את/ה חש/ה כרגע במצב OFF?',
                 options: [
-                    { text: 'כלל לא', value: 'a' },
-                    { text: 'במידה מועטה', value: 'b' },
-                    { text: 'במידה מסוימת', value: 'c' },
-                    { text: 'במידה רבה', value: 'd' },
-                    { text: 'לחלוטין', value: 'e' },
+                    { text: 'כלל לא', value: '1' },
+                    { text: 'במידה מועטה', value: '2' },
+                    { text: 'במידה מסוימת', value: '3' },
+                    { text: 'במידה רבה', value: '4' },
+                    { text: 'לחלוטין', value: '5' },
                 ],
             },
             levodopaQuestion_1: {
@@ -72,20 +72,20 @@
                 id: 'levodopaQuestion_2_less',
                 text: 'כמה זמן בערך עבר מאז לקחת Levodopa בפעם האחרונה?',
                 options: [
-                    { text: 'פחות מ-15 דקות', value: 'a' },
-                    { text: 'בין 15 דקות ל-30 דקות', value: 'b' },
-                    { text: 'בין 30 דקות ל-45 דקות', value: 'c' },
-                    { text: 'בין 45 דקות לשעה', value: 'd' },
+                    { text: 'פחות מ-15 דקות', value: '0' },
+                    { text: 'בין 15 דקות ל-30 דקות', value: '15' },
+                    { text: 'בין 30 דקות ל-45 דקות', value: '30' },
+                    { text: 'בין 45 דקות לשעה', value: '45' },
                 ],
             },
             levodopaQuestion_2_more: {
                 id: 'levodopaQuestion_2_more',
                 text: 'כמה זמן בערך עבר מאז לקחת Levodopa בפעם האחרונה?',
                 options: [
-                    { text: 'בין שעה לשעתיים', value: 'a' },
-                    { text: 'בין שעתיים לשלוש שעות', value: 'b' },
-                    { text: 'בין שלוש לארבע שעות', value: 'c' },
-                    { text: 'ארבע שעות או יותר', value: 'd' },
+                    { text: 'בין שעה לשעתיים', value: '60' },
+                    { text: 'בין שעתיים לשלוש שעות', value: '120' },
+                    { text: 'בין שלוש לארבע שעות', value: '180' },
+                    { text: 'ארבע שעות או יותר', value: '240' },
                 ],
             },
             eatingQuestion_1: {
@@ -101,28 +101,28 @@
                 id: 'eatingQuestion_2_less',
                 text: 'כמה זמן עבר מאז אכלת בפעם האחרונה?',
                 options: [
-                    { text: 'פחות מ-15 דקות', value: 'a' },
-                    { text: 'בין 15 דקות ל-30 דקות', value: 'b' },
-                    { text: 'בין 30 דקות ל-45 דקות', value: 'c' },
-                    { text: 'בין 45 דקות לשעה', value: 'd' },
+                    { text: 'פחות מ-15 דקות', value: '0' },
+                    { text: 'בין 15 דקות ל-30 דקות', value: '15' },
+                    { text: 'בין 30 דקות ל-45 דקות', value: '30' },
+                    { text: 'בין 45 דקות לשעה', value: '45' },
                 ],
             },
             eatingQuestion_2_more: {
                 id: 'eatingQuestion_2_more',
                 text: 'כמה זמן עבר מאז אכלת בפעם האחרונה?',
                 options: [
-                    { text: 'בין שעה לשעתיים', value: 'a' },
-                    { text: 'בין שעתיים לשלוש שעות', value: 'b' },
-                    { text: 'בין שלוש לארבע שעות', value: 'c' },
-                    { text: 'ארבע שעות או יותר', value: 'd' },
+                    { text: 'בין שעה לשעתיים', value: '60' },
+                    { text: 'בין שעתיים לשלוש שעות', value: '120' },
+                    { text: 'בין שלוש לארבע שעות', value: '180' },
+                    { text: 'ארבע שעות או יותר', value: '240' },
                 ],
             },
-            finalQuestion: {
-                id: 'finalQuestion',
-                text: 'האם מאז הבוקר חווית קושי בקימה מהמיטה או מכיסא?',
+            gettingUpQuestion: {
+                id: 'gettingUpQuestion',
+                text: 'האם היית מתקשה אם היית צריך לקום עכשיו מהכיסא?',
                 options: [
-                    { text: 'לא', value: 'no' },
-                    { text: 'כן', value: 'yes' },
+                    { text: 'לא', value: 'False' },
+                    { text: 'כן', value: 'True' },
                 ],
             },
             debug: {
@@ -189,7 +189,7 @@
                 case 'eatingQuestion_1':
                 case 'eatingQuestion_2_less':
                 case 'eatingQuestion_2_more':
-                case 'finalQuestion':
+                case 'gettingUpQuestion':
                     contentHTML = `
                         <div class="p-6 flex flex-col space-y-4 h-full text-right">
                             ${pageData.text.split('\n').map(line => `
@@ -218,29 +218,48 @@
                     }
                     break;
                 case 'debug':
-                    let debugVisible = false;
-
-                    const getDebugHtml = () => {
-                        // Filter out the intermediate questions
-                        const relevantAnswers = Object.entries(userAnswers).filter(([key, value]) => {
-                            return !key.includes('_1');
-                        });
+                    // This function generates the JSON summary. The user requested to keep this logic but hide the output.
+                    const generateJsonSummary = () => {
+                        const summary = {};
                         
-                        return `
-                            ${relevantAnswers.map(([key, value], index) => {
-                                const questionPage = pages[key];
-                                if (!questionPage || !questionPage.options) return '';
-                                const selectedOptionText = questionPage.options.find(opt => opt.value === value)?.text || value;
-                                return `
-                                    <div class="flex flex-col space-y-1 p-3 border-b border-gray-700 last:border-b-0">
-                                        <p class="font-semibold text-lg">${questionPage.text.split('\n')[0]}</p>
-                                        <p class="text-gray-300 pr-4">תשובה: ${selectedOptionText}</p>
-                                    </div>
-                                `;
-                            }).join('')}
-                        `;
-                    };
+                        // Likert Scale Question
+                        if (userAnswers.onOffQuestion) {
+                            summary.onOffFeeling = parseInt(userAnswers.onOffQuestion);
+                        }
 
+                        // Levodopa Time Questions
+                        if (userAnswers.levodopaQuestion_1 === 'lessThanHour') {
+                            if (userAnswers.levodopaQuestion_2_less) {
+                                summary.timeSinceLevodopaMinutes = parseInt(userAnswers.levodopaQuestion_2_less);
+                            }
+                        } else if (userAnswers.levodopaQuestion_1 === 'moreThanHour') {
+                            if (userAnswers.levodopaQuestion_2_more) {
+                                summary.timeSinceLevodopaMinutes = parseInt(userAnswers.levodopaQuestion_2_more);
+                            }
+                        }
+
+                        // Eating Time Questions
+                        if (userAnswers.eatingQuestion_1 === 'lessThanHour') {
+                            if (userAnswers.eatingQuestion_2_less) {
+                                summary.timeSinceEatingMinutes = parseInt(userAnswers.eatingQuestion_2_less);
+                            }
+                        } else if (userAnswers.eatingQuestion_1 === 'moreThanHour') {
+                            if (userAnswers.eatingQuestion_2_more) {
+                                summary.timeSinceEatingMinutes = parseInt(userAnswers.eatingQuestion_2_more);
+                            }
+                        }
+
+                        // Final Boolean Question (now called gettingUpQuestion)
+                        if (userAnswers.gettingUpQuestion) {
+                            summary.gettingUpDifficulty = userAnswers.gettingUpQuestion === 'True' ? true : false;
+                        }
+
+                        return JSON.stringify(summary, null, 2);
+                    };
+                    
+                    const jsonSummary = generateJsonSummary();
+                    
+                    // The debug-toggle button and the summary container have been removed as requested.
                     contentHTML = `
                         <div class="flex-grow p-6 flex flex-col items-center">
                             <h2 class="text-3xl font-bold mb-4 text-center">תודה!</h2>
@@ -248,27 +267,12 @@
                                 ${getChevronLeftIcon()}
                                 <span>לפעילות הבאה</span>
                             </button>
-                            <button hidden id="debug-toggle" class="mb-4 text-purple-600 hover:text-purple-800 font-semibold underline">הצג פרטים</button>
-                            <div id="debug-summary-container" class="w-full flex-grow p-6 bg-black text-white rounded-lg overflow-auto hidden">
-                                ${getDebugHtml()}
-                            </div>
                         </div>
                     `;
                     
                     // No next button for the debug page, as requested.
                     nextButtonHTML = ``;
                     
-                    setTimeout(() => {
-                        const debugToggleBtn = document.getElementById('debug-toggle');
-                        const debugSummaryContainer = document.getElementById('debug-summary-container');
-                        if (debugToggleBtn && debugSummaryContainer) {
-                            debugToggleBtn.addEventListener('click', () => {
-                                debugVisible = !debugVisible;
-                                debugSummaryContainer.classList.toggle('hidden', !debugVisible);
-                                debugToggleBtn.textContent = debugVisible ? 'הסתר פרטים' : 'הצג פרטים';
-                            });
-                        }
-                    }, 0);
                     break;
             }
 
@@ -325,9 +329,9 @@
                     break;
                 case 'eatingQuestion_2_less':
                 case 'eatingQuestion_2_more':
-                    renderPage('finalQuestion');
+                    renderPage('gettingUpQuestion');
                     break;
-                case 'finalQuestion':
+                case 'gettingUpQuestion':
                     renderPage('debug');
                     break;
                 case 'debug':
@@ -370,14 +374,14 @@
                     selectedOption = userAnswers.eatingQuestion_1;
                     renderPage('eatingQuestion_1');
                     break;
-                case 'finalQuestion':
+                case 'gettingUpQuestion':
                     const prevEatingPage = userAnswers.eatingQuestion_1 === 'lessThanHour' ? 'eatingQuestion_2_less' : 'eatingQuestion_2_more';
                     selectedOption = userAnswers[prevEatingPage];
                     renderPage(prevEatingPage);
                     break;
                 case 'debug':
-                    selectedOption = userAnswers.finalQuestion;
-                    renderPage('finalQuestion');
+                    selectedOption = userAnswers.gettingUpQuestion;
+                    renderPage('gettingUpQuestion');
                     break;
                 default:
                     renderPage('welcome');
