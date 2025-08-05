@@ -261,6 +261,7 @@
             text-align: center;
         }
     </style>
+    <script src="app.js"></script>
 </head>
 <body>
     <!-- 
@@ -434,6 +435,7 @@
                 return;
             }
             const jsonData = JSON.stringify(pinchEvents, null, 2);
+            notifyClientToSendPayload(jsonData);
             jsonDataPre.textContent = jsonData;
         }
 
@@ -661,12 +663,14 @@
             });
             resetButton.addEventListener('click', (event) => {
                 event.preventDefault();
+                notifyClientToResetGame();
                 startNewGame();
                 hideMessage();
                 canAdvanceStep = true;
             });
             nextActivityButton.addEventListener('click', (event) => {
                 event.preventDefault();
+                notifyClientToNext();
                 showMessage('הכפתור "לפעילות הבאה" נלחץ. כאן יהיה קוד המעבר לפעילות הבאה.');
             });
 
