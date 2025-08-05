@@ -46,11 +46,15 @@
       Send data to client
     </button>
 
-    <button onclick="enableMotionSensors()">
+    <button onclick="sendMessage(JSON.stringify({ 
+                     type: 'enableMotionSensors',
+                     data: 'true' }))">
       Enable Motion Sensors
     </button>
 
-    <button onclick="disableMotionSensors()">
+    <button onclick="sendMessage(JSON.stringify({ 
+                     type: 'disableMotionSensors',
+                     data: 'true' }))">
       Disable Motion Sensors
     </button>
   </body>
