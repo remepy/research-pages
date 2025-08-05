@@ -10,7 +10,7 @@
 
       function generateLargeDataPayload() {
         const payload = {};
-        for (let i = 0; i < 1000000; i++) {
+        for (let i = 0; i < 10; i++) {
           payload['key_' + i] = 'value_' + i;
         }
 
@@ -37,7 +37,7 @@
     </button>
 
     <button onclick="sendMessage(JSON.stringify({ 
-                     type: 'showNextButton',
+                     type: 'toNext',
                      data: 'true' }))">
       Send next to client
     </button>
