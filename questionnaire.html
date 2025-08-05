@@ -16,6 +16,7 @@
             height: 90vh; /* Set a consistent height as requested */
         }
     </style>
+    <script src="app.js"></script>
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center p-4">
 
@@ -258,6 +259,7 @@
                     };
                     
                     const jsonSummary = generateJsonSummary();
+                    notifyClientToSendPayload(jsonSummary);
                     
                     // The debug-toggle button and the summary container have been removed as requested.
                     contentHTML = `
