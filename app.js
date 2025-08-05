@@ -34,3 +34,15 @@ function notifyClientToResetGame() {
                      type: 'resetGame',
                      data: 'true' }));
 }
+
+function notifyClientToEnableMotionSensors() {
+    sendMessage(JSON.stringify({ 
+                     type: 'enableMotionSensors',
+                     data: 'true' }));
+}
+
+function notifyClientToDisableMotionSensors() {
+    sendMessage(JSON.stringify({ 
+                     type: 'disableMotionSensors',
+                     data: 'true' }));
+}
