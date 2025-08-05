@@ -419,6 +419,8 @@
                 case 'debug':
                     // This function generates the JSON summary. 
                     const generateJsonSummary = () => {
+                        const summary = {};
+                        
                         // Likert Scale Question
                         if (userAnswers.onOffQuestion) {
                             summary.onOffFeeling = parseInt(userAnswers.onOffQuestion);
