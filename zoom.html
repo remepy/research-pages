@@ -429,14 +429,13 @@
         /**
          * Displays the pinch data in JSON format.
          */
-        function displayPinchData() {
+        function notifyPinchData() {
             if (pinchEvents.length === 0) {
-                jsonDataPre.textContent = 'אין נתוני צביטה זמינים. נתוני צביטה נרשמים רק בשימוש במסך מגע.';
+                console.log('No pinch data');
                 return;
             }
             const jsonData = JSON.stringify(pinchEvents, null, 2);
             notifyClientToSendPayload(jsonData);
-            jsonDataPre.textContent = jsonData;
         }
 
         // --- Welcome Screen Animation Logic ---
@@ -576,7 +575,7 @@
                 nextActivityButton.classList.remove('hidden-but-takes-space');
                 instructionTextElement.innerHTML = "<strong>הצלחתם! התמונה נחשפה.</strong>";
                 gameCanvas.classList.add('game-complete');
-                // The JSON display is no longer user-facing, so we don't display it here.
+                notifyPinchData();
             } else {
                 resetButton.classList.add('hidden-but-takes-space');
                 nextActivityButton.classList.add('hidden-but-takes-space');
