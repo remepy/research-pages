@@ -190,6 +190,7 @@
         }
 
     </style>
+    <script src="app.js"></script>
 </head>
 <body>
     <div class="app-container">
@@ -310,11 +311,6 @@
             const formattedMilliseconds = String(milliseconds).padStart(2, '0');
             
             stopwatchDisplay.textContent = `${formattedMinutes}:${formattedSeconds}.${formattedMilliseconds}`;
-        }
-
-        // Empty function to notify the client as requested
-        function notifyClientToNext() {
-            console.log('Client notified to proceed to the next activity.');
         }
 
         // Event listener for the "Next" button on the splash screen
