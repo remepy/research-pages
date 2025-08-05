@@ -1,15 +1,16 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hocus Pocus</title>
+    <title>הוקוס פוקוס</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         /*
          * This is the CSS section.
-         * All styling is located here, separated from the code logic and HTML structure.
+         * All styling is located here, separate from the code logic and HTML structure.
          */
         body {
             font-family: 'Inter', sans-serif;
@@ -25,11 +26,11 @@
             box-sizing: border-box;
         }
 
-        .game-container {
+        .screen-container {
             background-color: #ffffff;
             border-radius: 1.5rem;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            padding: 1rem;
+            padding: 1.5rem;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -37,6 +38,35 @@
             max-width: 98vw;
             width: 98vw;
             box-sizing: border-box;
+        }
+        
+        .welcome-container {
+            text-align: center;
+        }
+
+        .welcome-content {
+            display: flex;
+            flex-direction: row; /* Changed to row */
+            align-items: center;
+            justify-content: center; /* Added to center horizontally */
+            gap: 2rem;
+            flex-wrap: wrap; /* Added for responsiveness */
+        }
+        
+        /* Containers for the new animations */
+        #animationCanvas {
+            width: 80%;
+            max-width: 300px;
+            aspect-ratio: 1 / 1;
+            background-color: #e2e8f0;
+            border-radius: 1rem;
+            padding: 1rem;
+            box-sizing: border-box;
+        }
+
+        .welcome-text {
+            font-size: 1.2rem;
+            line-height: 1.6;
         }
 
         canvas {
@@ -47,12 +77,12 @@
             width: 100%;
             aspect-ratio: 1 / 1;
             touch-action: none;
-            transition: border-color 0.5s ease-in-out, border-width 0.5s ease-in-out, box-shadow 0.5s ease-in-out; /* Add transition for border-width and box-shadow */
+            transition: border-color 0.5s ease-in-out, border-width 0.5s ease-in-out, box-shadow 0.5s ease-in-out;
         }
         
         .game-complete {
-            border: 8px solid #10b981; /* Thicker and more vibrant green border */
-            box-shadow: 0 0 15px rgba(16, 185, 129, 0.75); /* Add a glowing effect */
+            border: 8px solid #10b981;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.75);
         }
 
         .controls {
@@ -65,7 +95,6 @@
             width: 100%;
         }
 
-        /* Container for the buttons to stack them vertically */
         .button-stack {
             display: flex;
             flex-direction: column;
@@ -75,7 +104,7 @@
             align-items: center;
         }
 
-        #resetButton, #toggleDebugButton, #nextActivityButton {
+        #startButton, #resetButton, #toggleDebugButton, #nextActivityButton {
             background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
             color: white;
             padding: 1rem 2rem;
@@ -97,28 +126,27 @@
             white-space: nowrap;
         }
         
-        #resetButton, #nextActivityButton {
-            direction: rtl; /* Keep right-to-left for the Hebrew text on these buttons */
+        #startButton, #resetButton, #nextActivityButton {
+            direction: rtl;
         }
 
         #toggleDebugButton {
-            display: none;
-            direction: ltr; /* Set left-to-right for English text */
+            direction: rtl;
         }
 
-        #resetButton:hover, #toggleDebugButton:hover, #nextActivityButton:hover {
+        #startButton:hover, #resetButton:hover, #toggleDebugButton:hover, #nextActivityButton:hover {
             background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
             transform: translateY(-4px);
             box-shadow: 0 10px 25px rgba(79, 70, 229, 0.5);
         }
 
-        #resetButton:active, #toggleDebugButton:active, #nextActivityButton:active {
+        #startButton:active, #resetButton:active, #toggleDebugButton:active, #nextActivityButton:active {
             background: linear-gradient(135deg, #3730a3 0%, #4f46e5 100%);
             transform: translateY(0);
             box-shadow: 0 5px 10px rgba(79, 70, 229, 0.4);
         }
 
-        #resetButton svg, #toggleDebugButton svg, #nextActivityButton svg {
+        #startButton svg, #resetButton svg, #toggleDebugButton svg, #nextActivityButton svg {
             margin-left: 1rem;
             width: 2rem;
             height: 2rem;
@@ -132,7 +160,7 @@
         }
         
         #toggleDebugButton {
-            background: linear-gradient(135deg, #4299e1 0%, #2b6cb0 100%); /* Blue gradient for a different look */
+            background: linear-gradient(135deg, #4299e1 0%, #2b6cb0 100%);
             box-shadow: 0 8px 20px rgba(43, 108, 176, 0.4);
         }
 
@@ -142,7 +170,7 @@
         }
         
         #nextActivityButton {
-            background: linear-gradient(135deg, #9333ea 0%, #7e22ce 100%); /* Purple gradient for next activity button */
+            background: linear-gradient(135deg, #9333ea 0%, #7e22ce 100%);
             box-shadow: 0 8px 20px rgba(126, 34, 206, 0.4);
             direction: rtl;
         }
@@ -155,6 +183,10 @@
         .hidden-but-takes-space {
             opacity: 0;
             pointer-events: none;
+        }
+        
+        .hidden {
+            display: none;
         }
 
         .message-box {
@@ -177,7 +209,6 @@
             gap: 0.25rem;
             background-color: #e2e8f0;
             border-radius: 0.5rem;
-            padding: 0.25rem;
             box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
@@ -225,10 +256,32 @@
 </head>
 <body>
     <!-- 
-     * This is the HTML area.
-     * It contains the structure of the application, with elements like headers, canvas, and buttons.
+     * This is the HTML section.
+     * It contains the application structure, with elements like headings, canvas, and buttons.
      -->
-    <div class="game-container">
+    
+    <!-- Welcome Screen Container -->
+    <div id="welcomeScreen" class="screen-container welcome-container">
+        <h1 class="text-5xl font-bold text-gray-800 mb-4">הוקוס פוקוס</h1>
+        <p class="welcome-text text-gray-600">
+            במסך הבא תוצג לכם תמונה מוגדלת מאוד. השתמשו ביד המושפעת ביותר מהמחלה. "צבטו" את המסך מהר ככל שניתן 10 פעמים, כדי להקטין את התמונה עד שתוצג במלואה.
+        </p>
+        
+        <div class="welcome-content">
+            <!-- Pinch illustration on the right of the coral animation -->
+            <img id="pinch-png" src='https://cdn-icons-png.flaticon.com/512/6852/6852525.png' height="15%" width="15%">
+            
+            <!-- Canvas for the 3D animation -->
+            <canvas id="animationCanvas"></canvas>
+        </div>
+        
+        <a href="#" id="startButton">
+            התחלה
+        </a>
+    </div>
+
+    <!-- Game Screen Container (hidden initially) -->
+    <div id="gameScreen" class="screen-container hidden">
         <h1 class="text-5xl font-bold text-gray-800 mb-4">הוקוס פוקוס</h1>
         <div id="instructionTextContainer" class="text-gray-600 text-center mb-4 min-h-[3rem] flex items-center justify-center">
             <p id="instructionText">
@@ -240,7 +293,7 @@
         </div>
         <div class="controls">
             <div class="button-stack">
-                <!-- כפתור לאתחול המשחק -->
+                <!-- Button to reset the game -->
                 <a href="#" id="resetButton" class="hidden-but-takes-space">
                     שחק שוב
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
@@ -256,18 +309,17 @@
                     </svg>
                 </a>
                 
-                <!-- New button to toggle debug data, now in English -->
-                <a href="#" id="toggleDebugButton">
-                    Show Data
+                <!-- New button to toggle debug data, which is now hidden by default -->
+                <a href="#" id="toggleDebugButton" class="hidden">
+                    הצג נתונים
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                        <path fill-rule="evenodd" d="M12 1.5a.75.75 0 01.75.75V4.5a.75.75 0 01-1.5 0V2.25a.75.75 0 01.75-.75zM5.626 4.31a.75.75 0 10-1.06 1.06L6.5 7.258a.75.75 0 001.06-1.06L5.626 4.31zM3 10.5a.75.75 0 01.75-.75H6a.75.75 0 010 1.5H3.75a.75.75 0 01-.75-.75zM12 22.5a.75.75 0 01-.75-.75V19.5a.75.75 0 011.5 0v2.25a.75.75 0 01-.75.75zM17.25 10.5a.75.75 0 01.75-.75h2.25a.75.75 0 010 1.5H18a.75.75 0 01-.75-.75zM15.495 17.65l-1.061 1.06a.75.75 0 01-1.06-1.06l1.06-1.061a.75.75 0 011.061 1.06zM18.375 18.375a.75.75 0 000-1.06L16.5 15.496a.75.75 0 10-1.06 1.06l1.875 1.879a.75.75 0 001.06 0zM12 6a6 6 0 11-4.006 10.593A6 6 0 0112 6z" clip-rule="evenodd" />
-                    </svg>
+                        <path fill-rule="evenodd" d="M12 1.5a.75.75 0 01.75.75V4.5a.75.75 0 01-1.5 0V2.25a.75.75 0 01.75-.75zM5.626 4.31a.75.75 0 10-1.06 1.06L6.5 7.258a.75.75 0 001.06-1.06L5.626 4.31zM3 10.5a.75.75 0 01.75-.75H6a.75.75 0 010 1.5H3.75a.75.75 0 01-.75-.75zM12 22.5a.75.75 0 01-.75-.75V19.5a.75.75 0 011.5 0v2.25a.75.75 0 01-.75.75zM17.25 10.5a.75.75 0 01.75-.75h2.25a.75.75 0 010 1.5H18a.75.75 0 01-.75-.75zM15.495 17.65l-1.061 1.06a.75.75 0 01-1.06-1.06l1.06-1.061a.75.75 0 011.061 1.06zM18.375 18.375a.75.75 0 000-1.06L16.5 15.496a.75.75 0 10-1.06 1.06l1.875 1.879a.75.75 0 001.06 0zM12 6a6 6 0 11-4.006 10.593A6 6 0 0112 6z" clip-rule="evenodd" /></svg>
                 </a>
             </div>
         </div>
         <div id="pinchTableContainer" class="pinch-data-container">
             <div id="jsonDisplay" class="json-display hidden-but-takes-space">
-                <h2>Pinch Data (JSON)</h2>
+                <h2>נתוני צביטה (JSON)</h2>
                 <pre id="jsonDataPre"></pre>
             </div>
         </div>
@@ -277,20 +329,24 @@
     <script>
         //
         // This is the JavaScript section.
-        // The code is now separated into readable, well-defined functions.
+        // The code is divided into clear and understandable functions.
         //
-
-        // Global constants and variables
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
+        
+        // Global variables declaration
+        const welcomeScreen = document.getElementById('welcomeScreen');
+        const gameScreen = document.getElementById('gameScreen');
+        const startButton = document.getElementById('startButton');
+        const gameCanvas = document.getElementById('gameCanvas');
+        const ctxGame = gameCanvas.getContext('2d');
         const resetButton = document.getElementById('resetButton');
         const nextActivityButton = document.getElementById('nextActivityButton');
-        const toggleDebugButton = document.getElementById('toggleDebugButton');
         const messageBox = document.getElementById('messageBox');
         const progressBar = document.getElementById('progressBar');
         const instructionTextElement = document.getElementById('instructionText');
         const jsonDisplay = document.getElementById('jsonDisplay');
         const jsonDataPre = document.getElementById('jsonDataPre');
+        
+        const animationCanvas = document.getElementById('animationCanvas');
 
         let image = new Image();
         let isImageLoaded = false;
@@ -321,10 +377,11 @@
         const TOTAL_PROGRESS_LEVELS = 10;
         const stepCooldown = 300;
 
+        // --- General Helper Functions ---
         /**
          * Displays a message to the user in a dedicated box.
          * @param {string} message - The message to display.
-         * @param {string} type - The type of message ('info', 'success', 'error').
+         * @param {string} type - The message type ('info', 'success', 'error').
          */
         function showMessage(message, type = 'info') {
             messageBox.textContent = message;
@@ -349,16 +406,161 @@
         }
 
         /**
-         * Draws the loading screen on the canvas.
+         * Calculates the angle between two points.
+         * @param {object} p1 - Point 1.
+         * @param {object} p2 - Point 2.
+         * @returns {number} The angle in degrees (0-360).
+         */
+        function calculateAngle(p1, p2) {
+            const pointingFinger = p1.clientY < p2.clientY ? p1 : p2;
+            const thumb = p1.clientY < p2.clientY ? p2 : p1;
+            const deltaX = thumb.clientX - pointingFinger.clientX;
+            const deltaY = thumb.clientY - pointingFinger.clientY;
+            let angleRad = Math.atan2(deltaX, -deltaY);
+            let angleDeg = angleRad * 180 / Math.PI;
+            if (angleDeg < 0) {
+                angleDeg += 360;
+            }
+            return angleDeg;
+        }
+
+        /**
+         * Displays the pinch data in JSON format.
+         */
+        function displayPinchData() {
+            if (pinchEvents.length === 0) {
+                jsonDataPre.textContent = 'אין נתוני צביטה זמינים. נתוני צביטה נרשמים רק בשימוש במסך מגע.';
+                return;
+            }
+            const jsonData = JSON.stringify(pinchEvents, null, 2);
+            jsonDataPre.textContent = jsonData;
+        }
+
+        /**
+         * Handles the click on the debug data button.
+         */
+        function toggleDebugVisibility() {
+            const isHidden = jsonDisplay.classList.toggle('hidden-but-takes-space');
+            const toggleDebugButton = document.getElementById('toggleDebugButton');
+            if (isHidden) {
+                toggleDebugButton.innerHTML = `הצג נתונים <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M12 1.5a.75.75 0 01.75.75V4.5a.75.75 0 01-1.5 0V2.25a.75.75 0 01.75-.75zM5.626 4.31a.75.75 0 10-1.06 1.06L6.5 7.258a.75.75 0 001.06-1.06L5.626 4.31zM3 10.5a.75.75 0 01.75-.75H6a.75.75 0 010 1.5H3.75a.75.75 0 01-.75-.75zM12 22.5a.75.75 0 01-.75-.75V19.5a.75.75 0 011.5 0v2.25a.75.75 0 01-.75.75zM17.25 10.5a.75.75 0 01.75-.75h2.25a.75.75 0 010 1.5H18a.75.75 0 01-.75-.75zM15.495 17.65l-1.061 1.06a.75.75 0 01-1.06-1.06l1.06-1.061a.75.75 0 011.061 1.06zM18.375 18.375a.75.75 0 000-1.06L16.5 15.496a.75.75 0 10-1.06 1.06l1.875 1.879a.75.75 0 001.06 0zM12 6a6 6 0 11-4.006 10.593A6 6 0 0112 6z" clip-rule="evenodd" /></svg>`;
+            } else {
+                toggleDebugButton.innerHTML = `הסתר נתונים <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M18.375 16.875a1.875 1.875 0 000-3.75h-7.5a1.875 1.875 0 000 3.75h7.5zM15 12a.75.75 0 01-.75-.75h-1.5a.75.75 0 010-1.5h1.5a.75.75 0 01.75.75v1.5zM12 7.5a.75.75 0 01-.75-.75v-1.5a.75.75 0 011.5 0v1.5a.75.75 0 01-.75.75zM12 18a.75.75 0 01-.75-.75v-1.5a.75.75 0 011.5 0v1.5a.75.75 0 01-.75.75zM9 12a.75.75 0 01-.75-.75v-1.5a.75.75 0 011.5 0v1.5a.75.75 0 01-.75.75zM21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+            }
+        }
+
+        // --- Welcome Screen Animation Logic ---
+        
+        const canvas = document.getElementById('animationCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        const imageUrl = 'https://upload.wikimedia.org/wikipedia/commons/2/2e/Coral_Outcrop_Flynn_Reef.jpg';
+        const animatedImage = new Image();
+        animatedImage.crossOrigin = 'anonymous';
+
+        const zoomOutDuration = 6000;
+        const waitDuration = 2000;
+        const zoomInDuration = 6000;
+        const totalAnimationDuration = zoomOutDuration + waitDuration + zoomInDuration;
+        
+        let startTime = null;
+        
+        const initialZoomFactor = 40.0;
+        const finalZoomFactor = 1.0;
+        const zoomRange = initialZoomFactor - finalZoomFactor;
+
+        function resizeCanvas() {
+            const aspectRatio = animatedImage.width / animatedImage.height;
+            const containerWidth = animationCanvas.offsetWidth;
+            
+            animationCanvas.width = containerWidth;
+            animationCanvas.height = containerWidth / aspectRatio;
+
+            // Recalculate dimensions to fit the container while maintaining aspect ratio
+            const parentContainer = animationCanvas.parentElement;
+            const maxDimension = Math.min(parentContainer.offsetWidth, parentContainer.offsetHeight);
+            const ratio = animatedImage.width / animatedImage.height;
+            if (ratio > 1) { // Landscape image
+                animationCanvas.width = maxDimension;
+                animationCanvas.height = maxDimension / ratio;
+            } else { // Portrait or square image
+                animationCanvas.height = maxDimension;
+                animationCanvas.width = maxDimension * ratio;
+            }
+        }
+
+        function drawFrame(elapsedTime) {
+            let currentScale;
+            
+            if (elapsedTime < zoomOutDuration) {
+                const progress = elapsedTime / zoomOutDuration;
+                currentScale = initialZoomFactor - (progress * zoomRange);
+            } else if (elapsedTime < zoomOutDuration + waitDuration) {
+                currentScale = finalZoomFactor;
+            } else {
+                const phase3Time = elapsedTime - (zoomOutDuration + waitDuration);
+                const progress = phase3Time / zoomInDuration;
+                currentScale = finalZoomFactor + (progress * zoomRange);
+            }
+
+            ctx.clearRect(0, 0, animationCanvas.width, animationCanvas.height);
+            
+            const sourceWidth = animatedImage.width / currentScale;
+            const sourceHeight = animatedImage.height / currentScale;
+            const sourceX = (animatedImage.width - sourceWidth) / 2;
+            const sourceY = (animatedImage.height - sourceHeight) / 2;
+            
+            ctx.drawImage(
+                animatedImage, 
+                sourceX, 
+                sourceY, 
+                sourceWidth, 
+                sourceHeight, 
+                0, 
+                0, 
+                animationCanvas.width, 
+                animationCanvas.height
+            );
+        }
+
+        function animate(timestamp) {
+            if (!startTime) startTime = timestamp;
+            const elapsedTime = (timestamp - startTime) % totalAnimationDuration;
+            
+            drawFrame(elapsedTime);
+            
+            requestAnimationFrame(animate);
+        }
+
+        animatedImage.onload = () => {
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            requestAnimationFrame(animate);
+        };
+        
+        animatedImage.onerror = () => {
+            console.error("Failed to load the image.");
+            ctx.fillStyle = "white";
+            ctx.textAlign = "center";
+            ctx.font = "20px Arial";
+            ctx.fillText("Failed to load image.", animationCanvas.width / 2, animationCanvas.height / 2);
+        };
+        
+        animatedImage.src = imageUrl;
+        
+        // --- Core Game Logic ---
+
+        /**
+         * Draws the loading screen on the game canvas.
          */
         function drawLoadingScreen() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#64748b';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#f8fafc';
-            ctx.font = '20px Inter';
-            ctx.textAlign = 'center';
-            ctx.fillText('טוען תמונה...', canvas.width / 2, canvas.height / 2);
+            ctxGame.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+            ctxGame.fillStyle = '#64748b';
+            ctxGame.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
+            ctxGame.fillStyle = '#f8fafc';
+            ctxGame.font = '20px Inter';
+            ctxGame.textAlign = 'center';
+            ctxGame.fillText('טוען תמונה...', gameCanvas.width / 2, gameCanvas.height / 2);
         }
 
         /**
@@ -383,7 +585,7 @@
                 resetButton.classList.remove('hidden-but-takes-space');
                 nextActivityButton.classList.remove('hidden-but-takes-space');
                 instructionTextElement.innerHTML = "<strong>הצלחתם! התמונה נחשפה.</strong>";
-                canvas.classList.add('game-complete'); // Add the green frame class
+                gameCanvas.classList.add('game-complete');
                 displayPinchData();
             } else {
                 resetButton.classList.add('hidden-but-takes-space');
@@ -393,7 +595,7 @@
         }
 
         /**
-         * Safely advances the progress step, using a cooldown.
+         * Safely advances the progress step, with a cooldown.
          */
         function advanceProgressStep() {
             if (canAdvanceStep && currentProgressBarLevel < TOTAL_PROGRESS_LEVELS) {
@@ -409,7 +611,7 @@
          * Draws the image on the canvas with the current zoom level.
          */
         function drawImage() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctxGame.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
 
             if (!isImageLoaded) {
                 drawLoadingScreen();
@@ -426,7 +628,7 @@
             const sx = (image.naturalWidth - imageSquareSize) / 2 + (imageSquareSize - croppedSourceWidth) / 2;
             const sy = (image.naturalHeight - imageSquareSize) / 2 + (imageSquareSize - croppedSourceHeight) / 2;
 
-            ctx.drawImage(image, sx, sy, croppedSourceWidth, croppedSourceHeight, 0, 0, canvas.width, canvas.height);
+            ctxGame.drawImage(image, sx, sy, croppedSourceWidth, croppedSourceHeight, 0, 0, gameCanvas.width, gameCanvas.height);
         }
 
         /**
@@ -439,7 +641,7 @@
             
             drawLoadingScreen();
             
-            canvas.classList.remove('game-complete'); // Remove the green frame class for a new game
+            gameCanvas.classList.remove('game-complete');
             image.src = imageSources[currentImageIndex];
         }
 
@@ -456,60 +658,17 @@
         }
 
         /**
-         * Calculates the angle between two points.
-         * @param {object} p1 - Point 1.
-         * @param {object} p2 - Point 2.
-         * @returns {number} The angle in degrees (0-360).
-         */
-        function calculateAngle(p1, p2) {
-            const pointingFinger = p1.clientY < p2.clientY ? p1 : p2;
-            const thumb = p1.clientY < p2.clientY ? p2 : p1;
-            const deltaX = thumb.clientX - pointingFinger.clientX;
-            const deltaY = thumb.clientY - pointingFinger.clientY;
-            let angleRad = Math.atan2(deltaX, -deltaY);
-            let angleDeg = angleRad * 180 / Math.PI;
-            if (angleDeg < 0) {
-                angleDeg += 360;
-            }
-            return angleDeg;
-        }
-
-        /**
-         * Displays pinch data in JSON format.
-         */
-        function displayPinchData() {
-            if (pinchEvents.length === 0) {
-                jsonDataPre.textContent = 'No pinch data available. Pinch data is only recorded with touchscreen use.';
-                return;
-            }
-            const jsonData = JSON.stringify(pinchEvents, null, 2);
-            jsonDataPre.textContent = jsonData;
-        }
-
-        /**
-         * Handles the click on the debug data toggle button.
-         */
-        function toggleDebugVisibility() {
-            const isHidden = jsonDisplay.classList.toggle('hidden-but-takes-space');
-            if (isHidden) {
-                toggleDebugButton.innerHTML = `Show Data <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M12 1.5a.75.75 0 01.75.75V4.5a.75.75 0 01-1.5 0V2.25a.75.75 0 01.75-.75zM5.626 4.31a.75.75 0 10-1.06 1.06L6.5 7.258a.75.75 0 001.06-1.06L5.626 4.31zM3 10.5a.75.75 0 01.75-.75H6a.75.75 0 010 1.5H3.75a.75.75 0 01-.75-.75zM12 22.5a.75.75 0 01-.75-.75V19.5a.75.75 0 011.5 0v2.25a.75.75 0 01-.75.75zM17.25 10.5a.75.75 0 01.75-.75h2.25a.75.75 0 010 1.5H18a.75.75 0 01-.75-.75zM15.495 17.65l-1.061 1.06a.75.75 0 01-1.06-1.06l1.06-1.061a.75.75 0 011.061 1.06zM18.375 18.375a.75.75 0 000-1.06L16.5 15.496a.75.75 0 10-1.06 1.06l1.875 1.879a.75.75 0 001.06 0zM12 6a6 6 0 11-4.006 10.593A6 6 0 0112 6z" clip-rule="evenodd" /></svg>`;
-            } else {
-                toggleDebugButton.innerHTML = `Hide Data <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M18.375 16.875a1.875 1.875 0 000-3.75h-7.5a1.875 1.875 0 000 3.75h7.5zM15 12a.75.75 0 01-.75-.75h-1.5a.75.75 0 010-1.5h1.5a.75.75 0 01.75.75v1.5zM12 7.5a.75.75 0 01-.75-.75v-1.5a.75.75 0 011.5 0v1.5a.75.75 0 01-.75.75zM12 18a.75.75 0 01-.75-.75v-1.5a.75.75 0 011.5 0v1.5a.75.75 0 01-.75.75zM9 12a.75.75 0 01-.75-.75v-1.5a.75.75 0 011.5 0v1.5a.75.75 0 01-.75.75zM21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
-            }
-        }
-        
-        /**
          * Initializes all game functionality.
          */
         function initializeGame() {
-            // Set canvas size
-            canvas.width = canvas.offsetWidth;
-            canvas.height = canvas.offsetWidth;
+            // Set game canvas size
+            gameCanvas.width = gameCanvas.offsetWidth;
+            gameCanvas.height = gameCanvas.offsetWidth;
 
             // Event listeners
             window.addEventListener('resize', () => {
-                canvas.width = canvas.offsetWidth;
-                canvas.height = canvas.offsetWidth;
+                gameCanvas.width = gameCanvas.offsetWidth;
+                gameCanvas.height = gameCanvas.offsetWidth;
                 drawImage();
             });
             resetButton.addEventListener('click', (event) => {
@@ -522,11 +681,8 @@
                 event.preventDefault();
                 showMessage('הכפתור "לפעילות הבאה" נלחץ. כאן יהיה קוד המעבר לפעילות הבאה.');
             });
-            toggleDebugButton.addEventListener('click', (event) => {
-                event.preventDefault();
-                toggleDebugVisibility();
-            });
-            canvas.addEventListener('wheel', (event) => {
+
+            gameCanvas.addEventListener('wheel', (event) => {
                 event.preventDefault();
                 if (canAdvanceStep && event.deltaY > 0) {
                     pinchEvents.push({
@@ -540,7 +696,7 @@
                     advanceProgressStep();
                 }
             });
-            canvas.addEventListener('touchstart', (event) => {
+            gameCanvas.addEventListener('touchstart', (event) => {
                 if (event.touches.length === 2) {
                     currentPinch = {
                         startTimestamp: Date.now(),
@@ -556,13 +712,13 @@
                 }
                 event.preventDefault();
             }, { passive: false });
-            canvas.addEventListener('touchmove', (event) => {
+            gameCanvas.addEventListener('touchmove', (event) => {
                 if (event.touches.length === 2) {
                     lastTouchPoints = [event.touches[0], event.touches[1]];
                 }
                 event.preventDefault();
             }, { passive: false });
-            canvas.addEventListener('touchend', (event) => {
+            gameCanvas.addEventListener('touchend', (event) => {
                 if (currentPinch.startTimestamp && lastTouchPoints.length === 2) {
                     currentPinch.endTimestamp = Date.now();
                     currentPinch.endDistance = Math.hypot(
@@ -580,7 +736,7 @@
                     lastTouchPoints = [];
                 }
             });
-            canvas.addEventListener('touchcancel', () => {
+            gameCanvas.addEventListener('touchcancel', () => {
                 currentPinch = {};
                 lastTouchPoints = [];
             });
@@ -596,20 +752,27 @@
             image.onerror = () => {
                 isImageLoaded = false;
                 showMessage("טעינת התמונה נכשלה. אנא בדוק את כתובת ה-URL של התמונה.", 'error');
-                ctx.fillStyle = '#ef4444';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = '#f8fafc';
-                ctx.font = '20px Inter';
-                ctx.textAlign = 'center';
-                ctx.fillText('שגיאת טעינת תמונה', canvas.width / 2, canvas.height / 2);
+                ctxGame.fillStyle = '#ef4444';
+                ctxGame.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
+                ctxGame.fillStyle = '#f8fafc';
+                ctxGame.font = '20px Inter';
+                ctxGame.textAlign = 'center';
+                ctxGame.fillText('שגיאת טעינת תמונה', gameCanvas.width / 2, gameCanvas.height / 2);
             };
 
             image.src = imageSources[currentImageIndex];
             drawLoadingScreen();
         }
 
-        // Entry point for the application, triggered after the page loads.
-        window.onload = initializeGame;
+        // The main entry point - controls the transition between the welcome and game screens.
+        window.onload = () => {
+            startButton.addEventListener('click', (event) => {
+                event.preventDefault();
+                welcomeScreen.classList.add('hidden');
+                gameScreen.classList.remove('hidden');
+                initializeGame();
+            });
+        };
     </script>
 </body>
 </html>
