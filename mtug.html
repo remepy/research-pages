@@ -23,7 +23,8 @@
         .app-container {
             width: 100%;
             max-width: 500px;
-            height: 100%;
+            height: 85%; /* Adjusted height to shift container up */
+            margin: 5% auto; /* Maintains vertical centering while allowing for height change */
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -31,6 +32,8 @@
             box-sizing: border-box;
             padding: 20px;
             overflow: hidden; /* Prevent scrolling */
+            border-radius: 20px; /* Added for a nicer look */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); /* Added for a nicer look */
         }
 
         /* Style for the main content area */
@@ -48,6 +51,14 @@
             color: #4b0082;
             font-size: 2rem;
             margin-bottom: 20px;
+        }
+
+        /* Style for standard body text, matching list items */
+        .body-text {
+            font-size: 1.2rem;
+            margin: 0 0 20px;
+            text-align: right;
+            width: 100%;
         }
         
         /* Style for instructions list */
@@ -77,7 +88,8 @@
 
         /* Style for the illustration images */
         .illustration {
-            max-width: 100%;
+            max-width: 50px; /* Reduced max width to 50px */
+            max-height: 50px; /* Reduced max height to 50px */
             height: auto;
             margin-top: 20px;
         }
@@ -99,6 +111,11 @@
         /* Primary button style (purple) */
         .button.primary {
             background-color: #4b0082;
+        }
+
+        /* Danger button style (red) */
+        .button.danger {
+            background-color: #e74c3c;
         }
 
         /* Secondary button style (gray) */
@@ -161,6 +178,13 @@
             gap: 50px;
         }
 
+        .button-group {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
     </style>
 </head>
 <body>
@@ -170,16 +194,18 @@
         <div id="splashScreen" class="screen">
             <div class="content">
                 <h1>צעד-צעד</h1>
-                <p>כך תבצעו את הפעילות :</p>
+                <p class="body-text">כך תבצעו את הפעילות:</p>
                 <ol>
-                    <li>בחרו בחדר או מסדרון שקט, ללא הפרעות. לאחר שמיקמתם את הכסא וסימנתם מרחק של 3 מטרים ממנו:</li>
-                    <li>לחצו על "התחל הליכה"</li>
+                    <li>בחרו בחדר או מסדרון שקט, ללא הפרעות. לאחר שמיקמתם את הכסא וסימנתם מרחק של 3 מטרים ממנו.</li>
+                    <li>לחצו על "התחל הליכה".</li>
                     <li>הניחו את הטלפון בכיס הקדמי של המכנסיים.</li>
                 </ol>
-                <img src="https://placehold.co/300x400/fff/4b0082?text=phone+in+pocket" alt="phone in pocket illustration" class="illustration" />
+                <img src="https://placehold.co/50x50/fff/4b0082?text=1" alt="phone in pocket illustration" class="illustration" />
             </div>
-            <button id="nextBtn" class="button primary">הבא</button>
-            <button class="link-button">דלג על הפעולות</button>
+            <div class="button-group">
+                <button id="nextBtn" class="button primary">הבא</button>
+                <button class="button danger" onclick="notifyClientToNext()">דלג על הפעולות</button>
+            </div>
         </div>
 
         <!-- Instructions Screen -->
@@ -192,16 +218,19 @@
                     <li>קומו, לכו 3 מטרים, הסתובבו וחזרו לשבת.</li>
                     <li>הוציאו את הטלפון מהכיס ולחצו על "סיום".</li>
                 </ol>
-                <img src="https://placehold.co/400x300/fff/4b0082?text=walking+illustration" alt="walking illustration" class="illustration" />
+                <img src="https://placehold.co/50x50/fff/4b0082?text=2" alt="walking illustration" class="illustration" />
             </div>
-            <button id="startBtn" class="button primary">התחל הליכה</button>
+            <div class="button-group">
+                <button id="startBtn" class="button primary">התחל הליכה</button>
+                <button class="button danger" onclick="notifyClientToNext()">דלג על הפעולות</button>
+            </div>
         </div>
 
         <!-- Activity Screen with Stopwatch -->
         <div id="activityScreen" class="screen hidden">
             <div class="content timer-container">
                 <h1>התחילו!</h1>
-                <p>הניחו את הטלפון בכיס הקדמי והתיישבו.</p>
+                <p class="body-text">הניחו את הטלפון בכיס הקדמי והתיישבו.</p>
                 <div id="stopwatchDisplay" class="stopwatch">00:00.00</div>
             </div>
             <button id="stopBtn" class="button secondary">סיום</button>
@@ -211,7 +240,7 @@
         <div id="resultScreen" class="screen hidden">
             <div class="content result-container">
                 <h1>זה הכל!</h1>
-                <p>זמן כולל:</p>
+                <p class="body-text">זמן כולל:</p>
                 <div id="finalTime" class="stopwatch">00:00.00</div>
             </div>
             <button id="finishBtn" class="button primary">סיום</button>
@@ -277,6 +306,11 @@
             const formattedMilliseconds = String(milliseconds).padStart(2, '0');
             
             stopwatchDisplay.textContent = `${formattedMinutes}:${formattedSeconds}.${formattedMilliseconds}`;
+        }
+
+        // Empty function to notify the client as requested
+        function notifyClientToNext() {
+            console.log('Client notified to proceed to the next activity.');
         }
 
         // Event listener for the "Next" button on the splash screen
