@@ -23,14 +23,15 @@
         .app-container {
             width: 100%;
             max-width: 500px;
-            height: 85%; /* Adjusted height to shift container up */
-            margin: 5% auto; /* Maintains vertical centering while allowing for height change */
+            height: 100%; /* Changed to 100% to use full screen space */
+            margin: auto; /* Centering horizontally */
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            justify-content: space-between; /* Distributes space between content and buttons */
             background-color: #fff;
             box-sizing: border-box;
             padding: 20px;
+            padding-bottom: 10vh; /* Adds space at the bottom to position buttons at 90% height */
             overflow: hidden; /* Prevent scrolling */
             border-radius: 20px; /* Added for a nicer look */
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); /* Added for a nicer look */
