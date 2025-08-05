@@ -45,6 +45,7 @@
             justify-content: center;
             align-items: center;
             padding: 20px;
+            padding-top: 10px; /* Reduced padding-top by 50% to decrease space above the title */
         }
 
         /* Style for headings */
@@ -89,9 +90,8 @@
 
         /* Style for the illustration images */
         .illustration {
-            /* max-width: 100px; /* Reduced max width to 50px */
-            max-height: 200px; /* Reduced max height to 50px */
-
+            max-width: 50px; /* Reduced max width to 50px */
+            max-height: 50px; /* Reduced max height to 50px */
             height: auto;
             margin-top: 20px;
         }
@@ -153,8 +153,10 @@
             font-weight: bold;
             color: #4b0082;
             font-family: monospace; /* Use a monospace font to prevent width changes */
-            width: 300px; /* Set a fixed width to prevent layout shifts */
+            /* Removed fixed width to allow it to expand */
             display: inline-block;
+            width: 100%; /* Ensure it takes full width of its container */
+            text-align: center; /* Center the stopwatch text */
         }
 
         /* Hide elements by default */
