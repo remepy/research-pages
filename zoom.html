@@ -4,14 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>הוקוס פוקוס</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         /*
          * This is the CSS section.
-         * All styling is located here, separate from the code logic and HTML structure.
+         * All styling is located here, separated from the code logic and HTML structure.
+         * Tailwind CSS has been removed and replaced with native CSS.
          */
+        
+        /* Basic body and font styling */
         body {
             font-family: 'Inter', sans-serif;
             display: flex;
@@ -26,6 +28,7 @@
             box-sizing: border-box;
         }
 
+        /* Reusable container for screens */
         .screen-container {
             background-color: #ffffff;
             border-radius: 1.5rem;
@@ -44,16 +47,32 @@
             text-align: center;
         }
 
+        /* Welcome screen content layout */
         .welcome-content {
             display: flex;
-            flex-direction: row; /* Changed to row */
+            flex-direction: row;
             align-items: center;
-            justify-content: center; /* Added to center horizontally */
+            justify-content: center;
             gap: 2rem;
-            flex-wrap: wrap; /* Added for responsiveness */
+            flex-wrap: wrap;
         }
         
-        /* Containers for the new animations */
+        /* Heading styling */
+        .main-heading {
+            font-size: 3rem; /* text-5xl */
+            font-weight: 700; /* font-bold */
+            color: #1f2937; /* text-gray-800 */
+            margin-bottom: 1rem; /* mb-4 */
+        }
+
+        /* Welcome text styling */
+        .welcome-text {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: #4b5563; /* text-gray-600 */
+        }
+        
+        /* Canvas for the 3D animation */
         #animationCanvas {
             width: 80%;
             max-width: 300px;
@@ -64,11 +83,7 @@
             box-sizing: border-box;
         }
 
-        .welcome-text {
-            font-size: 1.2rem;
-            line-height: 1.6;
-        }
-
+        /* Game canvas styling */
         canvas {
             border: 2px solid #cbd5e1;
             border-radius: 1rem;
@@ -80,11 +95,13 @@
             transition: border-color 0.5s ease-in-out, border-width 0.5s ease-in-out, box-shadow 0.5s ease-in-out;
         }
         
+        /* Visual cue for game completion */
         .game-complete {
             border: 8px solid #10b981;
             box-shadow: 0 0 15px rgba(16, 185, 129, 0.75);
         }
 
+        /* Button and control layout */
         .controls {
             display: flex;
             gap: 1rem;
@@ -104,6 +121,7 @@
             align-items: center;
         }
 
+        /* Common button styles */
         #startButton, #resetButton, #nextActivityButton {
             background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
             color: white;
@@ -124,13 +142,10 @@
             max-width: 100%;
             text-decoration: none;
             white-space: nowrap;
-        }
-        
-        #startButton, #resetButton, #nextActivityButton {
             direction: rtl;
         }
-        
 
+        /* Hover and active states for buttons */
         #startButton:hover, #resetButton:hover, #nextActivityButton:hover {
             background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
             transform: translateY(-4px);
@@ -143,6 +158,7 @@
             box-shadow: 0 5px 10px rgba(79, 70, 229, 0.4);
         }
 
+        /* SVG icon styling within buttons */
         #startButton svg, #resetButton svg, #nextActivityButton svg {
             margin-left: 1rem;
             width: 2rem;
@@ -156,11 +172,10 @@
             margin-left: 0;
         }
         
-        
+        /* Specific styling for the next activity button */
         #nextActivityButton {
             background: linear-gradient(135deg, #9333ea 0%, #7e22ce 100%);
             box-shadow: 0 8px 20px rgba(126, 34, 206, 0.4);
-            direction: rtl;
         }
 
         #nextActivityButton:hover {
@@ -168,6 +183,7 @@
             box-shadow: 0 10px 25px rgba(126, 34, 206, 0.5);
         }
 
+        /* Utility classes for visibility */
         .hidden-but-takes-space {
             opacity: 0;
             pointer-events: none;
@@ -176,7 +192,8 @@
         .hidden {
             display: none;
         }
-
+        
+        /* Message box styling */
         .message-box {
             background-color: #dbeafe;
             color: #1e40af;
@@ -189,6 +206,7 @@
             box-sizing: border-box;
         }
 
+        /* Progress bar container */
         .progress-container {
             width: 100%;
             display: flex;
@@ -200,6 +218,7 @@
             box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
+        /* Individual progress bar segments */
         .progress-segment {
             flex-grow: 1;
             height: 1rem;
@@ -212,6 +231,7 @@
             background-color: #4f46e5;
         }
 
+        /* JSON data display container (hidden by default) */
         .pinch-data-container {
             margin-top: 2rem;
             width: 100%;
@@ -250,8 +270,8 @@
     
     <!-- Welcome Screen Container -->
     <div id="welcomeScreen" class="screen-container welcome-container">
-        <h1 class="text-5xl font-bold text-gray-800 mb-4">הוקוס פוקוס</h1>
-        <p class="welcome-text text-gray-600">
+        <h1 class="main-heading">הוקוס פוקוס</h1>
+        <p class="welcome-text">
             במסך הבא תוצג לכם תמונה מוגדלת מאוד. השתמשו ביד המושפעת ביותר מהמחלה. "צבטו" את המסך מהר ככל שניתן 10 פעמים, כדי להקטין את התמונה עד שתוצג במלואה.
         </p>
         
@@ -270,8 +290,8 @@
 
     <!-- Game Screen Container (hidden initially) -->
     <div id="gameScreen" class="screen-container hidden">
-        <h1 class="text-5xl font-bold text-gray-800 mb-4">הוקוס פוקוס</h1>
-        <div id="instructionTextContainer" class="text-gray-600 text-center mb-4 min-h-[3rem] flex items-center justify-center">
+        <h1 class="main-heading">הוקוס פוקוס</h1>
+        <div id="instructionTextContainer" style="color: #4b5563; text-align: center; margin-bottom: 1rem; min-height: 3rem; display: flex; align-items: center; justify-content: center;">
             <p id="instructionText">
                 השתמשו בתנועת צביטה כדי לחשוף את התמונה הנסתרת מהר ככל שתוכלו.
             </p></div>
@@ -554,7 +574,7 @@
                 nextActivityButton.classList.remove('hidden-but-takes-space');
                 instructionTextElement.innerHTML = "<strong>הצלחתם! התמונה נחשפה.</strong>";
                 gameCanvas.classList.add('game-complete');
-                displayPinchData();
+                // The JSON display is no longer user-facing, so we don't display it here.
             } else {
                 resetButton.classList.add('hidden-but-takes-space');
                 nextActivityButton.classList.add('hidden-but-takes-space');
