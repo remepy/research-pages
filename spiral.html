@@ -407,13 +407,13 @@
             canvas.addEventListener('touchmove', handleMove, { passive: false });
             canvas.addEventListener('touchend', handleEnd);
             resetButton.addEventListener('click', resetGame);
+            nextActivityButton.addEventListener('click', nextActivity);
             toggleDebugButton.addEventListener('click', toggleDebugSection);
             window.addEventListener('resize', resizeCanvas);
 
             // Initial setup
             resizeCanvas();
             drawGame();
-            notifyClientToShowBackButton();
         }
         
         /**
@@ -808,6 +808,7 @@
             }
 
             const results = {
+                gameName: 'Spiral',
                 totalTime: finalTime.toFixed(2),
                 accuracy: finalAccuracy.toFixed(2),
                 tremorChanges: finalTremorSpikes,
@@ -978,7 +979,6 @@
                 tremorScore1Display.innerHTML = 'Tremor (changes): ' + finalTremorSpikes + ' spikes';
                 tremorScore3Display.innerHTML = 'Tremor (magnitude): ' + finalTremorMagnitude.toFixed(2);
                 generateAndDisplayJson();
-                // notifyClientToNext();
                 resetButton.classList.remove('hidden');
                 nextActivityButton.classList.remove('hidden');
             }
@@ -1005,6 +1005,13 @@
          */
         function handleEnd() {
             discDragging = false;
+        }
+
+        /**
+         * Moves to next activity.
+         */
+        function nextActivity() {
+            notifyClientToNext()
         }
 
         /**
@@ -1038,7 +1045,7 @@
             nextActivityButton.classList.add('hidden');
             gameInstructions.classList.remove('hidden');
             drawGame();
-            // notifyClientToResetGame();
+            notifyClientToResetGame();
         }
         
         // Run the initialization function when the page loads
