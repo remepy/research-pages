@@ -337,9 +337,8 @@
                     renderPage('debug');
                     break;
                 case 'debug':
-                    // Reset the quiz
-                    userAnswers = {};
-                    renderPage('welcome');
+                    // Finished with quiz
+                    notifyClientToNext();
                     break;
                 default:
                     renderPage('welcome');
