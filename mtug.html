@@ -44,7 +44,8 @@
             flex-grow: 1;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            /* Align content to the top instead of the center to prevent overflow */
+            justify-content: flex-start;
             align-items: center;
             padding-top: 0; /* Dramatically reduced padding before title */
             padding-left: 10px;
@@ -93,15 +94,18 @@
             font-size: 1.6rem;
         }
 
-        /* Style for the illustration images */
+        /* Style for the illustration images - now dynamically fills remaining space */
         .illustration {
-            /* Image is now centered due to the parent container's align-items: center */
+            /* Flex-grow allows the image to take up all remaining vertical space */
+            flex-grow: 1;
+            /* Ensure the image is centered horizontally */
+            align-self: center;
             /* Allow image to take up available width and height while maintaining aspect ratio */
             max-width: 100%;
             max-height: 100%;
             height: auto;
             object-fit: contain;
-            /* Minimal top margin for spacing */
+            /* Minimal top margin for spacing, but flex-grow will distribute space */
             margin-top: 10px;
         }
 
