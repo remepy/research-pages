@@ -22,19 +22,21 @@
         /* Container for the entire app, ensuring it takes up the full viewport */
         .app-container {
             width: 100%;
-            max-width: 500px;
-            height: 100%; /* Changed to 100% to use full screen space */
-            margin: auto; /* Centering horizontally */
+            max-width: 100%; /* Squeezed to maximum screen width */
+            height: 100%;
+            margin: auto;
             display: flex;
             flex-direction: column;
-            justify-content: space-between; /* Distributes space between content and buttons */
+            justify-content: space-between;
             background-color: #fff;
             box-sizing: border-box;
-            padding: 20px;
-            padding-bottom: 10vh; /* Adds space at the bottom to position buttons at 90% height */
-            overflow: hidden; /* Prevent scrolling */
-            border-radius: 20px; /* Added for a nicer look */
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); /* Added for a nicer look */
+            padding-top: 5px; /* Reduced top padding */
+            padding-left: 10px;
+            padding-right: 10px;
+            padding-bottom: 5vh; /* Reduced padding-bottom */
+            overflow: hidden;
+            border-radius: 0; /* Removed border-radius for full width look */
+            box-shadow: none; /* Removed box-shadow */
         }
 
         /* Style for the main content area */
@@ -44,21 +46,23 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 20px;
-            padding-top: 10px; /* Reduced padding-top by 50% to decrease space above the title */
+            padding-top: 0; /* Dramatically reduced padding before title */
+            padding-left: 10px;
+            padding-right: 10px;
         }
 
-        /* Style for headings */
+        /* Style for headings - reduced spacing dramatically (x5) */
         h1, h2 {
             color: #4b0082;
-            font-size: 3rem; /* Adjusted font size */
-            margin-bottom: 20px;
+            font-size: 2.8rem;
+            margin-top: 0; /* Removed default margin from top */
+            margin-bottom: 4px; /* Reduced from 20px (x5 reduction) */
         }
 
-        /* Style for standard body text, matching list items */
+        /* Style for standard body text - reduced spacing (x1.5) */
         .body-text {
-            font-size: 1.8rem; /* Adjusted font size */
-            margin: 0 0 20px;
+            font-size: 1.6rem;
+            margin: 0 0 13px; /* Reduced from 20px (x1.5 reduction) */
             text-align: right;
             width: 100%;
         }
@@ -68,15 +72,15 @@
             list-style: none;
             counter-reset: my-awesome-counter;
             padding-right: 0;
-            margin: 0;
+            margin: 0 0 6px; /* Reduced spacing between #2 and image (x3 reduction) */
         }
 
         li {
             counter-increment: my-awesome-counter;
-            margin-bottom: 20px;
+            margin-bottom: 10px; /* Reduced from 20px (x2 reduction) */
             text-align: right;
-            padding-right: 40px; /* Adjusted padding for larger numbers */
-            font-size: 1.8rem; /* Adjusted font size */
+            padding-right: 30px; /* Increased from 20px for more space */
+            font-size: 1.6rem;
             position: relative;
         }
 
@@ -86,21 +90,22 @@
             font-weight: bold;
             position: absolute;
             right: 0;
-            font-size: 1.8rem; /* Ensure counter size matches text */
+            font-size: 1.6rem;
         }
 
-        /* Style for the illustration images */
+        /* Style for the illustration images - reduced spacing (x3) */
         .illustration {
-            max-height: 200px;
+            max-width: 50px;
+            max-height: 50px;
             height: auto;
-            margin-top: 20px;
+            margin-top: 6px; /* Reduced from 20px (x3 reduction) */
         }
 
-        /* Style for buttons */
+        /* Style for buttons - text size increased */
         .button {
             width: 100%;
-            padding: 20px; /* Adjusted padding */
-            font-size: 1.8rem; /* Adjusted font size */
+            padding: 14px;
+            font-size: 1.4rem; /* Increased button text size */
             font-weight: bold;
             color: #fff;
             border: none;
@@ -134,7 +139,7 @@
             color: #4b0082;
             background: none;
             border: none;
-            font-size: 1.4rem; /* Adjusted font size */
+            font-size: 1.2rem;
             font-weight: bold;
             cursor: pointer;
             margin-top: 15px;
@@ -142,20 +147,20 @@
         
         .link-button.back {
             position: absolute;
-            top: 20px;
-            right: 20px;
+            top: 10px; /* Adjusted position */
+            right: 10px; /* Adjusted position */
             margin-top: 0;
         }
 
         /* Stopwatch display style */
         .stopwatch {
-            font-size: 5rem; /* Adjusted font size */
+            font-size: 4.5rem;
             font-weight: bold;
             color: #4b0082;
-            font-family: monospace; /* Use a monospace font to prevent width changes */
+            font-family: monospace;
             display: inline-block;
-            width: 100%; /* Ensure it takes full width of its container */
-            text-align: center; /* Center the stopwatch text */
+            width: 100%;
+            text-align: center;
         }
 
         /* Hide elements by default */
@@ -169,7 +174,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            gap: 20px;
+            gap: 10px; /* Reduced gap */
         }
 
         /* Specific container for the timer screen */
@@ -178,36 +183,36 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            gap: 50px;
+            gap: 20px; /* Reduced gap */
         }
 
         .button-group {
             width: 100%;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 10px; /* Reduced gap */
         }
 
-        /* Base style for long press buttons (round, progress ring, checkmark) */
+        /* Base style for long press buttons - size increased back */
         .long-press-base {
-            width: 200px; /* Increased size (approx. twice 100px) */
-            height: 200px; /* Increased size (approx. twice 100px) */
-            border-radius: 50%; /* Make it round */
+            width: 200px; /* Increased back to original size */
+            height: 200px; /* Increased back to original size */
+            border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            margin: 0 auto; /* Center the button */
+            margin: 0 auto;
             position: relative;
-            overflow: hidden; /* Hide overflow of the ring */
-            font-size: 1.8rem; /* Adjusted font size for the text inside */
+            overflow: hidden;
+            font-size: 1.4rem; /* Increased text size */
             color: #fff;
             font-weight: bold;
             border: none;
             cursor: pointer;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             transition: background-color 0.3s ease;
-            text-align: center; /* Center text within the button */
-            line-height: 1.2; /* Adjust line height for multi-line text */
+            text-align: center;
+            line-height: 1.2;
         }
 
         .long-press-base:active {
@@ -223,33 +228,33 @@
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            background: conic-gradient(#007bff var(--progress, 0%), transparent var(--progress, 0%)); /* Blue color for progress */
+            background: conic-gradient(#007bff var(--progress, 0%), transparent var(--progress, 0%));
             z-index: 1;
             box-sizing: border-box;
         }
 
         .long-press-base .button-text {
             position: relative;
-            z-index: 2; /* Ensure text is above the ring */
-            padding: 5px; /* Add some padding to prevent text touching edges */
+            z-index: 2;
+            padding: 5px;
         }
 
-        /* Green checkmark */
+        /* Green checkmark - size adjusted to fit new button size */
         .long-press-base .checkmark {
-            display: none; /* Hidden by default */
+            display: none;
             position: absolute;
-            font-size: 6.5rem; /* Adjusted checkmark size */
-            color: #28a745; /* Green color */
+            font-size: 6.5rem; /* Adjusted back to original size */
+            color: #28a745;
             z-index: 3;
-            line-height: 1; /* Adjust line height to center vertically */
+            line-height: 1;
         }
 
         .long-press-base.completed .checkmark {
-            display: block; /* Show when completed */
+            display: block;
         }
 
         .long-press-base.completed .button-text {
-            display: none; /* Hide text when completed */
+            display: none;
         }
 
         /* Specific styles for stop button (secondary color) */
@@ -290,7 +295,6 @@
                     <li>הניחו את הטלפון בכיס הקדמי של המכנסיים והתיישבו על הכיסא.</li>
                 </ol>
                 <img src="phone_in_pocket.png" alt="phone in pocket illustration" class="illustration" />
-                
             </div>
             <div class="button-group">
                 <button id="nextBtn" class="button primary">הבא</button>
@@ -357,19 +361,19 @@
         const finalTime = document.getElementById('finalTime');
 
         let timer;
-        let stopwatchStartTime; // Renamed for clarity
-        let stopwatchEndTime; // New variable to store end time
+        let stopwatchStartTime;
+        let stopwatchEndTime;
         let elapsedTime = 0;
 
         let pressTimer;
-        const LONG_PRESS_DURATION = 2000; // 2 seconds
+        const LONG_PRESS_DURATION = 2000;
         let progressInterval;
         let progress = 0;
-        let failedLongPressTries = 0; // Counter for failed long presses
+        let failedLongPressTries = 0;
         let gaitData;
-
+        
         window.onFlutterMessageReceived = function(data) {
-            // Access the message data through event.data
+            // Access the message data through data
             console.log('Received message:', data);
             alert(data)
 
@@ -386,17 +390,13 @@
             // Perform actions based on the received data
         };
 
-
         // Function to show a specific screen and hide others
         function showScreen(screenToShow) {
-            // Hide all screens first
             introScreen.classList.add('hidden');
             splashScreen.classList.add('hidden');
             instructionsScreen.classList.add('hidden');
             activityScreen.classList.add('hidden');
             resultScreen.classList.add('hidden');
-            
-            // Show the selected screen
             screenToShow.classList.remove('hidden');
         }
 
@@ -410,18 +410,18 @@
 
         // Function to start the stopwatch
         function startStopwatch() {
-            stopwatchStartTime = Date.now(); // Capture start time
-            elapsedTime = 0; // Reset elapsed time for new start
+            stopwatchStartTime = Date.now();
+            elapsedTime = 0;
             timer = setInterval(() => {
                 elapsedTime = Date.now() - stopwatchStartTime;
                 updateStopwatchDisplay();
-            }, 10); // Update every 10 milliseconds for precision
+            }, 10);
         }
 
         // Function to stop the stopwatch
         function stopStopwatch() {
             clearInterval(timer);
-            stopwatchEndTime = Date.now(); // Capture end time
+            stopwatchEndTime = Date.now();
         }
 
         // Function to update the stopwatch display
@@ -431,7 +431,6 @@
             const seconds = Math.floor((totalMilliseconds % 60000) / 1000);
             const milliseconds = Math.floor((totalMilliseconds % 1000) / 10);
             
-            // Format minutes, seconds, and milliseconds with leading zeros
             const formattedMinutes = String(minutes).padStart(2, '0');
             const formattedSeconds = String(seconds).padStart(2, '0');
             const formattedMilliseconds = String(milliseconds).padStart(2, '0');
@@ -442,43 +441,37 @@
         // Long press event handlers for stopBtn
         stopBtn.addEventListener('mousedown', startPress);
         stopBtn.addEventListener('mouseup', endPress);
-        stopBtn.addEventListener('mouseleave', endPress); // If mouse leaves button while pressing
+        stopBtn.addEventListener('mouseleave', endPress);
         stopBtn.addEventListener('touchstart', startPress);
         stopBtn.addEventListener('touchend', endPress);
         stopBtn.addEventListener('touchcancel', endPress);
 
         function startPress(e) {
-            // Prevent default touch behavior (e.g., scrolling)
             if (e.type === 'touchstart') {
                 e.preventDefault();
             }
 
-            // Reset progress and visual state
             progress = 0;
             stopBtn.style.setProperty('--progress', '0%');
             stopBtn.classList.remove('completed');
-            // Do NOT reset stopwatchDisplay.textContent here, it should continue running until stopPressAction
 
-            // Start visual progress update
             const pressStartTime = Date.now();
             progressInterval = setInterval(() => {
                 const elapsed = Date.now() - pressStartTime;
                 progress = (elapsed / LONG_PRESS_DURATION) * 100;
                 if (progress > 100) progress = 100;
                 stopBtn.style.setProperty('--progress', `${progress}%`);
-            }, 50); // Update progress every 50ms
+            }, 50);
 
-            // Start the long press timer
             pressTimer = setTimeout(() => {
-                stopPressAction(); // This will stop the stopwatch and transition to results
-                stopBtn.classList.add('completed'); // Mark as completed
+                stopPressAction();
+                stopBtn.classList.add('completed');
             }, LONG_PRESS_DURATION);
         }
 
         function endPress() {
             clearTimeout(pressTimer);
             clearInterval(progressInterval);
-            // If press was not long enough, increment failed tries and reset progress bar
             if (progress < 100) {
                 failedLongPressTries++;
                 stopBtn.style.setProperty('--progress', '0%');
@@ -489,19 +482,18 @@
             stopStopwatch();
             finalTime.textContent = stopwatchDisplay.textContent;
             showScreen(resultScreen);
-            notifyClientToDisableMotionSensors();
-            // Apply the completed state to the finish button on the results screen
-            finishBtn.style.setProperty('--progress', '100%'); // Ensure ring is full
-            finishBtn.classList.add('completed'); // Show checkmark and hide text
+            // notifyClientToDisableMotionSensors(); // Commented out
+            
+            finishBtn.style.setProperty('--progress', '100%');
+            finishBtn.classList.add('completed');
 
-            // Reset failed tries for the next activity
             failedLongPressTries = 0;
 
-            // Automatically call notifyClientToNext after 3 seconds on the results screen
             setTimeout(() => {
                 notifyClientToNext();
-            }, 3000); // 3-second delay
-
+                showScreen(introScreen);
+                resetLongPressButtons();
+            }, 5000);
         }
 
         // Event listener for the "Yes" button on the intro screen
@@ -514,35 +506,35 @@
             notifyClientToNext();
         });
 
-        // Event listener for the "Next" button on the splash screen (now second)
+        // Event listener for the "Next" button on the splash screen
         nextBtn.addEventListener('click', () => {
             showScreen(instructionsScreen);
         });
 
-        // Event listener for the "Back" button on the instructions screen (now third)
+        // Event listener for the "Back" button on the instructions screen
         backBtn.addEventListener('click', () => {
             showScreen(splashScreen);
         });
 
-        // Event listener for the "Start" button on the instructions screen (now third)
+        // Event listener for the "Start" button on the instructions screen
         startBtn.addEventListener('click', () => {
-            notifyClientToEnableMotionSensors();
+            // notifyClientToEnableMotionSensors(); // Commented out
             showScreen(activityScreen);
-            resetLongPressButtons(); // Reset buttons when starting activity
+            resetLongPressButtons();
             startStopwatch();
         });
         
-        // Event listener for the "Finish" button on the results screen (now fifth)
+        // Event listener for the "Finish" button on the results screen
         finishBtn.addEventListener('click', () => {
-            notifyClientToNext(); // Call the client notification function
-            showScreen(introScreen); // Go back to the intro screen
-            resetLongPressButtons(); // Reset buttons when returning to intro
+            notifyClientToNext();
+            showScreen(introScreen);
+            resetLongPressButtons();
         });
         
         // Initial screen on page load
         document.addEventListener('DOMContentLoaded', () => {
-            showScreen(introScreen); // Show the new intro screen first
-            resetLongPressButtons(); // Reset buttons on initial load
+            showScreen(introScreen);
+            resetLongPressButtons();
         });
 
     </script>
