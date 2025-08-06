@@ -496,6 +496,12 @@
 
             // Reset failed tries for the next activity
             failedLongPressTries = 0;
+
+            // Automatically call notifyClientToNext after 3 seconds on the results screen
+            setTimeout(() => {
+                notifyClientToNext();
+            }, 3000); // 3-second delay
+
         }
 
         // Event listener for the "Yes" button on the intro screen
