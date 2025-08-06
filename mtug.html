@@ -368,11 +368,10 @@
         let failedLongPressTries = 0; // Counter for failed long presses
         let gaitData;
 
-        const myChannel = new BroadcastChannel('AppToWebView');
-        myChannel.addEventListener('message', (event) => {
+        window.onFlutterMessageReceived = function(data) {
             // Access the message data through event.data
-            console.log('Received message:', event.data);
-            gaitData = event.data;
+            console.log('Received message:', data);
+            gaitData = data;
             // Perform actions based on the received data
         });
 
