@@ -366,11 +366,13 @@
         let progressInterval;
         let progress = 0;
         let failedLongPressTries = 0; // Counter for failed long presses
+        let gaitData;
 
         const myChannel = new BroadcastChannel('AppToWebView');
         myChannel.addEventListener('message', (event) => {
             // Access the message data through event.data
             console.log('Received message:', event.data);
+            gaitData = event.data;
             // Perform actions based on the received data
         });
 
@@ -487,7 +489,8 @@
                 gameName: "mtug",
                 numberOfFailedTries: failedLongPressTries,
                 stopwatchStartTime: stopwatchStartTime,
-                stopwatchEndTime: stopwatchEndTime
+                stopwatchEndTime: stopwatchEndTime,
+                gaitData: gaitData
             };
             notifyClientToSendPayload(payload);
 
