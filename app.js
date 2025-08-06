@@ -35,7 +35,7 @@ function notifyClientToResetGame() {
                      data: 'true' }));
 }
 
-function notifyClientToEnableMotionSensors(frequency_millis=10) {
+function notifyClientToEnableMotionSensors(frequency_millis=20) {
     sendMessage(JSON.stringify({ 
                      type: 'enableMotionSensors',
                      data: frequency_millis}));
