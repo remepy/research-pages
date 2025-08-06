@@ -371,7 +371,18 @@
         window.onFlutterMessageReceived = function(data) {
             // Access the message data through event.data
             console.log('Received message:', data);
-            gaitData = data;
+            alert(data)
+
+            // Prepare and send payload
+            const payload = {
+                gameName: "mtug",
+                numberOfFailedTries: failedLongPressTries,
+                stopwatchStartTime: stopwatchStartTime,
+                stopwatchEndTime: stopwatchEndTime,
+                gaitData: data
+            };
+            notifyClientToSendPayload(payload);
+            
             // Perform actions based on the received data
         };
 
@@ -482,16 +493,6 @@
             // Apply the completed state to the finish button on the results screen
             finishBtn.style.setProperty('--progress', '100%'); // Ensure ring is full
             finishBtn.classList.add('completed'); // Show checkmark and hide text
-
-            // Prepare and send payload
-            const payload = {
-                gameName: "mtug",
-                numberOfFailedTries: failedLongPressTries,
-                stopwatchStartTime: stopwatchStartTime,
-                stopwatchEndTime: stopwatchEndTime,
-                gaitData: gaitData
-            };
-            notifyClientToSendPayload(payload);
 
             // Reset failed tries for the next activity
             failedLongPressTries = 0;
