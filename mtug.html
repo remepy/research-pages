@@ -477,6 +477,7 @@
             stopStopwatch();
             finalTime.textContent = stopwatchDisplay.textContent;
             showScreen(resultScreen);
+            notifyClientToDisableMotionSensors();
             // Apply the completed state to the finish button on the results screen
             finishBtn.style.setProperty('--progress', '100%'); // Ensure ring is full
             finishBtn.classList.add('completed'); // Show checkmark and hide text
@@ -516,6 +517,7 @@
 
         // Event listener for the "Start" button on the instructions screen (now third)
         startBtn.addEventListener('click', () => {
+            notifyClientToEnableMotionSensors();
             showScreen(activityScreen);
             resetLongPressButtons(); // Reset buttons when starting activity
             startStopwatch();
