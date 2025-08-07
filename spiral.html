@@ -853,7 +853,6 @@
                     gameStarted = true;
                     startTime = Date.now();
                     timerInterval = setInterval(updateTimer, 100);
-                    // gameInstructions.classList.add('hidden');
                     messageBox.textContent = gameDirectionOutwards ? 'גררו את הכדור החוצה לקצה הספירלה!' : 'גררו את הכדור פנימה לקצה הספירלה!';
                     hebrewTimerDisplay.classList.remove('hidden');
                 }
@@ -981,6 +980,7 @@
                 generateAndDisplayJson();
                 resetButton.classList.remove('hidden');
                 nextActivityButton.classList.remove('hidden');
+                gameInstructions.classList.add('hidden');
             }
         }
         
@@ -1043,7 +1043,7 @@
             messageBox.textContent = 'לחצו על הכדור כדי להתחיל!';
             resetButton.classList.add('hidden');
             nextActivityButton.classList.add('hidden');
-            // gameInstructions.classList.remove('hidden');
+            gameInstructions.classList.remove('hidden');
             drawGame();
             notifyClientToResetGame();
         }
