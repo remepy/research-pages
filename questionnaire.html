@@ -39,14 +39,32 @@
         }
 
         /* Typography */
-        .text-3xl {
-            font-size: 1.875rem; /* text-3xl */
-            line-height: 2.25rem;
+        /* Custom font sizes for larger text */
+        .text-custom-title { /* For welcome page title */
+            font-size: 4rem; /* Increased */
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
+            line-height: 1;
         }
-        .text-xl {
-            font-size: 1.25rem; /* text-xl */
-            line-height: 1.75rem;
+        .text-custom-body { /* For welcome page body text and question text */
+            font-size: 1.5rem; /* Increased */
+            line-height: 1; /* Reduced line height for tighter spacing */
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+
         }
+        .text-custom-button { /* For option buttons */
+            font-size: 1.8rem; /* Increased */
+        }
+        .text-custom-next-button { /* For main next button */
+            font-size: 2.2rem; /* Increased */
+        }
+        .text-custom-back-button { /* For back button */
+            font-size: 1.8rem; /* Increased */
+        }
+
+
         .text-gray-800 { color: #1f2937; } /* text-gray-800 */
         .text-gray-600 { color: #4b5563; } /* text-gray-600 */
         .text-gray-500 { color: #6b7280; } /* text-gray-500 */
@@ -75,7 +93,7 @@
         /* Buttons and interactive elements */
         .option-button {
             width: 100%;
-            padding: 1rem 1.5rem; /* py-4 px-6 */
+            padding: 1rem 1rem; /* py-4 px-6 */
             text-align: right; /* text-right */
             border-radius: 0.75rem; /* rounded-xl */
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
@@ -84,14 +102,12 @@
             background-color: #fff; /* bg-white */
             border: 2px solid #e5e7eb; /* border-2 border-gray-200 */
             color: #1f2937; /* text-gray-800 */
-            font-size: 1.125rem; /* Increased font size */
+            font-size: 1.8rem; /* text-custom-button */
         }
-        
-         .option-button2:hover {
+        .option-button:hover {
             background-color: #f3f4f6; /* hover:bg-gray-100 */
         }
-        
-        .option-button.active { 
+        .option-button.active {
             background-color: #e9d5ff; /* bg-purple-200 */
             border-color: #9333ea; /* border-purple-600 */
             color: #6b21a8; /* text-purple-800 */
@@ -106,7 +122,7 @@
             transition-property: color, background-color, border-color, text-decoration-color, fill, stroke; /* transition-colors */
             transition-duration: 150ms;
             background-color: #9333ea; /* bg-purple-600 */
-            font-size: 1.25rem; /* Increased font size */
+            font-size: 2.2rem; /* text-custom-next-button */
         }
         .next-button:hover {
             background-color: #7e22ce; /* hover:bg-purple-700 */
@@ -120,7 +136,7 @@
             display: flex;
             align-items: center;
             color: #6b7280; /* text-gray-500 */
-            font-size: 1.125rem; /* Increased font size */
+            font-size: 1.8rem; /* text-custom-back-button */
         }
         .back-button:hover {
             color: #374151; /* hover:text-gray-700 */
@@ -170,7 +186,7 @@
             welcome: {
                 id: 'welcome',
                 title: 'ברוכים הבאים',
-                text: 'מטרת הפעילות היא לבנות מודל המסוגל לאמוד את השפעת הטיפול התרופתי בפרקינסון בצורה קלה ואמינה.\n\nמיד נשאל ארבע שאלות על השפעת התרופות. \nלאחר מכן תתבקשו לבצע כמה מטלות פשוטות. הפעילות כולה אמורה לארוך כ-5 דקות, נשמח אם תחזרו עליה החודש כמה שיותר פעמים - פעם במצב Off ופעם במצב On.',
+                text: 'מטרת הפעילות היא לבנות מודל המסוגל לאמוד את השפעת הטיפול התרופתי בפרקינסון בצורה קלה ואמינה.\nמיד נשאל ארבע שאלות על השפעת התרופות. \nלאחר מכן תתבקשו לבצע כמה מטלות פשוטות. הפעילות כולה אמורה לארוך כ-5 דקות, נשמח אם תחזרו עליה החודש כמה שיותר פעמים - פעם במצב Off ופעם במצב On.',
                 buttonText: 'מעבר לשאלות',
             },
             onOffQuestion: {
@@ -276,7 +292,7 @@
             if (currentPage !== 'welcome') {
                 backButtonHTML = `
                     <div class="flex justify-start items-center px-4 py-2 text-purple-700 font-bold text-xl">
-                        <button id="back-button" class="back-button">
+                        <button id="back-button" class="back-button text-custom-back-button">
                             ${getChevronRightIcon()}
                             <span>חזרה</span>
                         </button>
@@ -285,23 +301,25 @@
             }
 
             // Function to render multiline text as separate paragraphs
-            const renderMultiLineText = (text) => {
+            // Added my-0 to remove vertical margins from paragraphs
+            const renderMultiLineText = (text, className = 'text-gray-600 leading-relaxed') => {
                 const lines = text.split('\n');
-                return lines.map(line => `<p class="text-gray-600 leading-relaxed">${line}</p>`).join('');
+                return lines.map(line => `<p class="${className} my-0">${line}</p>`).join('');
             };
 
             // Render the main content for the current page
             switch (currentPage) {
                 case 'welcome':
+                    // Reduced padding and space-y for welcome screen
                     contentHTML = `
-                        <div class="p-6 flex flex-col items-center text-right space-y-4">
-                            <h1 class="text-3xl font-bold text-gray-800">${pageData.title}</h1>
-                            ${renderMultiLineText(pageData.text)}
+                        <div class="p-4 flex flex-col items-center text-right space-y-0">
+                            <h1 class="text-custom-title font-bold text-gray-800 mb-2">${pageData.title}</h1>
+                            ${renderMultiLineText(pageData.text, 'text-custom-body text-gray-600 leading-relaxed')}
                         </div>
                     `;
                     nextButtonHTML = `
                         <div class="p-6">
-                            <button id="next-button" class="next-button">
+                            <button id="next-button" class="next-button text-custom-next-button">
                                 ${pageData.buttonText}
                             </button>
                         </div>
@@ -315,16 +333,19 @@
                 case 'eatingQuestion_2_less':
                 case 'eatingQuestion_2_more':
                 case 'gettingUpQuestion':
+                    // Reduced padding and space-y for question pages
                     contentHTML = `
-                        <div class="p-6 flex flex-col space-y-4 h-full text-right">
-                            ${pageData.text.split('\n').map(line => `
-                                <p class="text-xl text-gray-800 font-semibold">${line}</p>
-                            `).join('')}
+                        <div class="p-4 flex flex-col space-y-4 h-full text-right">
+                            <div class="flex flex-col space-y-px"> <!-- New div for question text with minimal spacing -->
+                                ${pageData.text.split('\n').map(line => `
+                                    <p class="text-custom-body text-gray-800 font-semibold my-0">${line}</p>
+                                `).join('')}
+                            </div>
                             <div class="flex flex-col space-y-4 flex-grow w-full" id="options-container">
                                 ${pageData.options.map(option => `
                                     <button
                                         data-value="${option.value}"
-                                        class="option-button"
+                                        class="option-button text-custom-button"
                                     >
                                         ${option.text}
                                     </button>
@@ -335,7 +356,7 @@
                     if (!pageData.oneClick) {
                         nextButtonHTML = `
                             <div class="p-6">
-                                <button id="next-button" disabled class="next-button">
+                                <button id="next-button" disabled class="next-button text-custom-next-button">
                                     הבא
                                 </button>
                             </div>
@@ -343,13 +364,59 @@
                     }
                     break;
                 case 'debug':
+                    // This function generates the JSON summary. The user requested to keep this logic but hide the output.
+                    const generateJsonSummary = () => {
+                        const summary = {};
+                        
+                        // Likert Scale Question
+                        if (userAnswers.onOffQuestion) {
+                            summary.onOffFeeling = parseInt(userAnswers.onOffQuestion);
+                        }
+
+                        // Levodopa Time Questions
+                        if (userAnswers.levodopaQuestion_1 === 'lessThanHour') {
+                            if (userAnswers.levodopaQuestion_2_less) {
+                                summary.timeSinceLevodopaMinutes = parseInt(userAnswers.levodopaQuestion_2_less);
+                            }
+                        } else if (userAnswers.levodopaQuestion_1 === 'moreThanHour') {
+                            if (userAnswers.levodopaQuestion_2_more) {
+                                summary.timeSinceLevodopaMinutes = parseInt(userAnswers.levodopaQuestion_2_more);
+                            }
+                        }
+
+                        // Eating Time Questions
+                        if (userAnswers.eatingQuestion_1 === 'lessThanHour') {
+                            if (userAnswers.eatingQuestion_2_less) {
+                                summary.timeSinceEatingMinutes = parseInt(userAnswers.eatingQuestion_2_less);
+                            }
+                        } else if (userAnswers.eatingQuestion_1 === 'moreThanHour') {
+                            if (userAnswers.eatingQuestion_2_more) {
+                                summary.timeSinceEatingMinutes = parseInt(userAnswers.eatingQuestion_2_more);
+                            }
+                        }
+
+                        // Final Boolean Question (now called gettingUpQuestion)
+                        if (userAnswers.gettingUpQuestion) {
+                            summary.gettingUpDifficulty = userAnswers.gettingUpQuestion === 'True' ? true : false;
+                        }
+
+                        return JSON.stringify(summary, null, 2);
+                    };
+                    
+                    const jsonSummary = generateJsonSummary();
+                    
                     // The debug-toggle button and the summary container have been removed as requested.
                     contentHTML = `
-                        <div class="flex-grow p-6 flex flex-col items-center">
-                            <h2 class="text-3xl font-bold mb-4 text-center">תודה!</h2>
-                            <button id="next-activity-button" class="next-button w-full max-w-xs flex items-center justify-center space-x-2 shadow-lg">
-                                ${getChevronLeftIcon()}
+                        <div class="flex-grow p-6 flex flex-col items-center justify-end">
+                            <h2 class="text-3xl font-bold mb-12 text-center">תודה!</h2>
+                            <br />
+                            <br />
+                            <br />
+                            <br />
+                            <br />
+                            <button id="next-activity-button" class="next-button w-full max-w-xs flex items-center justify-center space-x-2 space-x-reverse shadow-lg text-custom-next-button mb-4">
                                 <span>לפעילות הבאה</span>
+                                ${getChevronLeftIcon()}
                             </button>
                         </div>
                     `;
@@ -567,3 +634,4 @@
     </script>
 </body>
 </html>
+
