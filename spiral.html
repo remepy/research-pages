@@ -192,7 +192,7 @@
             margin-top: 1rem;
             font-size: 1.5rem;
             color: #475569;
-            max-width: 80%;
+            max-width: 95%;
         }
 
         /* JSON data display styling */
@@ -853,7 +853,7 @@
                     gameStarted = true;
                     startTime = Date.now();
                     timerInterval = setInterval(updateTimer, 100);
-                    gameInstructions.classList.add('hidden');
+                    // gameInstructions.classList.add('hidden');
                     messageBox.textContent = gameDirectionOutwards ? 'גררו את הכדור החוצה לקצה הספירלה!' : 'גררו את הכדור פנימה לקצה הספירלה!';
                     hebrewTimerDisplay.classList.remove('hidden');
                 }
@@ -1043,7 +1043,7 @@
             messageBox.textContent = 'לחצו על הכדור כדי להתחיל!';
             resetButton.classList.add('hidden');
             nextActivityButton.classList.add('hidden');
-            gameInstructions.classList.remove('hidden');
+            // gameInstructions.classList.remove('hidden');
             drawGame();
             notifyClientToResetGame();
         }
