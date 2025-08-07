@@ -364,7 +364,7 @@
         let pinchEvents = [];
         let currentPinch = {};
         let lastTouchPoints = [];
-        let startTime = 0;
+        let startTaskTime = 0;
 
         // Game settings
         const imageSources = [
@@ -490,7 +490,7 @@
 
             payload = {
                 gameName: 'zoom',
-                time: (Date.now() - startTime) / 1000,
+                time: (Date.now() - startTaskTime) / 1000,
                 pinchData: jsonPinchData
             }
             notifyClientToSendPayload(jsonData);
