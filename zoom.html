@@ -364,6 +364,7 @@
         let pinchEvents = [];
         let currentPinch = {};
         let lastTouchPoints = [];
+        let startTime = 0;
 
         // Game settings
         const imageSources = [
@@ -485,7 +486,13 @@
                 console.log('No pinch data');
                 return;
             }
-            const jsonData = JSON.stringify(pinchEvents, null, 2);
+            const jsonPinchData = JSON.stringify(pinchEvents, null, 2);
+
+            payload = {
+                gameName = 'zoom',
+                time = (Date.now() - startTime) / 1000,
+                pinchData = jsonPinchData
+            }
             notifyClientToSendPayload(jsonData);
         }
 
@@ -804,6 +811,7 @@
 
             image.src = imageSources[currentImageIndex];
             drawLoadingScreen();
+            startTime = Date.now();
         }
 
         // The main entry point - controls the transition between the welcome and game screens.
