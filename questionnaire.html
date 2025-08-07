@@ -368,6 +368,8 @@
                     // This function generates the JSON summary. The user requested to keep this logic but hide the output.
                     const generateJsonSummary = () => {
                         const summary = {};
+
+                        summary.gameName = 'questionnaire';
                         
                         // Likert Scale Question
                         if (userAnswers.onOffQuestion) {
