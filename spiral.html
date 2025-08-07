@@ -287,15 +287,15 @@
             h1.textContent = "ברל'ה " + String.fromCodePoint(0x1f40c); // Snail emoji using code point
             body.appendChild(h1);
 
+            const canvasContainer = document.createElement('div');
+            canvasContainer.className = 'canvas-container';
+            body.appendChild(canvasContainer);
+
             gameInstructions = document.createElement('p');
             gameInstructions.id = 'gameInstructions';
             gameInstructions.className = 'instructions';
             gameInstructions.textContent = 'השתמשו ביד שבה קיים יותר קושי. העבירו את הכדור מתחילת הספירלה עד סופה מהר ככל האפשר.';
             canvasContainer.appendChild(gameInstructions);
-
-            const canvasContainer = document.createElement('div');
-            canvasContainer.className = 'canvas-container';
-            body.appendChild(canvasContainer);
 
             canvas = document.createElement('canvas');
             canvas.id = 'gameCanvas';
