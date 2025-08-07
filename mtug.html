@@ -486,6 +486,14 @@
                 stopPressAction();
                 stopBtn.classList.add('completed');
             }, LONG_PRESS_DURATION);
+
+            setTimeout(() => {
+                notifyClientToDisableMotionSensors();
+                setTimeout(() => {
+                    notifyClientToNext();
+                }, 5000);
+            }, 300000);
+
         }
 
         function endPress() {
@@ -501,7 +509,7 @@
             stopStopwatch();
             finalTime.textContent = stopwatchDisplay.textContent;
             showScreen(resultScreen);
-            // notifyClientToDisableMotionSensors(); // Commented out
+            notifyClientToDisableMotionSensors();
             
             finishBtn.style.setProperty('--progress', '100%');
             finishBtn.classList.add('completed');
@@ -510,8 +518,6 @@
 
             setTimeout(() => {
                 notifyClientToNext();
-                showScreen(introScreen);
-                resetLongPressButtons();
             }, 5000);
         }
 
@@ -537,7 +543,7 @@
 
         // Event listener for the "Start" button on the instructions screen
         startBtn.addEventListener('click', () => {
-            // notifyClientToEnableMotionSensors(); // Commented out
+            notifyClientToEnableMotionSensors();
             showScreen(activityScreen);
             resetLongPressButtons();
             startStopwatch();
