@@ -13,16 +13,18 @@
             min-height: 100vh; /* min-h-screen */
             display: flex; /* flex */
             align-items: center; /* items-center */
-            padding: 1rem; /* p-4 */
+            padding: 0; /* Removed padding */
+            width: 95%; /* Use 95% of screen width */
+            margin: auto; /* Center the body */
         }
         
         /* App container */
         .app-container {
             background-color: #fff; /* bg-white */
-            padding: 1rem; /* p-4 */
+            padding: 0.5rem; /* Reduced padding */
             border-radius: 1rem; /* rounded-2xl */
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-xl */
-            max-width: 32rem; /* max-w-lg */
+            max-width: none; /* Removed max-w-lg */
             width: 100%; /* w-full */
             height: 90vh;
             display: flex; /* flex */
@@ -34,34 +36,33 @@
         /* Responsive padding for app container */
         @media (min-width: 640px) {
             .app-container {
-                padding: 2rem; /* sm:p-8 */
+                padding: 1rem; /* Adjusted sm:p-8 */
             }
         }
 
         /* Typography */
         /* Custom font sizes for larger text */
         .text-custom-title { /* For welcome page title */
-            font-size: 4rem; /* Increased */
+            font-size: 4rem;
             padding: 0.5rem;
             margin-top: 0.5rem;
             margin-bottom: 0.5rem;
             line-height: 1;
         }
         .text-custom-body { /* For welcome page body text and question text */
-            font-size: 1.5rem; /* Increased */
-            line-height: 1; /* Reduced line height for tighter spacing */
-            margin-top: 1rem;
-            margin-bottom: 1rem;
-
+            font-size: 1.5rem;
+            line-height: 1.2; /* Further reduced line height for tighter spacing */
+            margin-top: 0.5rem; /* Reduced margin */
+            margin-bottom: 0.5rem; /* Reduced margin */
         }
         .text-custom-button { /* For option buttons */
-            font-size: 1.8rem; /* Increased */
+            font-size: 1.5rem; /* 1.8rem * 0.8 */
         }
         .text-custom-next-button { /* For main next button */
-            font-size: 2.2rem; /* Increased */
+            font-size: 2rem; /* 2.2rem * 0.8 */
         }
         .text-custom-back-button { /* For back button */
-            font-size: 1.8rem; /* Increased */
+            font-size: 1.5rem; /* 1.8rem * 0.8 */
         }
 
 
@@ -102,7 +103,7 @@
             background-color: #fff; /* bg-white */
             border: 2px solid #e5e7eb; /* border-2 border-gray-200 */
             color: #1f2937; /* text-gray-800 */
-            font-size: 1.8rem; /* text-custom-button */
+            font-size: 1.5rem; /* text-custom-button */
         }
         .option-button:hover {
             background-color: #f3f4f6; /* hover:bg-gray-100 */
@@ -122,7 +123,7 @@
             transition-property: color, background-color, border-color, text-decoration-color, fill, stroke; /* transition-colors */
             transition-duration: 150ms;
             background-color: #9333ea; /* bg-purple-600 */
-            font-size: 2.2rem; /* text-custom-next-button */
+            font-size: 2rem; /* text-custom-next-button */
         }
         .next-button:hover {
             background-color: #7e22ce; /* hover:bg-purple-700 */
@@ -136,7 +137,7 @@
             display: flex;
             align-items: center;
             color: #6b7280; /* text-gray-500 */
-            font-size: 1.8rem; /* text-custom-back-button */
+            font-size: 1.5rem; /* text-custom-back-button */
         }
         .back-button:hover {
             color: #374151; /* hover:text-gray-700 */
