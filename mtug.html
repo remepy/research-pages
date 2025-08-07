@@ -40,6 +40,18 @@
         }
 
         /* Style for the main content area */
+        .title_content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            /* Align content to the top instead of the center to prevent overflow */
+            justify-content: flex-start;
+            align-items: center;
+            padding-top: 50px; /* Dramatically reduced padding before title */
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+
         .content {
             flex-grow: 1;
             display: flex;
@@ -47,7 +59,7 @@
             /* Align content to the top instead of the center to prevent overflow */
             justify-content: flex-start;
             align-items: center;
-            padding-top: 0; /* Dramatically reduced padding before title */
+            padding-top: 0px; 
             padding-left: 10px;
             padding-right: 10px;
         }
@@ -282,7 +294,7 @@
 
         <!-- New Intro Screen -->
         <div id="introScreen" class="screen">
-            <div class="content">
+            <div class="title_content">
                 <h1>צעד-צעד</h1>
                 <p class="body-text">לפני שנתחיל בפעילות, <br>האם ביכולתך כרגע לקום מהכיסא ולצעוד למרחק קצר ובחזרה בצורה בטוחה?</p>
             </div>
