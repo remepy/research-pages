@@ -65,6 +65,7 @@
             font-size: 1.5rem; /* 1.8rem * 0.8 */
         }
 
+
         .text-gray-800 { color: #1f2937; } /* text-gray-800 */
         .text-gray-600 { color: #4b5563; } /* text-gray-600 */
         .text-gray-500 { color: #6b7280; } /* text-gray-500 */
@@ -89,7 +90,6 @@
         .space-x-2 > * + * { margin-left: 0.5rem; } /* space-x-2 */
         .w-full { width: 100%; } /* w-full */
         .max-w-xs { max-width: 20rem; } /* max-w-xs */
-        .mt-4 { margin-top: 1rem; }
         
         /* Buttons and interactive elements */
         .option-button {
@@ -104,9 +104,8 @@
             border: 2px solid #e5e7eb; /* border-2 border-gray-200 */
             color: #1f2937; /* text-gray-800 */
             font-size: 1.5rem; /* text-custom-button */
-            cursor: pointer;
         }
-        .option-button:hover:not(:disabled) {
+        .option-button-2:hover {
             background-color: #f3f4f6; /* hover:bg-gray-100 */
         }
         .option-button.active {
@@ -114,10 +113,6 @@
             border-color: #9333ea; /* border-purple-600 */
             color: #6b21a8; /* text-purple-800 */
             font-weight: 700; /* font-bold */
-        }
-        .option-button:disabled {
-            cursor: not-allowed;
-            opacity: 0.7;
         }
         .next-button {
             width: 100%;
@@ -129,8 +124,6 @@
             transition-duration: 150ms;
             background-color: #9333ea; /* bg-purple-600 */
             font-size: 2rem; /* text-custom-next-button */
-            border: none;
-            cursor: pointer;
         }
         .next-button:hover {
             background-color: #7e22ce; /* hover:bg-purple-700 */
@@ -145,9 +138,6 @@
             align-items: center;
             color: #6b7280; /* text-gray-500 */
             font-size: 1.5rem; /* text-custom-back-button */
-            background: none;
-            border: none;
-            cursor: pointer;
         }
         .back-button:hover {
             color: #374151; /* hover:text-gray-700 */
@@ -167,6 +157,7 @@
         .rtl-scale-x-100 { transform: scaleX(1); }
 
     </style>
+    <script src="app.js"></script>
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center p-4">
 
@@ -189,6 +180,7 @@
                 <path fill-rule="evenodd" d="M11.78 5.22a.75.75 0 0 1 0 1.06L7.06 10l4.72 4.72a.75.75 0 1 1-1.06 1.06l-5.25-5.25a.75.75 0 0 1 0-1.06l5.25-5.25a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
             </svg>
         `;
+
 
         // Question data objects for each page
         const pages = {
@@ -216,10 +208,11 @@
                     { text: 'עד שעה', value: 'lessThanHour' },
                     { text: 'שעה או יותר', value: 'moreThanHour' },
                 ],
+                oneClick: true,
             },
             levodopaQuestion_2_less: {
                 id: 'levodopaQuestion_2_less',
-                text: 'בחר/י את הזמן המדויק:',
+                text: 'כמה זמן בערך עבר מאז לקחת Levodopa בפעם האחרונה?',
                 options: [
                     { text: 'פחות מ-15 דקות', value: '0' },
                     { text: 'בין 15 דקות ל-30 דקות', value: '15' },
@@ -229,7 +222,7 @@
             },
             levodopaQuestion_2_more: {
                 id: 'levodopaQuestion_2_more',
-                text: 'בחר/י את הזמן המדויק:',
+                text: 'כמה זמן בערך עבר מאז לקחת Levodopa בפעם האחרונה?',
                 options: [
                     { text: 'בין שעה לשעתיים', value: '60' },
                     { text: 'בין שעתיים לשלוש שעות', value: '120' },
@@ -244,10 +237,11 @@
                     { text: 'עד שעה', value: 'lessThanHour' },
                     { text: 'שעה או יותר', value: 'moreThanHour' },
                 ],
+                oneClick: true,
             },
             eatingQuestion_2_less: {
                 id: 'eatingQuestion_2_less',
-                text: 'בחר/י את הזמן המדויק:',
+                text: 'כמה זמן עבר מאז אכלת בפעם האחרונה?',
                 options: [
                     { text: 'פחות מ-15 דקות', value: '0' },
                     { text: 'בין 15 דקות ל-30 דקות', value: '15' },
@@ -257,7 +251,7 @@
             },
             eatingQuestion_2_more: {
                 id: 'eatingQuestion_2_more',
-                text: 'בחר/י את הזמן המדויק:',
+                text: 'כמה זמן עבר מאז אכלת בפעם האחרונה?',
                 options: [
                     { text: 'בין שעה לשעתיים', value: '60' },
                     { text: 'בין שעתיים לשלוש שעות', value: '120' },
@@ -289,7 +283,6 @@
         const renderPage = (pageId) => {
             appContainer.innerHTML = ''; // Clear previous content
             currentPage = pageId;
-            selectedOption = null; // Reset selection on page render
 
             let contentHTML = '';
             let backButtonHTML = '';
@@ -308,6 +301,8 @@
                 `;
             }
 
+            // Function to render multiline text as separate paragraphs
+            // Added my-0 to remove vertical margins from paragraphs
             const renderMultiLineText = (text, className = 'text-gray-600 leading-relaxed') => {
                 const lines = text.split('\n');
                 return lines.map(line => `<p class="${className} my-0">${line}</p>`).join('');
@@ -316,6 +311,7 @@
             // Render the main content for the current page
             switch (currentPage) {
                 case 'welcome':
+                    // Reduced padding and space-y for welcome screen
                     contentHTML = `
                         <div class="p-4 flex flex-col items-center text-right space-y-0">
                             <h1 class="text-custom-title font-bold text-gray-800 mb-2">${pageData.title}</h1>
@@ -331,11 +327,20 @@
                     `;
                     break;
                 case 'onOffQuestion':
+                case 'levodopaQuestion_1':
+                case 'levodopaQuestion_2_less':
+                case 'levodopaQuestion_2_more':
+                case 'eatingQuestion_1':
+                case 'eatingQuestion_2_less':
+                case 'eatingQuestion_2_more':
                 case 'gettingUpQuestion':
+                    // Reduced padding and space-y for question pages
                     contentHTML = `
                         <div class="p-4 flex flex-col space-y-4 h-full text-right">
-                            <div class="flex flex-col space-y-px">
-                                <p class="text-custom-body text-gray-800 font-semibold my-0">${pageData.text}</p>
+                            <div class="flex flex-col space-y-px"> <!-- New div for question text with minimal spacing -->
+                                ${pageData.text.split('\n').map(line => `
+                                    <p class="text-custom-body text-gray-800 font-semibold my-0">${line}</p>
+                                `).join('')}
                             </div>
                             <div class="flex flex-col space-y-4 flex-grow w-full" id="options-container">
                                 ${pageData.options.map(option => `
@@ -349,47 +354,36 @@
                             </div>
                         </div>
                     `;
-                    nextButtonHTML = `
-                        <div class="p-6">
-                            <button id="next-button" disabled class="next-button text-custom-next-button">
-                                הבא
-                            </button>
-                        </div>
-                    `;
-                    break;
-                case 'levodopaQuestion_1':
-                case 'eatingQuestion_1':
-                     contentHTML = `
-                        <div class="p-4 flex flex-col space-y-4 h-full text-right">
-                            <div class="flex flex-col space-y-px">
-                                <p class="text-custom-body text-gray-800 font-semibold my-0">${pageData.text}</p>
+                    if (!pageData.oneClick) {
+                        nextButtonHTML = `
+                            <div class="p-6">
+                                <button id="next-button" disabled class="next-button text-custom-next-button">
+                                    הבא
+                                </button>
                             </div>
-                            <div class="flex flex-col space-y-4 w-full" id="options-container">
-                                ${pageData.options.map(option => `
-                                    <button
-                                        data-value="${option.value}"
-                                        class="option-button text-custom-button"
-                                    >
-                                        ${option.text}
-                                    </button>
-                                `).join('')}
-                            </div>
-                            <div id="sub-options-container" class="flex flex-col space-y-4 w-full mt-4 flex-grow"></div>
-                        </div>
-                    `;
+                        `;
+                    }
                     break;
                 case 'debug':
+                    // The debug-toggle button and the summary container have been removed as requested.
                     contentHTML = `
                         <div class="flex-grow p-6 flex flex-col items-center justify-end">
                             <h1 class="text-3xl font-bold mb-12 text-center">תודה!</h1>
-                            <br /><br /><br /><br /><br />
+                            <br />
+                            <br />
+                            <br />
+                            <br />
+                            <br />
                             <button id="next-activity-button" class="next-button w-full max-w-xs flex items-center justify-center space-x-2 space-x-reverse shadow-lg text-custom-next-button mb-4">
                                 <span>לפעילות הבאה</span>
                                 ${getChevronLeftIcon()}
                             </button>
                         </div>
                     `;
+                    
+                    // No next button for the debug page, as requested.
                     nextButtonHTML = ``;
+                    
                     break;
             }
 
@@ -602,3 +596,4 @@
     </script>
 </body>
 </html>
+
