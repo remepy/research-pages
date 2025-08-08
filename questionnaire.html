@@ -393,6 +393,7 @@
                     break;
             }
 
+            // Assemble the final HTML and inject it
             appContainer.innerHTML = `
                 <div class="flex flex-col h-full">
                     ${backButtonHTML}
@@ -403,15 +404,21 @@
                 </div>
             `;
             
+            // Re-attach event listeners after DOM update
             addEventListeners();
         };
 
         // Function to handle moving to the next page
         const handleNext = () => {
+            // Save the current answer before moving on, if it's a question page
             if (pages[currentPage].options && selectedOption) {
                 userAnswers[currentPage] = selectedOption;
             }
-            
+
+            // Reset selected option for the next page
+            selectedOption = null;
+
+            // Conditional navigation logic
             switch (currentPage) {
                 case 'welcome':
                     renderPage('onOffQuestion');
@@ -420,19 +427,76 @@
                     renderPage('levodopaQuestion_1');
                     break;
                 case 'levodopaQuestion_1':
+                    if (userAnswers.levodopaQuestion_1 === 'lessThanHour') {
+                        renderPage('levodopaQuestion_2_less');
+                    } else {
+                        renderPage('levodopaQuestion_2_more');
+                    }
+                    break;
+                case 'levodopaQuestion_2_less':
+                case 'levodopaQuestion_2_more':
                     renderPage('eatingQuestion_1');
                     break;
                 case 'eatingQuestion_1':
-                     renderPage('gettingUpQuestion');
+                    if (userAnswers.eatingQuestion_1 === 'lessThanHour') {
+                        renderPage('eatingQuestion_2_less');
+                    } else {
+                        renderPage('eatingQuestion_2_more');
+                    }
+                    break;
+                case 'eatingQuestion_2_less':
+                case 'eatingQuestion_2_more':
+                    renderPage('gettingUpQuestion');
                     break;
                 case 'gettingUpQuestion':
                     renderPage('debug');
                     break;
                 case 'debug':
+                    // This function generates the JSON summary. 
+                    const generateJsonSummary = () => {
+                        const summary = {};
+
+                        summary.gameName = 'questionnaire'
+                        
+                        // Likert Scale Question
+                        if (userAnswers.onOffQuestion) {
+                            summary.onOffFeeling = parseInt(userAnswers.onOffQuestion);
+                        }
+
+                        // Levodopa Time Questions
+                        if (userAnswers.levodopaQuestion_1 === 'lessThanHour') {
+                            if (userAnswers.levodopaQuestion_2_less) {
+                                summary.timeSinceLevodopaMinutes = parseInt(userAnswers.levodopaQuestion_2_less);
+                            }
+                        } else if (userAnswers.levodopaQuestion_1 === 'moreThanHour') {
+                            if (userAnswers.levodopaQuestion_2_more) {
+                                summary.timeSinceLevodopaMinutes = parseInt(userAnswers.levodopaQuestion_2_more);
+                            }
+                        }
+
+                        // Eating Time Questions
+                        if (userAnswers.eatingQuestion_1 === 'lessThanHour') {
+                            if (userAnswers.eatingQuestion_2_less) {
+                                summary.timeSinceEatingMinutes = parseInt(userAnswers.eatingQuestion_2_less);
+                            }
+                        } else if (userAnswers.eatingQuestion_1 === 'moreThanHour') {
+                            if (userAnswers.eatingQuestion_2_more) {
+                                summary.timeSinceEatingMinutes = parseInt(userAnswers.eatingQuestion_2_more);
+                            }
+                        }
+
+                        // Final Boolean Question (now called gettingUpQuestion)
+                        if (userAnswers.gettingUpQuestion) {
+                            summary.gettingUpDifficulty = userAnswers.gettingUpQuestion === 'True' ? true : false;
+                        }
+
+                        return JSON.stringify(summary, null, 2);
+                    };
+
                     const jsonSummary = generateJsonSummary();
-                    console.log("Quiz Finished. Summary:", jsonSummary);
-                    userAnswers = {};
-                    renderPage('welcome');
+                    notifyClientToSendPayload(jsonSummary);
+                    // Finished with quiz
+                    notifyClientToNext();
                     break;
                 default:
                     renderPage('welcome');
@@ -441,143 +505,89 @@
 
         // Function to handle moving to the previous page
         const handleBack = () => {
+            selectedOption = null;
+            delete userAnswers[currentPage];
+            
             switch (currentPage) {
                 case 'onOffQuestion':
                     renderPage('welcome');
                     break;
                 case 'levodopaQuestion_1':
-                    delete userAnswers.onOffQuestion;
+                    // Restore the previous selected option
+                    selectedOption = userAnswers.onOffQuestion;
                     renderPage('onOffQuestion');
                     break;
-                case 'eatingQuestion_1':
-                    delete userAnswers.levodopaQuestion_1;
-                    delete userAnswers.levodopaQuestion_2_less;
-                    delete userAnswers.levodopaQuestion_2_more;
+                case 'levodopaQuestion_2_less':
+                case 'levodopaQuestion_2_more':
+                    // Restore the selection for the previous page
+                    selectedOption = userAnswers.levodopaQuestion_1;
                     renderPage('levodopaQuestion_1');
                     break;
-                case 'gettingUpQuestion':
-                    delete userAnswers.eatingQuestion_1;
-                    delete userAnswers.eatingQuestion_2_less;
-                    delete userAnswers.eatingQuestion_2_more;
+                case 'eatingQuestion_1':
+                    const prevLevodopaPage = userAnswers.levodopaQuestion_1 === 'lessThanHour' ? 'levodopaQuestion_2_less' : 'levodopaQuestion_2_more';
+                    selectedOption = userAnswers[prevLevodopaPage];
+                    renderPage(prevLevodopaPage);
+                    break;
+                case 'eatingQuestion_2_less':
+                case 'eatingQuestion_2_more':
+                    selectedOption = userAnswers.eatingQuestion_1;
                     renderPage('eatingQuestion_1');
                     break;
+                case 'gettingUpQuestion':
+                    const prevEatingPage = userAnswers.eatingQuestion_1 === 'lessThanHour' ? 'eatingQuestion_2_less' : 'eatingQuestion_2_more';
+                    selectedOption = userAnswers[prevEatingPage];
+                    renderPage(prevEatingPage);
+                    break;
                 case 'debug':
-                    delete userAnswers.gettingUpQuestion;
+                    selectedOption = userAnswers.gettingUpQuestion;
                     renderPage('gettingUpQuestion');
                     break;
                 default:
                     renderPage('welcome');
             }
         };
-        
-        // Function to generate the final JSON summary
-        const generateJsonSummary = () => {
-            const summary = { gameName: 'questionnaire' };
-            if (userAnswers.onOffQuestion) {
-                summary.onOffFeeling = parseInt(userAnswers.onOffQuestion);
-            }
-            const levodopaAnswer = userAnswers.levodopaQuestion_2_less || userAnswers.levodopaQuestion_2_more;
-            if (levodopaAnswer) {
-                summary.timeSinceLevodopaMinutes = parseInt(levodopaAnswer);
-            }
-            const eatingAnswer = userAnswers.eatingQuestion_2_less || userAnswers.eatingQuestion_2_more;
-            if (eatingAnswer) {
-                summary.timeSinceEatingMinutes = parseInt(eatingAnswer);
-            }
-            if (userAnswers.gettingUpQuestion) {
-                summary.gettingUpDifficulty = userAnswers.gettingUpQuestion === 'True';
-            }
-            return JSON.stringify(summary, null, 2);
-        };
-
-        // Function to render sub-options for hierarchical questions
-        const renderSubOptions = (primaryValue, primaryQuestionKey) => {
-            const subContainer = document.getElementById('sub-options-container');
-            if (!subContainer) return;
-
-            const baseQuestionKey = primaryQuestionKey.replace('_1', '');
-            const subPageKey = `${baseQuestionKey}_2_${primaryValue === 'lessThanHour' ? 'less' : 'more'}`;
-            const subPageData = pages[subPageKey];
-            
-            if (!subPageData) {
-                console.error(`Sub page data not found for key: ${subPageKey}`);
-                return;
-            }
-            
-            let subOptionsHTML = `<p class="text-custom-body text-gray-800 font-semibold my-0">${subPageData.text}</p>`;
-            subOptionsHTML += subPageData.options.map(option => `
-                <button
-                    data-value="${option.value}"
-                    data-parent-page="${subPageKey}"
-                    class="option-button text-custom-button sub-option"
-                >
-                    ${option.text}
-                </button>
-            `).join('');
-            
-            subContainer.innerHTML = subOptionsHTML;
-
-            subContainer.querySelectorAll('.sub-option').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    const subValue = e.target.dataset.value;
-                    const parentPage = e.target.dataset.parentPage;
-
-                    userAnswers[parentPage] = subValue;
-
-                    subContainer.querySelectorAll('.sub-option').forEach(btn => {
-                        btn.classList.remove('active');
-                        btn.disabled = true;
-                    });
-                    e.target.classList.add('active');
-
-                    setTimeout(() => handleNext(), 200);
-                });
-            });
-        };
 
         // Function to attach all event listeners
         const addEventListeners = () => {
             const nextButton = document.getElementById('next-button');
-            if (nextButton) nextButton.addEventListener('click', handleNext);
+            if (nextButton) {
+                nextButton.addEventListener('click', handleNext);
+            }
 
             const backButton = document.getElementById('back-button');
-            if (backButton) backButton.addEventListener('click', handleBack);
+            if (backButton) {
+                backButton.addEventListener('click', handleBack);
+            }
             
             const nextActivityButton = document.getElementById('next-activity-button');
-            if (nextActivityButton) nextActivityButton.addEventListener('click', handleNext);
+            if (nextActivityButton) {
+                nextActivityButton.addEventListener('click', handleNext);
+            }
 
             const optionsContainer = document.getElementById('options-container');
             if (optionsContainer) {
                 optionsContainer.querySelectorAll('.option-button').forEach(button => {
                     button.addEventListener('click', (event) => {
                         const value = event.target.dataset.value;
-                        selectedOption = value;
                         
-                        // Handle hierarchical questions (levodopa, eating)
-                        if (currentPage === 'levodopaQuestion_1' || currentPage === 'eatingQuestion_1') {
-                            userAnswers[currentPage] = value;
-                            
-                            // Hide the unselected button and disable the selected one
-                            optionsContainer.querySelectorAll('.option-button').forEach(btn => {
-                                if (btn === event.target) {
-                                    btn.classList.add('active');
-                                    btn.disabled = true;
-                                } else {
-                                    btn.style.display = 'none'; // Hide the other button
-                                }
-                            });
-                            
-                            renderSubOptions(value, currentPage);
-                        } else {
-                            // Standard question behavior
-                            optionsContainer.querySelectorAll('.option-button').forEach(btn => {
-                                btn.classList.remove('active');
-                            });
-                            event.target.classList.add('active');
+                        // Update selected option
+                        selectedOption = value;
 
-                            if (nextButton) {
-                                nextButton.disabled = false;
-                            }
+                        // Update button styles
+                        optionsContainer.querySelectorAll('.option-button').forEach(btn => {
+                            btn.classList.remove('active');
+                        });
+                        event.target.classList.add('active');
+
+                        // Enable next button
+                        if (nextButton) {
+                            nextButton.disabled = false;
+                        }
+
+                        // Handle one-click pages
+                        const pageData = pages[currentPage];
+                        if (pageData.oneClick) {
+                             setTimeout(() => handleNext(), 100);
                         }
                     });
                 });
