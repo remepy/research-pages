@@ -9,7 +9,7 @@
         body, html {
             margin: 0;
             padding: 0;
-            height: 100vh;
+            min-height: 100vh; /* Allows body/html to grow beyond viewport if content pushes */
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: #f0f0f0;
             display: flex;
@@ -19,11 +19,11 @@
             color: #333;
         }
 
-        /* Container for the entire app, ensuring it takes up the full viewport */
+        /* Container for the entire app, ensuring it takes up the full viewport initially, but can grow */
         .app-container {
             width: 100%;
             max-width: 100%; /* Squeezed to maximum screen width */
-            height: 100vh;
+            min-height: 100vh; /* Allows app-container to grow beyond viewport if content pushes */
             margin: auto;
             display: flex;
             flex-direction: column;
@@ -33,14 +33,15 @@
             padding-top: 5px; /* Reduced top padding */
             padding-left: 10px;
             padding-right: 10px;
-            padding-bottom: 20px; /* Reduced padding-bottom */
+            padding-bottom: 20px; /* Reduced to fixed value for predictability */
+            /* Removed overflow: hidden; to allow page scrolling */
             border-radius: 0; /* Removed border-radius for full width look */
             box-shadow: none; /* Removed box-shadow */
         }
 
         /* Style for the main content area */
         .content {
-            flex-grow: 0; /* Changed from 1 to 0. This div just holds title/subtitle, not flexible space */
+            flex-grow: 0; /* This div just holds title/subtitle, not flexible space */
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
@@ -94,7 +95,6 @@
 
         /* Style for the illustration images/videos - dynamically fills remaining space, centered */
         .illustration {
-            /* No flex-grow here, as instructions-section handles vertical space */
             align-self: center; /* Centers horizontally within flex container */
             max-width: 100%;
             height: auto; /* Allow height to adjust based on aspect ratio */
@@ -275,6 +275,7 @@
         .instructions-section {
             width: 100%;
             flex-grow: 1; /* Make this section take up all available vertical space dynamically */
+            /* Removed height: 0; and overflow-y: auto; for page-level scrolling */
             margin-top: 10px; /* Small margin above instructions */
             padding-bottom: 10px; /* Add some padding at the bottom for content */
             box-sizing: border-box;
@@ -285,7 +286,7 @@
             margin-bottom: 10px;
         }
 
-                /* Intermediate Screen specific flex setup */
+        /* Intermediate Screen specific flex setup */
         #intermediateScreen {
             display: flex;
             flex-direction: column;
@@ -293,10 +294,12 @@
             justify-content: space-between; /* Distribute space between top content and bottom button */
             /* Removed overflow-y: auto here to ensure parent app-container scrolls */
         }
+
         #intermediateScreen .content {
             flex-grow: 0; /* Content (title/subtitle) takes only necessary space */
             flex-shrink: 0;
         }
+
         #dynamicContentContainer {
             flex-grow: 1; /* This container fills remaining vertical space */
             display: flex;
@@ -314,6 +317,7 @@
             margin-top: 15px; /* Added margin-top for spacing */
             flex-shrink: 0; /* Do not allow this to shrink */
         }
+
 
     </style>
     <script src="app.js"></script>
@@ -432,9 +436,9 @@
         let failedLongPressTries = 0;
         let gaitData;
         
+        // This function would be called by the Flutter client, if integrated
         window.onFlutterMessageReceived = function(data) {
-            console.log('Received message:', data);
-            alert(data)
+            console.log('Received message from Flutter:', data);
             const payload = {
                 gameName: "mtug",
                 numberOfFailedTries: failedLongPressTries,
