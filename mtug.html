@@ -9,7 +9,7 @@
         body, html {
             margin: 0;
             padding: 0;
-            height: 100%;
+            height: 100vh;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: #f0f0f0;
             display: flex;
@@ -23,7 +23,7 @@
         .app-container {
             width: 100%;
             max-width: 100%; /* Squeezed to maximum screen width */
-            height: 100%;
+            height: 100vh;
             margin: auto;
             display: flex;
             flex-direction: column;
@@ -33,8 +33,7 @@
             padding-top: 5px; /* Reduced top padding */
             padding-left: 10px;
             padding-right: 10px;
-            padding-bottom: 5vh; /* Reduced padding-bottom */
-            overflow: hidden; /* Prevent scrolling on the main app container */
+            padding-bottom: 20px; /* Reduced padding-bottom */
             border-radius: 0; /* Removed border-radius for full width look */
             box-shadow: none; /* Removed box-shadow */
         }
@@ -275,12 +274,7 @@
         /* Instructions section specific styles */
         .instructions-section {
             width: 100%;
-            /* Make this section take up all available vertical space dynamically */
-            flex-grow: 1; 
-            /* Set a min-height to ensure it gets some space even if content is small */
-            min-height: 50px; 
-            /* Enable vertical scrolling only for this section if content overflows */
-            overflow-y: auto; 
+            flex-grow: 1; /* Make this section take up all available vertical space dynamically */
             margin-top: 10px; /* Small margin above instructions */
             padding-bottom: 10px; /* Add some padding at the bottom for content */
             box-sizing: border-box;
@@ -289,6 +283,36 @@
         .instructions-section h2 {
             font-size: 2.2rem;
             margin-bottom: 10px;
+        }
+
+                /* Intermediate Screen specific flex setup */
+        #intermediateScreen {
+            display: flex;
+            flex-direction: column;
+            min-height: 100%; /* Changed to min-height to allow content to push */
+            justify-content: space-between; /* Distribute space between top content and bottom button */
+            /* Removed overflow-y: auto here to ensure parent app-container scrolls */
+        }
+        #intermediateScreen .content {
+            flex-grow: 0; /* Content (title/subtitle) takes only necessary space */
+            flex-shrink: 0;
+        }
+        #dynamicContentContainer {
+            flex-grow: 1; /* This container fills remaining vertical space */
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            /* min-height: 0; is important for nested flex children to shrink */
+            min-height: 0;
+        }
+        
+        #instructionsButtonOnlyContainer {
+            flex-shrink: 0; /* Do not allow this to shrink */
+        }
+        
+        #startMeasurementBtnContainer { /* New container for the button for specific styling */
+            margin-top: 15px; /* Added margin-top for spacing */
+            flex-shrink: 0; /* Do not allow this to shrink */
         }
 
     </style>
@@ -319,7 +343,7 @@
             </div>
 
             <!-- This div is the main flexible content area for the intermediate screen, between title and start button -->
-            <div id="dynamicContentContainer" style="flex-grow: 1; display: flex; flex-direction: column; width: 100%;">
+            <div id="dynamicContentContainer">
                 
                 <!-- Initial instructions button, visible by default -->
                 <div id="instructionsButtonOnlyContainer" class="button-group">
@@ -342,7 +366,7 @@
             </div>
 
             <!-- Start Measurement button - ALWAYS at the bottom of the intermediate screen -->
-            <div class="button-group" style="margin-top: 15px;"> <!-- Added margin-top here for spacing -->
+            <div class="button-group" id="startMeasurementBtnContainer">
                  <button id="startMeasurementBtn" class="button primary">התחל מדידה ⏱️</button>
             </div>
         </div>
