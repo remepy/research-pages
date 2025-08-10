@@ -27,39 +27,26 @@
             margin: auto;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            justify-content: space-between; /* This pushes the start button to the bottom */
             background-color: #fff;
             box-sizing: border-box;
             padding-top: 5px; /* Reduced top padding */
             padding-left: 10px;
             padding-right: 10px;
             padding-bottom: 5vh; /* Reduced padding-bottom */
-            overflow: hidden;
+            overflow: hidden; /* Prevent scrolling on the main app container */
             border-radius: 0; /* Removed border-radius for full width look */
             box-shadow: none; /* Removed box-shadow */
         }
 
         /* Style for the main content area */
-        .title_content {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            /* Align content to the top instead of the center to prevent overflow */
-            justify-content: flex-start;
-            align-items: center;
-            padding-top: 50px; /* Dramatically reduced padding before title */
-            padding-left: 10px;
-            padding-right: 10px;
-        }
-
         .content {
-            flex-grow: 1;
+            flex-grow: 0; /* Changed from 1 to 0. This div just holds title/subtitle, not flexible space */
             display: flex;
             flex-direction: column;
-            /* Align content to the top instead of the center to prevent overflow */
             justify-content: flex-start;
             align-items: center;
-            padding-top: 0px; 
+            padding-top: 0; /* Dramatically reduced padding before title */
             padding-left: 10px;
             padding-right: 10px;
         }
@@ -67,15 +54,15 @@
         /* Style for headings - reduced spacing dramatically (x5) */
         h1, h2 {
             color: #4b0082;
-            font-size: 2.8rem;
-            margin-top: 10; /* Removed default margin from top */
+            font-size: 2.5rem; /* Adjusted font size */
+            margin-top: 0; /* Removed default margin from top */
             margin-bottom: 4px; /* Reduced from 20px (x5 reduction) */
         }
 
         /* Style for standard body text - reduced spacing (x1.5) */
         .body-text {
-            font-size: 1.6rem;
-            margin: 0 0 13px; /* Reduced from 20px (x1.5 reduction) */
+            font-size: 1.5rem; /* Adjusted font size */
+            margin: 0 0 10px; /* Reduced from 13px */
             text-align: right;
             width: 100%;
         }
@@ -85,15 +72,15 @@
             list-style: none;
             counter-reset: my-awesome-counter;
             padding-right: 0;
-            margin: 0 0 6px; /* Reduced spacing between #2 and image (x3 reduction) */
+            margin: 0 0 5px; /* Reduced spacing between #2 and image (x3 reduction) */
         }
 
         li {
             counter-increment: my-awesome-counter;
-            margin-bottom: 10px; /* Reduced from 20px (x2 reduction) */
+            margin-bottom: 8px; /* Reduced from 10px */
             text-align: right;
-            padding-right: 30px; /* Increased from 20px for more space */
-            font-size: 1.6rem;
+            padding-right: 25px; /* Adjusted from 30px for more space between number and text */
+            font-size: 1.5rem; /* Adjusted font size */
             position: relative;
         }
 
@@ -103,28 +90,25 @@
             font-weight: bold;
             position: absolute;
             right: 0;
-            font-size: 1.6rem;
+            font-size: 1.5rem; /* Ensure counter size matches text */
         }
 
-        /* Style for the illustration images - now dynamically fills remaining space */
+        /* Style for the illustration images/videos - dynamically fills remaining space, centered */
         .illustration {
-            /* Flex-grow allows the image to take up all remaining vertical space */
-            flex-grow: 1;
-            /* Ensure the image is centered horizontally */
-            align-self: center;
-            /* Allow image to take up available width and height while maintaining aspect ratio */
-            max-height: 220px;
-            height: auto;
-            object-fit: contain;
-            /* Minimal top margin for spacing, but flex-grow will distribute space */
-            margin-top: 10px;
+            /* No flex-grow here, as instructions-section handles vertical space */
+            align-self: center; /* Centers horizontally within flex container */
+            max-width: 100%;
+            height: auto; /* Allow height to adjust based on aspect ratio */
+            object-fit: contain; /* Preserves aspect ratio */
+            margin-top: 5px; /* Minimal top margin */
+            margin-bottom: 5px; /* Minimal bottom margin */
         }
 
-        /* Style for buttons - text size increased */
+        /* Style for buttons */
         .button {
             width: 100%;
-            padding: 14px;
-            font-size: 1.4rem; /* Increased button text size */
+            padding: 16px; /* Adjusted padding */
+            font-size: 1.5rem; /* Adjusted button text size */
             font-weight: bold;
             color: #fff;
             border: none;
@@ -134,9 +118,9 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
-        /* Primary button style (purple) */
+        /* Primary button style (lighter purple) */
         .button.primary {
-            background-color: #4b0082;
+            background-color: #6a1a8f; /* Lighter purple shade */
         }
 
         /* Danger button style (red) */
@@ -158,7 +142,7 @@
             color: #4b0082;
             background: none;
             border: none;
-            font-size: 1.2rem;
+            font-size: 1.1rem; /* Adjusted font size */
             font-weight: bold;
             cursor: pointer;
             margin-top: 15px;
@@ -173,7 +157,7 @@
 
         /* Stopwatch display style */
         .stopwatch {
-            font-size: 4.5rem;
+            font-size: 4rem; /* Adjusted font size */
             font-weight: bold;
             color: #4b0082;
             font-family: monospace;
@@ -184,7 +168,7 @@
 
         /* Hide elements by default */
         .hidden {
-            display: none;
+            display: none !important; /* Added !important to ensure it always hides */
         }
 
         /* Specific container for the final results screen */
@@ -193,7 +177,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            gap: 10px; /* Reduced gap */
+            gap: 10px;
         }
 
         /* Specific container for the timer screen */
@@ -202,15 +186,27 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            gap: 20px; /* Reduced gap */
+            gap: 20px;
         }
 
+        /* Adjusted button-group for intermediate screen to allow horizontal arrangement */
         .button-group {
             width: 100%;
             display: flex;
-            flex-direction: column;
-            gap: 10px; /* Reduced gap */
+            flex-direction: column; /* Default to column for general use */
+            gap: 10px;
         }
+
+        /* Horizontal button group for initial intermediate screen buttons */
+        .button-group.horizontal {
+            flex-direction: row;
+            justify-content: space-around;
+            align-items: center;
+        }
+        .button-group.horizontal .button {
+            width: 48%; /* Adjust width to fit two buttons side-by-side with gap */
+        }
+
 
         /* Base style for long press buttons - size increased back */
         .long-press-base {
@@ -223,7 +219,7 @@
             margin: 0 auto;
             position: relative;
             overflow: hidden;
-            font-size: 1.4rem; /* Increased text size */
+            font-size: 1.5rem; /* Adjusted text size */
             color: #fff;
             font-weight: bold;
             border: none;
@@ -262,7 +258,7 @@
         .long-press-base .checkmark {
             display: none;
             position: absolute;
-            font-size: 6.5rem; /* Adjusted back to original size */
+            font-size: 6rem; /* Adjusted checkmark size */
             color: #28a745;
             z-index: 3;
             line-height: 1;
@@ -276,14 +272,23 @@
             display: none;
         }
 
-        /* Specific styles for stop button (secondary color) */
-        #stopBtn {
-            background-color: #a9a9a9;
+        /* Instructions section specific styles */
+        .instructions-section {
+            width: 100%;
+            /* Make this section take up all available vertical space dynamically */
+            flex-grow: 1; 
+            /* Set a min-height to ensure it gets some space even if content is small */
+            min-height: 50px; 
+            /* Enable vertical scrolling only for this section if content overflows */
+            overflow-y: auto; 
+            margin-top: 10px; /* Small margin above instructions */
+            padding-bottom: 10px; /* Add some padding at the bottom for content */
+            box-sizing: border-box;
         }
 
-        /* Specific styles for finish button (primary color) */
-        #finishBtn {
-            background-color: #4b0082;
+        .instructions-section h2 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
         }
 
     </style>
@@ -292,9 +297,9 @@
 <body>
     <div class="app-container">
 
-        <!-- New Intro Screen -->
+        <!-- Intro Screen -->
         <div id="introScreen" class="screen">
-            <div class="title_content">
+            <div class="content">
                 <h1>צעד-צעד</h1>
                 <p class="body-text">לפני שנתחיל בפעילות, <br>האם ביכולתך כרגע לקום מהכיסא ולצעוד למרחק קצר ובחזרה בצורה בטוחה?</p>
             </div>
@@ -304,36 +309,45 @@
             </div>
         </div>
 
-        <!-- Splash/Initial Screen (now second screen) -->
-        <div id="splashScreen" class="screen hidden">
+        <!-- New Intermediate Screen -->
+        <div id="intermediateScreen" class="screen hidden">
+            <button id="backFromIntermediateBtn" class="link-button back">חזרה</button>
             <div class="content">
                 <h1>צעד-צעד</h1>
-                <p class="body-text">בחרו בחדר או מסדרון שקט, ללא הפרעות. לאחר שמיקמתם את הכסא וסימנתם מרחק של 3 מטר ממנו:</p>
-                <ol>
-                    <li>לחצו על ״התחל הליכה״</li>
-                    <li>הניחו את הטלפון בכיס הקדמי של המכנסיים והתיישבו על הכיסא.</li>
-                </ol>
-                <img src="phone_in_pocket.png" alt="phone in pocket illustration" class="illustration" />
+                <!-- Subtitle for instructions will be toggled here -->
+                <h2 id="instructionsSubtitle" class="body-text hidden">הנחיות לביצוע צעד-צעד</h2>
             </div>
-            <div class="button-group">
-                <button id="nextBtn" class="button primary">הבא</button>
+
+            <!-- This div is the main flexible content area for the intermediate screen, between title and start button -->
+            <div id="dynamicContentContainer" style="flex-grow: 1; display: flex; flex-direction: column; width: 100%;">
+                
+                <!-- Initial instructions button, visible by default -->
+                <div id="instructionsButtonOnlyContainer" class="button-group">
+                    <button id="revealInstructionsBtn" class="button primary">הנחיות <span style="font-size: 1em;">ⓘ</span></button>
+                </div>
+
+                <!-- Detailed instructions section, initially hidden and scrollable -->
+                <div id="instructionsDetailedSection" class="instructions-section hidden">
+                    <ol>
+                        <li>לחצו על ״התחל הליכה״</li>
+                        <li>הניחו את הטלפון בכיס הקדמי של המכנסיים והתיישבו על הכיסא.</li>
+                    </ol>
+                    <img src="phone_in_pocket.png" alt="phone in pocket illustration" class="illustration" />
+                    <p class="body-text" style="margin-top: 20px;">
+                        3. כעת קומו, לכו 3 מטרים, הסתובבו במקום, חיזרו אל הכיסא והתיישבו.
+                        <br/>
+                        4. הוציאו את הטלפון מהכיס ולחצו לחיצה ארוכה על “סיום״.</p>
+                    <img src="mtug_demo.gif" />
+                </div>
+            </div>
+
+            <!-- Start Measurement button - ALWAYS at the bottom of the intermediate screen -->
+            <div class="button-group" style="margin-top: 15px;"> <!-- Added margin-top here for spacing -->
+                 <button id="startMeasurementBtn" class="button primary">התחל מדידה ⏱️</button>
             </div>
         </div>
 
-        <!-- Instructions Screen (now third screen) -->
-        <div id="instructionsScreen" class="screen hidden">
-            <button id="backBtn" class="link-button back">חזרה</button>
-            <div class="content">
-                <h1>צעד-צעד</h1>
-                <p class="body-text">3. כעת קומו, לכו 3 מטרים, הסתובבו במקום, חיזרו אל הכיסא והתיישבו.<br>4. הוציאו את הטלפון מהכיס ולחצו לחיצה ארוכה על “סיום״.</p>
-                <img src="mtug_instructions.png" alt="walking illustration" class="illustration" />
-            </div>
-            <div class="button-group">
-                <button id="startBtn" class="button primary">התחל הליכה</button>
-            </div>
-        </div>
-
-        <!-- Activity Screen with Stopwatch (now fourth screen) -->
+        <!-- Activity Screen with Stopwatch -->
         <div id="activityScreen" class="screen hidden">
             <div class="content timer-container">
                 <h1>התחילו!</h1>
@@ -346,7 +360,7 @@
             </button>
         </div>
 
-        <!-- Results Screen (now fifth screen) -->
+        <!-- Results Screen -->
         <div id="resultScreen" class="screen hidden">
             <div class="content result-container">
                 <h1>זה הכל!</h1>
@@ -363,18 +377,21 @@
     <script>
         // Get references to all the screens and buttons
         const introScreen = document.getElementById('introScreen');
-        const splashScreen = document.getElementById('splashScreen');
-        const instructionsScreen = document.getElementById('instructionsScreen');
+        const intermediateScreen = document.getElementById('intermediateScreen');
         const activityScreen = document.getElementById('activityScreen');
         const resultScreen = document.getElementById('resultScreen');
 
         const introYesBtn = document.getElementById('introYesBtn');
         const introNoBtn = document.getElementById('introNoBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        const backBtn = document.getElementById('backBtn');
-        const startBtn = document.getElementById('startBtn');
+        const revealInstructionsBtn = document.getElementById('revealInstructionsBtn');
+        const startMeasurementBtn = document.getElementById('startMeasurementBtn'); // This is the single Start Measurement button
+        const backFromIntermediateBtn = document.getElementById('backFromIntermediateBtn');
         const stopBtn = document.getElementById('stopBtn');
         const finishBtn = document.getElementById('finishBtn');
+
+        const instructionsButtonOnlyContainer = document.getElementById('instructionsButtonOnlyContainer'); // Container for initial instructions button
+        const instructionsDetailedSection = document.getElementById('instructionsDetailedSection'); // Detailed instructions section
+        const instructionsSubtitle = document.getElementById('instructionsSubtitle'); // Instructions subtitle
 
         const stopwatchDisplay = document.getElementById('stopwatchDisplay');
         const finalTime = document.getElementById('finalTime');
@@ -392,10 +409,8 @@
         let gaitData;
         
         window.onFlutterMessageReceived = function(data) {
-            // Access the message data through data
             console.log('Received message:', data);
-
-            // Prepare and send payload
+            alert(data)
             const payload = {
                 gameName: "mtug",
                 numberOfFailedTries: failedLongPressTries,
@@ -404,15 +419,12 @@
                 gaitData: data
             };
             notifyClientToSendPayload(payload);
-            
-            // Perform actions based on the received data
         };
 
         // Function to show a specific screen and hide others
         function showScreen(screenToShow) {
             introScreen.classList.add('hidden');
-            splashScreen.classList.add('hidden');
-            instructionsScreen.classList.add('hidden');
+            intermediateScreen.classList.add('hidden');
             activityScreen.classList.add('hidden');
             resultScreen.classList.add('hidden');
             screenToShow.classList.remove('hidden');
@@ -455,7 +467,7 @@
             
             stopwatchDisplay.textContent = `${formattedMinutes}:${formattedSeconds}.${formattedMilliseconds}`;
         }
-
+        
         // Long press event handlers for stopBtn
         stopBtn.addEventListener('mousedown', startPress);
         stopBtn.addEventListener('mouseup', endPress);
@@ -514,7 +526,10 @@
 
         // Event listener for the "Yes" button on the intro screen
         introYesBtn.addEventListener('click', () => {
-            showScreen(splashScreen);
+            showScreen(intermediateScreen); // Navigate to the new intermediate screen
+            instructionsButtonOnlyContainer.classList.remove('hidden'); // Show initial instructions button
+            instructionsDetailedSection.classList.add('hidden'); // Ensure instructions are hidden
+            instructionsSubtitle.classList.add('hidden'); // Ensure subtitle is hidden
         });
 
         // Event listener for the "No" button on the intro screen
@@ -522,18 +537,15 @@
             notifyClientToNext();
         });
 
-        // Event listener for the "Next" button on the splash screen
-        nextBtn.addEventListener('click', () => {
-            showScreen(instructionsScreen);
+        // Event listener for the "Reveal Instructions" button
+        revealInstructionsBtn.addEventListener('click', () => {
+            instructionsButtonOnlyContainer.classList.add('hidden'); // This hides the button's container
+            instructionsDetailedSection.classList.remove('hidden'); // Show instructions
+            instructionsSubtitle.classList.remove('hidden'); // Show the instructions subtitle
         });
 
-        // Event listener for the "Back" button on the instructions screen
-        backBtn.addEventListener('click', () => {
-            showScreen(splashScreen);
-        });
-
-        // Event listener for the "Start" button on the instructions screen
-        startBtn.addEventListener('click', () => {
+        // Event listener for the "Start Measurement" button
+        startMeasurementBtn.addEventListener('click', () => {
             notifyClientToEnableMotionSensors();
             setTimeout(() => {
                 notifyClientToDisableMotionSensors();
@@ -546,12 +558,13 @@
             resetLongPressButtons();
             startStopwatch();
         });
-        
-        // Event listener for the "Finish" button on the results screen
-        finishBtn.addEventListener('click', () => {
-            notifyClientToNext();
-            showScreen(introScreen);
-            resetLongPressButtons();
+
+        // Event listener for the "Back" button on the intermediate screen
+        backFromIntermediateBtn.addEventListener('click', () => {
+            showScreen(introScreen); // Go back to intro screen
+            instructionsButtonOnlyContainer.classList.remove('hidden'); // Show initial instructions button again
+            instructionsDetailedSection.classList.add('hidden'); // Hide instructions
+            instructionsSubtitle.classList.add('hidden'); // Hide subtitle
         });
         
         // Initial screen on page load
