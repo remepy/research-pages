@@ -49,20 +49,24 @@
             margin-bottom: 0.5rem;
             line-height: 1;
         }
-        .text-custom-body { /* For welcome page body text and question text */
+        .welcome-text-paragraph { /* For welcome page body text paragraphs */
             font-size: 1.5rem;
             line-height: 1.2; /* Further reduced line height for tighter spacing */
-            margin-top: 0.5rem; /* Reduced margin */
-            margin-bottom: 0.5rem; /* Reduced margin */
+            margin-top: 0.2rem; /* Reduced margin */
+            margin-bottom: 0.2rem; /* Reduced margin */
         }
-        .text-custom-button { /* For option buttons */
-            font-size: 1.5rem; /* 1.8rem * 0.8 */
+        .text-custom-body { /* For question text on other pages */
+            font-size: 1.5rem; 
+            line-height: 1.3;
+        }
+        .text-custom-button { /* For options and next/back buttons */
+            font-size: 2rem; /* Increased */
         }
         .text-custom-next-button { /* For main next button */
-            font-size: 2rem; /* 2.2rem * 0.8 */
+            font-size: 2rem;
         }
         .text-custom-back-button { /* For back button */
-            font-size: 1.5rem; /* 1.8rem * 0.8 */
+            font-size: 1.5rem; 
         }
 
 
@@ -104,9 +108,7 @@
             border: 2px solid #e5e7eb; /* border-2 border-gray-200 */
             color: #1f2937; /* text-gray-800 */
             font-size: 1.5rem; /* text-custom-button */
-        }
-        .option-button-2:hover {
-            background-color: #f3f4f6; /* hover:bg-gray-100 */
+            /* No hover effect */
         }
         .option-button.active {
             background-color: #e9d5ff; /* bg-purple-200 */
@@ -150,12 +152,96 @@
         .mb-4 { margin-bottom: 1rem; }
         .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0,0,0,.1),0 4px 6px -2px rgba(0,0,0,.05); }
 
+        /* Accordion specific styles */
+        .accordion-header {
+            background-color: #eff6ff; /* Very light blue, almost white */
+            border: 2px solid #dbeafe; /* Lighter blue border */
+            font-weight: 700; /* Bold to make it stand out */
+            display: flex; /* To align text and icon */
+            justify-content: space-between; /* To push text to right, icon to left */
+            align-items: center;
+            cursor: pointer; /* Indicate it's clickable */
+            padding: 1rem 1.5rem; /* Same padding as option-button for consistency */
+            border-radius: 0.75rem; /* Same border-radius */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            color: #1e40af; /* Tailwind text-blue-800 */
+            font-size: 2rem; /* text-custom-button equivalent */
+            /* No hover effect */
+        }
+
+        /* Navy blue for active accordion header */
+        .accordion-header.active {
+            background-color: #000080; /* Navy blue background */
+            border-color: #000080; /* Navy blue border */
+            color: #fff; /* White text */
+            font-weight: 700; /* font-bold */
+        }
+
+        /* Accordion icon styling */
+        .accordion-icon {
+            transition: transform 0.3s ease-in-out; /* Smooth rotation */
+            transform: rotate(0deg); /* Points down initially (closed) */
+            height: 2rem; /* Adjusted size to match text height */
+            width: 2rem; /* Adjusted size to match text height */
+        }
+
+        .accordion-header.active .accordion-icon {
+            transform: rotate(180deg); /* Points up when active/open */
+        }
+
+        /* Accordion content */
+        .accordion-content {
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            gap: 0.5rem; /* Reduced space between accordion options (x2 from 1rem) */
+            padding-top: 0.5rem; /* Space after main option (reduced) */
+            padding-bottom: 0.5rem; /* Added padding to bottom of accordion content (reduced) */
+        }
+        .accordion-content.is-open {
+            display: flex;
+        }
+
+        /* The sub-options within the accordion should still look like regular option buttons */
+        .accordion-content .option-button {
+            background-color: #f9fafb; /* Lighter background for sub-options */
+            border-color: #e5e7eb; /* Keep light border */
+            font-size: 2rem; /* Match other option buttons or slightly smaller */
+            padding: 0.8rem 1.2rem; /* Slightly smaller padding than main options */
+            /* No hover effect */
+        }
+        .accordion-content .option-button.active {
+            background-color: #d8b4fe; /* bg-purple-300 for active sub-option */
+            border-color: #7e22ce; /* border-purple-700 */
+            color: #4c1d95; /* text-purple-900 */
+        }
+
         /* Icon styling */
         .h-5 { height: 1.25rem; }
         .w-5 { width: 1.25rem; }
-        [dir="rtl"] .rtl-scale-x-100 { transform: scaleX(-1); }
-        .rtl-scale-x-100 { transform: scaleX(1); }
+        /* RTL: We want the chevron to visually point right for "back" and left for "next" after rotation */
+        /* For standard chevron, default is pointing down. No need for rtl-scale-x-100 here. */
+        /* Only for chevron right/left */
+        .chevron-rtl-flip {
+            transform: scaleX(-1);
+        }
 
+        /* Reduced space between question lines */
+        .question-text-group {
+            line-height: 1.1; /* Tighter line spacing for question text */
+        }
+
+        /* Reduced space between general options */
+        .options-container-reduced-space .option-button {
+            margin-bottom: 0.5rem; /* Half of original 1rem space */
+        }
+        .options-container-reduced-space .option-button:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Unified spacing for main options container */
+        #main-options-container {
+            gap: 0.5rem; /* Match the gap of accordion-content and options-container-reduced-space */
+        }
     </style>
     <script src="app.js"></script>
 </head>
@@ -167,17 +253,23 @@
     </div>
 
     <script>
-        // Use a content fetcher to get the Heroicons SVG
-        // This is a common way to use icons in pure JS
+        // Heroicons SVG for chevrons
         const getChevronRightIcon = () => `
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-5 w-5 rtl-scale-x-100">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-5 w-5 chevron-rtl-flip">
                 <path fill-rule="evenodd" d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.5 4.5a.75.75 0 0 1 0 1.06l-4.5 4.5a.75.75 0 0 1-1.06-1.06L12.94 10 8.22 5.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
             </svg>
         `;
 
         const getChevronLeftIcon = () => `
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-5 w-5 rtl-scale-x-100">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-5 w-5 chevron-rtl-flip">
                 <path fill-rule="evenodd" d="M11.78 5.22a.75.75 0 0 1 0 1.06L7.06 10l4.72 4.72a.75.75 0 1 1-1.06 1.06l-5.25-5.25a.75.75 0 0 1 0-1.06l5.25-5.25a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
+            </svg>
+        `;
+        
+        // Chevron for accordion (points down)
+        const getChevronDownIcon = () => `
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="accordion-icon">
+                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.25 4.25a.75.75 0 01-1.06 0L5.23 8.27a.75.75 0 010-1.06z" clip-rule="evenodd" />
             </svg>
         `;
 
@@ -201,63 +293,51 @@
                     { text: 'לחלוטין', value: '5' },
                 ],
             },
-            levodopaQuestion_1: {
-                id: 'levodopaQuestion_1',
+            levodopaQuestion: {
+                id: 'levodopaQuestion',
                 text: 'כמה זמן בערך עבר מאז לקחת Levodopa בפעם האחרונה?',
-                options: [
-                    { text: 'עד שעה', value: 'lessThanHour' },
+                mainOptions: [
+                    { text: 'פחות משעה', value: 'lessThanHour' },
                     { text: 'שעה או יותר', value: 'moreThanHour' },
                 ],
-                oneClick: true,
+                subOptions: {
+                    'lessThanHour': [
+                        { text: 'פחות מ-15 דקות', value: '0' },
+                        { text: 'בין 15 דקות ל-30 דקות', value: '15' },
+                        { text: 'בין 30 דקות ל-45 דקות', value: '30' },
+                        { text: 'בין 45 דקות לשעה', value: '45' },
+                    ],
+                    'moreThanHour': [
+                        { text: 'בין שעה לשעתיים', value: '60' },
+                        { text: 'בין שעתיים לשלוש שעות', value: '120' },
+                        { text: 'בין שלוש לארבע שעות', value: '180' },
+                        { text: 'ארבע שעות או יותר', value: '240' },
+                    ],
+                },
+                requiresSubSelection: true,
             },
-            levodopaQuestion_2_less: {
-                id: 'levodopaQuestion_2_less',
-                text: 'כמה זמן בערך עבר מאז לקחת Levodopa בפעם האחרונה?',
-                options: [
-                    { text: 'פחות מ-15 דקות', value: '0' },
-                    { text: 'בין 15 דקות ל-30 דקות', value: '15' },
-                    { text: 'בין 30 דקות ל-45 דקות', value: '30' },
-                    { text: 'בין 45 דקות לשעה', value: '45' },
-                ],
-            },
-            levodopaQuestion_2_more: {
-                id: 'levodopaQuestion_2_more',
-                text: 'כמה זמן בערך עבר מאז לקחת Levodopa בפעם האחרונה?',
-                options: [
-                    { text: 'בין שעה לשעתיים', value: '60' },
-                    { text: 'בין שעתיים לשלוש שעות', value: '120' },
-                    { text: 'בין שלוש לארבע שעות', value: '180' },
-                    { text: 'ארבע שעות או יותר', value: '240' },
-                ],
-            },
-            eatingQuestion_1: {
-                id: 'eatingQuestion_1',
+            eatingQuestion: {
+                id: 'eatingQuestion',
                 text: 'כמה זמן עבר מאז אכלת בפעם האחרונה?',
-                options: [
-                    { text: 'עד שעה', value: 'lessThanHour' },
+                mainOptions: [
+                    { text: 'פחות משעה', value: 'lessThanHour' },
                     { text: 'שעה או יותר', value: 'moreThanHour' },
                 ],
-                oneClick: true,
-            },
-            eatingQuestion_2_less: {
-                id: 'eatingQuestion_2_less',
-                text: 'כמה זמן עבר מאז אכלת בפעם האחרונה?',
-                options: [
-                    { text: 'פחות מ-15 דקות', value: '0' },
-                    { text: 'בין 15 דקות ל-30 דקות', value: '15' },
-                    { text: 'בין 30 דקות ל-45 דקות', value: '30' },
-                    { text: 'בין 45 דקות לשעה', value: '45' },
-                ],
-            },
-            eatingQuestion_2_more: {
-                id: 'eatingQuestion_2_more',
-                text: 'כמה זמן עבר מאז אכלת בפעם האחרונה?',
-                options: [
-                    { text: 'בין שעה לשעתיים', value: '60' },
-                    { text: 'בין שעתיים לשלוש שעות', value: '120' },
-                    { text: 'בין שלוש לארבע שעות', value: '180' },
-                    { text: 'ארבע שעות או יותר', value: '240' },
-                ],
+                subOptions: {
+                    'lessThanHour': [
+                        { text: 'פחות מ-15 דקות', value: '0' },
+                        { text: 'בין 15 דקות ל-30 דקות', value: '15' },
+                        { text: 'בין 30 דקות ל-45 דקות', value: '30' },
+                        { text: 'בין 45 דקות לשעה', value: '45' },
+                    ],
+                    'moreThanHour': [
+                        { text: 'בין שעה לשעתיים', value: '60' },
+                        { text: 'בין שעתיים לשלוש שעות', value: '120' },
+                        { text: 'בין שלוש לארבע שעות', value: '180' },
+                        { text: 'ארבע שעות או יותר', value: '240' },
+                    ],
+                },
+                requiresSubSelection: true,
             },
             gettingUpQuestion: {
                 id: 'gettingUpQuestion',
@@ -278,6 +358,7 @@
         let selectedOption = null;
         let userAnswers = {};
         const appContainer = document.getElementById('app');
+        let currentOpenAccordion = null; // To track the currently open accordion section
 
         // Function to render the current page
         const renderPage = (pageId) => {
@@ -302,20 +383,18 @@
             }
 
             // Function to render multiline text as separate paragraphs
-            // Added my-0 to remove vertical margins from paragraphs
-            const renderMultiLineText = (text, className = 'text-gray-600 leading-relaxed') => {
+            const renderMultiLineText = (text, className = 'welcome-text-paragraph') => {
                 const lines = text.split('\n');
-                return lines.map(line => `<p class="${className} my-0">${line}</p>`).join('');
+                return lines.map(line => `<p class="${className}">${line}</p>`).join('');
             };
 
             // Render the main content for the current page
             switch (currentPage) {
                 case 'welcome':
-                    // Reduced padding and space-y for welcome screen
                     contentHTML = `
-                        <div class="p-4 flex flex-col items-center text-right space-y-0">
-                            <h2 class="text-custom-title font-bold text-gray-800 mb-2">${pageData.title}</h2>
-                            ${renderMultiLineText(pageData.text, 'text-custom-body text-gray-600 leading-relaxed')}
+                        <div class="p-4 flex flex-col items-center text-right">
+                            <h1 class="text-custom-title font-bold text-gray-800 mb-2">${pageData.title}</h1>
+                            ${renderMultiLineText(pageData.text, 'welcome-text-paragraph text-gray-600')}
                         </div>
                     `;
                     nextButtonHTML = `
@@ -327,22 +406,15 @@
                     `;
                     break;
                 case 'onOffQuestion':
-                case 'levodopaQuestion_1':
-                case 'levodopaQuestion_2_less':
-                case 'levodopaQuestion_2_more':
-                case 'eatingQuestion_1':
-                case 'eatingQuestion_2_less':
-                case 'eatingQuestion_2_more':
                 case 'gettingUpQuestion':
-                    // Reduced padding and space-y for question pages
                     contentHTML = `
-                        <div class="p-4 flex flex-col space-y-4 h-full text-right">
-                            <div class="flex flex-col space-y-px"> <!-- New div for question text with minimal spacing -->
+                        <div class="p-4 flex flex-col space-y-2 h-full text-right"> <!-- Reduced space-y -->
+                            <div class="flex flex-col question-text-group"> <!-- Apply tighter line spacing here -->
                                 ${pageData.text.split('\n').map(line => `
                                     <p class="text-custom-body text-gray-800 font-semibold my-0">${line}</p>
                                 `).join('')}
                             </div>
-                            <div class="flex flex-col space-y-4 flex-grow w-full" id="options-container">
+                            <div class="flex flex-col options-container-reduced-space flex-grow w-full" id="options-container">
                                 ${pageData.options.map(option => `
                                     <button
                                         data-value="${option.value}"
@@ -363,6 +435,73 @@
                             </div>
                         `;
                     }
+                    break;
+                case 'levodopaQuestion':
+                case 'eatingQuestion':
+                    contentHTML = `
+                        <div class="p-4 flex flex-col space-y-2 h-full text-right"> <!-- Reduced space-y -->
+                            <p class="text-custom-body text-gray-800 font-semibold my-0">${pageData.text}</p>
+                            <div class="flex flex-col space-y-2 w-full" id="main-options-container"> <!-- Reduced space-y -->
+                                ${pageData.mainOptions.map(option => `
+                                    <button
+                                        data-value="${option.value}"
+                                        data-type="accordion-header"
+                                        class="accordion-header text-custom-button"
+                                    >
+                                        <span>${option.text}</span>
+                                        ${getChevronDownIcon()}
+                                    </button>
+                                    <div id="sub-options-container-${option.value}" class="accordion-content">
+                                        ${pageData.subOptions[option.value].map(subOption => `
+                                            <button
+                                                data-value="${subOption.value}"
+                                                data-type="sub"
+                                                class="option-button text-custom-button"
+                                            >
+                                                ${subOption.text}
+                                            </button>
+                                        `).join('')}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                    nextButtonHTML = `
+                        <div class="p-6">
+                            <button id="next-button" disabled class="next-button text-custom-next-button">
+                                הבא
+                            </button>
+                        </div>
+                    `;
+                    
+                    // Logic to immediately open previous selection if returning to page
+                    setTimeout(() => {
+                        const nextBtn = document.getElementById('next-button');
+                        const mainSelectionValue = userAnswers[currentPage + '_main'];
+                        const subSelectionValue = userAnswers[currentPage];
+
+                        if (mainSelectionValue) {
+                            const mainButton = document.querySelector(`button[data-value="${mainSelectionValue}"][data-type="accordion-header"]`);
+                            const subOptionsContainerToOpen = document.getElementById(`sub-options-container-${mainSelectionValue}`);
+                            
+                            if (mainButton) {
+                                mainButton.classList.add('active');
+                            }
+                            if (subOptionsContainerToOpen) {
+                                subOptionsContainerToOpen.classList.add('is-open');
+                                currentOpenAccordion = subOptionsContainerToOpen; // Track the open accordion
+                            }
+
+                            if (subSelectionValue) {
+                                const subButton = subOptionsContainerToOpen.querySelector(`button[data-value="${subSelectionValue}"][data-type="sub"]`);
+                                if (subButton) {
+                                    subButton.classList.add('active');
+                                }
+                                selectedOption = subSelectionValue;
+                                if (nextBtn) nextBtn.disabled = false;
+                            }
+                        }
+                    }, 0); 
                     break;
                 case 'debug':
                     // The debug-toggle button and the summary container have been removed as requested.
@@ -387,7 +526,6 @@
                     break;
             }
 
-            // Assemble the final HTML and inject it
             appContainer.innerHTML = `
                 <div class="flex flex-col h-full">
                     ${backButtonHTML}
@@ -398,48 +536,31 @@
                 </div>
             `;
             
-            // Re-attach event listeners after DOM update
             addEventListeners();
         };
 
-        // Function to handle moving to the next page
         const handleNext = () => {
-            // Save the current answer before moving on, if it's a question page
-            if (pages[currentPage].options && selectedOption) {
+            if (pages[currentPage].requiresSubSelection) {
+                if (selectedOption === null) {
+                    return; // Do not proceed if sub-option not selected for accordion page
+                }
+                userAnswers[currentPage] = selectedOption; // Save the final selected sub-option
+            } else if (pages[currentPage].options && selectedOption) {
                 userAnswers[currentPage] = selectedOption;
             }
-
-            // Reset selected option for the next page
             selectedOption = null;
 
-            // Conditional navigation logic
             switch (currentPage) {
                 case 'welcome':
                     renderPage('onOffQuestion');
                     break;
                 case 'onOffQuestion':
-                    renderPage('levodopaQuestion_1');
+                    renderPage('levodopaQuestion');
                     break;
-                case 'levodopaQuestion_1':
-                    if (userAnswers.levodopaQuestion_1 === 'lessThanHour') {
-                        renderPage('levodopaQuestion_2_less');
-                    } else {
-                        renderPage('levodopaQuestion_2_more');
-                    }
+                case 'levodopaQuestion':
+                    renderPage('eatingQuestion');
                     break;
-                case 'levodopaQuestion_2_less':
-                case 'levodopaQuestion_2_more':
-                    renderPage('eatingQuestion_1');
-                    break;
-                case 'eatingQuestion_1':
-                    if (userAnswers.eatingQuestion_1 === 'lessThanHour') {
-                        renderPage('eatingQuestion_2_less');
-                    } else {
-                        renderPage('eatingQuestion_2_more');
-                    }
-                    break;
-                case 'eatingQuestion_2_less':
-                case 'eatingQuestion_2_more':
+                case 'eatingQuestion':
                     renderPage('gettingUpQuestion');
                     break;
                 case 'gettingUpQuestion':
@@ -497,43 +618,38 @@
             }
         };
 
-        // Function to handle moving to the previous page
         const handleBack = () => {
             selectedOption = null;
-            delete userAnswers[currentPage];
+            // Only delete the current page's answer if it's a direct question page
+            // For accordion pages, we want to preserve the main selection if we go back
+            if (!pages[currentPage].requiresSubSelection) {
+                 delete userAnswers[currentPage];
+            } else {
+                // For accordion pages, clear the sub-selection but keep main for easier navigation back
+                userAnswers[currentPage] = undefined; 
+            }
             
+
             switch (currentPage) {
                 case 'onOffQuestion':
                     renderPage('welcome');
                     break;
-                case 'levodopaQuestion_1':
-                    // Restore the previous selected option
-                    selectedOption = userAnswers.onOffQuestion;
+                case 'levodopaQuestion':
+                    selectedOption = userAnswers.onOffQuestion; // Restore previous selection
                     renderPage('onOffQuestion');
                     break;
-                case 'levodopaQuestion_2_less':
-                case 'levodopaQuestion_2_more':
-                    // Restore the selection for the previous page
-                    selectedOption = userAnswers.levodopaQuestion_1;
-                    renderPage('levodopaQuestion_1');
-                    break;
-                case 'eatingQuestion_1':
-                    const prevLevodopaPage = userAnswers.levodopaQuestion_1 === 'lessThanHour' ? 'levodopaQuestion_2_less' : 'levodopaQuestion_2_more';
-                    selectedOption = userAnswers[prevLevodopaPage];
-                    renderPage(prevLevodopaPage);
-                    break;
-                case 'eatingQuestion_2_less':
-                case 'eatingQuestion_2_more':
-                    selectedOption = userAnswers.eatingQuestion_1;
-                    renderPage('eatingQuestion_1');
+                case 'eatingQuestion':
+                    selectedOption = userAnswers.levodopaQuestion; // Restore previous selection
+                    userAnswers.levodopaQuestion_main = userAnswers.levodopaQuestion_main; // Keep main selection for accordions
+                    renderPage('levodopaQuestion');
                     break;
                 case 'gettingUpQuestion':
-                    const prevEatingPage = userAnswers.eatingQuestion_1 === 'lessThanHour' ? 'eatingQuestion_2_less' : 'eatingQuestion_2_more';
-                    selectedOption = userAnswers[prevEatingPage];
-                    renderPage(prevEatingPage);
+                    selectedOption = userAnswers.eatingQuestion; // Restore previous selection
+                    userAnswers.eatingQuestion_main = userAnswers.eatingQuestion_main; // Keep main selection for accordions
+                    renderPage('eatingQuestion');
                     break;
                 case 'debug':
-                    selectedOption = userAnswers.gettingUpQuestion;
+                    selectedOption = userAnswers.gettingUpQuestion; // Restore previous selection
                     renderPage('gettingUpQuestion');
                     break;
                 default:
@@ -541,7 +657,6 @@
             }
         };
 
-        // Function to attach all event listeners
         const addEventListeners = () => {
             const nextButton = document.getElementById('next-button');
             if (nextButton) {
@@ -558,27 +673,89 @@
                 nextActivityButton.addEventListener('click', handleNext);
             }
 
-            const optionsContainer = document.getElementById('options-container');
-            if (optionsContainer) {
-                optionsContainer.querySelectorAll('.option-button').forEach(button => {
-                    button.addEventListener('click', (event) => {
-                        const value = event.target.dataset.value;
-                        
-                        // Update selected option
-                        selectedOption = value;
+            // --- Accordion Logic ---
+            const mainOptionsContainers = document.querySelectorAll('button[data-type="accordion-header"]');
+            const subOptionsContainers = document.querySelectorAll('.accordion-content');
+            const nextBtn = document.getElementById('next-button');
 
-                        // Update button styles
-                        optionsContainer.querySelectorAll('.option-button').forEach(btn => {
+            mainOptionsContainers.forEach(mainButton => {
+                mainButton.addEventListener('click', (event) => {
+                    const mainValue = event.currentTarget.dataset.value;
+                    const targetSubContainer = document.getElementById(`sub-options-container-${mainValue}`);
+
+                    // If a different accordion is open, close it
+                    if (currentOpenAccordion && currentOpenAccordion !== targetSubContainer) {
+                        currentOpenAccordion.classList.remove('is-open');
+                        const prevMainButton = document.querySelector(`button[data-value="${currentOpenAccordion.id.replace('sub-options-container-', '')}"][data-type="accordion-header"]`);
+                        if (prevMainButton) {
+                            prevMainButton.classList.remove('active');
+                        }
+                    }
+
+                    // Toggle the clicked accordion
+                    targetSubContainer.classList.toggle('is-open');
+                    event.currentTarget.classList.toggle('active');
+
+                    // Set currentOpenAccordion to the newly opened one, or null if just closed
+                    currentOpenAccordion = targetSubContainer.classList.contains('is-open') ? targetSubContainer : null;
+
+                    // Reset selected sub-option for this accordion section and disable next button
+                    selectedOption = null;
+                    if (nextBtn) nextBtn.disabled = true;
+
+                    // Store main selection (for back button navigation)
+                    userAnswers[currentPage + '_main'] = mainValue;
+
+                    // Ensure all other sub-options are not active for the current page type
+                    document.querySelectorAll('button[data-type="sub"]').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                });
+            });
+
+            // Event delegation for sub-options
+            subOptionsContainers.forEach(subContainer => {
+                subContainer.addEventListener('click', (event) => {
+                    if (event.target.tagName === 'BUTTON' && event.target.dataset.type === 'sub') {
+                        const subValue = event.target.dataset.value;
+                        selectedOption = subValue;
+
+                        // Update sub button styles
+                        subContainer.querySelectorAll('button[data-type="sub"]').forEach(btn => {
                             btn.classList.remove('active');
                         });
                         event.target.classList.add('active');
 
                         // Enable next button
+                        if (nextBtn) {
+                            nextBtn.disabled = false;
+                        }
+                    }
+                });
+            });
+
+            // --- End Accordion Logic ---
+
+
+            // For non-accordion question pages (original logic)
+            const optionsContainer = document.getElementById('options-container');
+            // This condition ensures this block only runs for non-accordion pages
+            if (optionsContainer && !pages[currentPage].requiresSubSelection) { 
+                optionsContainer.querySelectorAll('.option-button').forEach(button => {
+                    button.addEventListener('click', (event) => {
+                        const value = event.target.dataset.value;
+                        
+                        selectedOption = value;
+
+                        optionsContainer.querySelectorAll('.option-button').forEach(btn => {
+                            btn.classList.remove('active');
+                        });
+                        event.target.classList.add('active');
+
                         if (nextButton) {
                             nextButton.disabled = false;
                         }
 
-                        // Handle one-click pages
                         const pageData = pages[currentPage];
                         if (pageData.oneClick) {
                              setTimeout(() => handleNext(), 100);
@@ -588,7 +765,6 @@
             }
         };
 
-        // Initialize the app on window load
         window.onload = () => {
             renderPage('welcome');
         };
@@ -596,4 +772,3 @@
     </script>
 </body>
 </html>
-
