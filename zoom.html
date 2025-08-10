@@ -488,7 +488,7 @@
             }
             const jsonPinchData = JSON.stringify(pinchEvents, null, 2);
 
-            payload = {
+            const payload = {
                 gameName: 'zoom',
                 time: (Date.now() - startTaskTime) / 1000,
                 pinchData: jsonPinchData
@@ -496,37 +496,19 @@
             notifyClientToSendPayload(payload);
         }
 
-        // --- Welcome Screen Animation Logic ---
+        // --- Welcome Screen Static Image Logic ---
         
-        const canvas = document.getElementById('animationCanvas');
-        const ctx = canvas.getContext('2d');
-        
-        const imageUrl = 'https://upload.wikimedia.org/wikipedia/commons/2/2e/Coral_Outcrop_Flynn_Reef.jpg';
-        const animatedImage = new Image();
-        animatedImage.crossOrigin = 'anonymous';
+        const welcomeImage = new Image();
+        welcomeImage.crossOrigin = 'anonymous';
+        const welcomeImageUrl = 'https://upload.wikimedia.org/wikipedia/commons/2/2e/Coral_Outcrop_Flynn_Reef.jpg';
 
-        const zoomOutDuration = 6000;
-        const waitDuration = 2000;
-        const zoomInDuration = 6000;
-        const totalAnimationDuration = zoomOutDuration + waitDuration + zoomInDuration;
-        
-        let startTime = null;
-        
-        const initialZoomFactor = 40.0;
-        const finalZoomFactor = 1.0;
-        const zoomRange = initialZoomFactor - finalZoomFactor;
+        function drawStaticWelcomeImage() {
+            if (!welcomeImage.complete) return; // Ensure image is loaded
 
-        function resizeCanvas() {
-            const aspectRatio = animatedImage.width / animatedImage.height;
-            const containerWidth = animationCanvas.offsetWidth;
-            
-            animationCanvas.width = containerWidth;
-            animationCanvas.height = containerWidth / aspectRatio;
-
-            // Recalculate dimensions to fit the container while maintaining aspect ratio
+            // Adjust canvas size to fit parent container while maintaining aspect ratio
             const parentContainer = animationCanvas.parentElement;
             const maxDimension = Math.min(parentContainer.offsetWidth, parentContainer.offsetHeight);
-            const ratio = animatedImage.width / animatedImage.height;
+            const ratio = welcomeImage.width / welcomeImage.height;
             if (ratio > 1) { // Landscape image
                 animationCanvas.width = maxDimension;
                 animationCanvas.height = maxDimension / ratio;
@@ -534,66 +516,26 @@
                 animationCanvas.height = maxDimension;
                 animationCanvas.width = maxDimension * ratio;
             }
+            
+            ctxAnimation.clearRect(0, 0, animationCanvas.width, animationCanvas.height);
+            // Draw the image completely zoomed out (static)
+            ctxAnimation.drawImage(welcomeImage, 0, 0, animationCanvas.width, animationCanvas.height);
         }
 
-        function drawFrame(elapsedTime) {
-            let currentScale;
-            
-            if (elapsedTime < zoomOutDuration) {
-                const progress = elapsedTime / zoomOutDuration;
-                currentScale = initialZoomFactor - (progress * zoomRange);
-            } else if (elapsedTime < zoomOutDuration + waitDuration) {
-                currentScale = finalZoomFactor;
-            } else {
-                const phase3Time = elapsedTime - (zoomOutDuration + waitDuration);
-                const progress = phase3Time / zoomInDuration;
-                currentScale = finalZoomFactor + (progress * zoomRange);
-            }
-
-            ctx.clearRect(0, 0, animationCanvas.width, animationCanvas.height);
-            
-            const sourceWidth = animatedImage.width / currentScale;
-            const sourceHeight = animatedImage.height / currentScale;
-            const sourceX = (animatedImage.width - sourceWidth) / 2;
-            const sourceY = (animatedImage.height - sourceHeight) / 2;
-            
-            ctx.drawImage(
-                animatedImage, 
-                sourceX, 
-                sourceY, 
-                sourceWidth, 
-                sourceHeight, 
-                0, 
-                0, 
-                animationCanvas.width, 
-                animationCanvas.height
-            );
-        }
-
-        function animate(timestamp) {
-            if (!startTime) startTime = timestamp;
-            const elapsedTime = (timestamp - startTime) % totalAnimationDuration;
-            
-            drawFrame(elapsedTime);
-            
-            requestAnimationFrame(animate);
-        }
-
-        animatedImage.onload = () => {
-            resizeCanvas();
-            window.addEventListener('resize', resizeCanvas);
-            requestAnimationFrame(animate);
+        welcomeImage.onload = () => {
+            drawStaticWelcomeImage();
+            window.addEventListener('resize', drawStaticWelcomeImage); // Redraw on resize
         };
         
-        animatedImage.onerror = () => {
-            console.error("Failed to load the image.");
-            ctx.fillStyle = "white";
-            ctx.textAlign = "center";
-            ctx.font = "20px Arial";
-            ctx.fillText("Failed to load image.", animationCanvas.width / 2, animationCanvas.height / 2);
+        welcomeImage.onerror = () => {
+            console.error("Failed to load the welcome image.");
+            ctxAnimation.fillStyle = "white";
+            ctxAnimation.textAlign = "center";
+            ctxAnimation.font = "20px Arial";
+            ctxAnimation.fillText("Failed to load image.", animationCanvas.width / 2, animationCanvas.height / 2);
         };
         
-        animatedImage.src = imageUrl;
+        welcomeImage.src = welcomeImageUrl;
         
         // --- Core Game Logic ---
 
@@ -811,7 +753,7 @@
 
             image.src = imageSources[currentImageIndex];
             drawLoadingScreen();
-            startTime = Date.now();
+            startTaskTime = Date.now(); // Start timing when the game begins
         }
 
         // The main entry point - controls the transition between the welcome and game screens.
