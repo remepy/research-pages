@@ -355,6 +355,7 @@
         const jsonDataPre = document.getElementById('jsonDataPre');
         
         const animationCanvas = document.getElementById('animationCanvas');
+        const ctxAnimation = animationCanvas.getContext('2d'); // Get 2D context for the animation canvas
 
         let image = new Image();
         let isImageLoaded = false;
