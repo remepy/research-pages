@@ -299,7 +299,8 @@
             flex-direction: column;
             min-height: 100%; /* Changed to min-height to allow content to push */
             justify-content: space-between; /* Distribute space between top content and bottom button */
-            /* Removed overflow-y: auto here to ensure parent app-container scrolls */
+            width: 100%; /* Ensure it spans the full width of app-container */
+            box-sizing: border-box;
         }
 
         #intermediateScreen .content {
@@ -312,17 +313,21 @@
             display: flex;
             flex-direction: column;
             width: 100%;
-            /* min-height: 0; is important for nested flex children to shrink */
+            min-height: 0;
+            box-sizing: border-box;
+
             min-height: 0;
         }
         
         #instructionsButtonOnlyContainer {
             flex-shrink: 0; /* Do not allow this to shrink */
+            padding: 0 10px; /* Added horizontal padding here */
         }
         
         #startMeasurementBtnContainer { /* New container for the button for specific styling */
             margin-top: 15px; /* Added margin-top for spacing */
             flex-shrink: 0; /* Do not allow this to shrink */
+            padding: 0 10px; /* Added horizontal padding here */
         }
 
 
