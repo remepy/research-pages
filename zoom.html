@@ -439,6 +439,53 @@
         const TOTAL_PROGRESS_LEVELS = 10;
         const stepCooldown = 300;
 
+        
+        /* *************************** */
+        /* pseudo random image picking */
+        /* *************************** */
+        function setCookie(name, value) {
+            const date = new Date();
+            date.setTime(date.getTime() + (24 * 60 * 60 * 1000));
+            let expires = "; expires=" + date.toUTCString();
+            document.cookie = name + "=" + (value || "") + expires + "; path=/";
+        }
+
+        function getCookie(name) {
+            const nameEQ = name + "=";
+            const ca = document.cookie.split(';');
+            for (let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+                if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+            }
+            return null;
+        }
+
+        const m = 2147483647; // Modulus (2^31 - 1, a large prime)
+        const a = 16807;     // Multiplier
+        const c = 0;         // Increment (0 for multiplicative LCG)
+        let currentLcgState;        // The current internal state of the LCG
+        const CURRENT_STATE_COOKIE_NAME = "prng_current_state";
+
+        function getDaySeed() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            return today.getTime();
+        }
+
+        function generateNextNumber() {
+            currentLcgState = getCookie(CURRENT_STATE_COOKIE_NAME);
+            if (currentLcgState == null) {
+                currentLcgState = getDaySeed();
+            }
+            currentLcgState = (a * currentLcgState + c) % m;
+            setCookie(CURRENT_STATE_COOKIE_NAME, currentLcgState.toString());
+            const randomNumber = currentLcgState % imageSources.length;
+
+            return randomNumber;
+        }
+        
+
         // --- General Helper Functions ---
         /**
          * Displays a message to the user in a dedicated box.
@@ -632,7 +679,7 @@
          * Initializes a new game by loading the next image.
          */
         function startNewGame() {
-            currentImageIndex = (currentImageIndex + 1) % imageSources.length;
+            currentImageIndex = generateNextNumber();
             pinchEvents = [];
             isImageLoaded = false;
             
