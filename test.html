@@ -61,10 +61,35 @@
   <button onclick="sendMessage(JSON.stringify({ 
     type: 'navigateTo',
     data: {
+        shouldCloseCurrentStep: 'true'
+    }
+    }))">
+      Close step
+  </button>
+  
+  <button onclick="sendMessage(JSON.stringify({ 
+    type: 'navigateTo',
+    data: {
         routeTo: 'settings',
         shouldCloseCurrentStep: 'true'
     }
     }))">
       Close step and navigate to settings step
+  </button>
+  
+  <button onclick="sendMessage(JSON.stringify({ 
+    type: 'navigateTo',
+    data: {
+        routeTo: 'settings',
+    }
+    }))">
+      Navigate to settings step
+  </button>
+  
+  <button onclick="sendMessage(JSON.stringify({ 
+    type: 'navigateTo',
+    data: {}
+    }))">
+      Do nothing: Don't close step and don't navigate to settings step
   </button>
 </html>
