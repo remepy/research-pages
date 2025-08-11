@@ -49,7 +49,7 @@ function notifyClientToDisableMotionSensors() {
 
 function notifyClientToNavigateTo(
   shouldCloseCurrentStep = true,
-  screenName = 'topics'
+  screenName = ''
 ) {
   sendMessage(
     JSON.stringify({
