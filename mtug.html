@@ -10,6 +10,8 @@
             margin: 0;
             padding: 0;
             min-height: 100vh; /* Allows body/html to grow beyond viewport if content pushes */
+            width: 100vw; /* Ensure it takes full viewport width */
+            box-sizing: border-box; /* Include padding/border in width calculation */
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: #f0f0f0;
             display: flex;
@@ -21,23 +23,33 @@
 
         /* Container for the entire app, ensuring it takes up the full viewport initially, but can grow */
         .app-container {
-            width: 100%;
-            max-width: 100%; /* Squeezed to maximum screen width */
+            width: 100vw; /* Ensure it takes full viewport width */
+            max-width: 100vw; /* Ensure it takes full viewport width */
             min-height: 100vh; /* Allows app-container to grow beyond viewport if content pushes */
             margin: auto;
             display: flex;
             flex-direction: column;
-            justify-content: space-between; /* This pushes the start button to the bottom */
+            /* justify-content: space-between; REMOVED - will be controlled by individual margins */
             background-color: #fff;
             box-sizing: border-box;
-            padding-top: 50px;
-            padding-left: 10px;
-            padding-right: 10px;
+            padding-top: 50px; /* User's updated padding-top */
             padding-bottom: 20px; /* Reduced to fixed value for predictability */
-            /* Removed overflow: hidden; to allow page scrolling */
             border-radius: 0; /* Removed border-radius for full width look */
             box-shadow: none; /* Removed box-shadow */
         }
+
+        /* General style for all screen containers to apply consistent horizontal padding */
+        .screen {
+            width: 100%; /* Take full width of parent app-container */
+            padding: 0 2.5vw; /* Apply 2.5vw padding on each side for 95% effective content width */
+            box-sizing: border-box;
+            display: flex; /* Ensure these are flex containers for their children */
+            flex-direction: column;
+            align-items: center; /* Center content horizontally */
+            flex-grow: 1; /* Allow screens to grow and push content */
+            min-height: 0; /* Important for flex children */
+        }
+
 
         /* Style for the main content area */
         .content {
@@ -46,9 +58,8 @@
             flex-direction: column;
             justify-content: flex-start;
             align-items: center;
-            padding-top: 1rem; /* Dramatically reduced padding before title */
-            padding-left: 10px;
-            padding-right: 10px;
+            padding: 1rem 0 0; /* Increased top padding here, REMOVED horizontal padding here */
+            width: 100%; /* Ensure content takes full width of its padded parent screen */
         }
 
         /* Style for headings - reduced spacing dramatically (x5) */
@@ -73,6 +84,8 @@
             counter-reset: my-awesome-counter;
             padding-right: 0;
             margin: 0 0 5px; /* Reduced spacing between #2 and image (x3 reduction) */
+            width: 100%; /* Ensure list takes full width of its parent */
+            text-align: right; /* Align list text to the right */
         }
 
         li {
@@ -94,7 +107,7 @@
         }
 
         /* Style for the illustration images/videos - dynamically fills remaining space, centered */
-        .illustration {
+        .illustration, .illustration-image { /* Combined both classes for consistent styling */
             align-self: center; /* Centers horizontally within flex container */
             max-width: 100%;
             height: auto; /* Allow height to adjust based on aspect ratio */
@@ -103,16 +116,17 @@
             margin-bottom: 5px; /* Minimal bottom margin */
         }
 
+        /* Specific height for illustration-image, overridden by `height: auto` from .illustration for video */
         .illustration-image {
-            max-width: 100%;
             max-height: 200px;
             display: block;
             margin: auto;
         }
 
+
         /* Style for buttons */
         .button {
-            width: 100%;
+            width: 100%; /* Buttons will take full width of their parent .button-group */
             padding: 16px; /* Adjusted padding */
             font-size: 1.5rem; /* Adjusted button text size */
             font-weight: bold;
@@ -197,12 +211,13 @@
 
         /* Adjusted button-group for intermediate screen to allow horizontal arrangement */
         .button-group {
-            width: 100%;
+            width: 100%; /* Ensure button group takes full width of its parent (.screen) */
             display: flex;
             flex-direction: column; /* Default to column for general use */
             gap: 10px;
-            margin-bottom: 1rem;
-            padding: 0 10px; /* Apply horizontal padding here to give desired side margins for buttons */
+            box-sizing: border-box; /* Include padding/border in width calculation */
+            /* REMOVED horizontal padding here; handled by .screen */
+            margin-bottom: 1rem; /* Kept margin-bottom for spacing */
         }
 
         /* Horizontal button group for initial intermediate screen buttons */
@@ -218,13 +233,13 @@
 
         /* Base style for long press buttons - size increased back */
         .long-press-base {
-            width: 200px; /* Increased back to original size */
-            height: 200px; /* Increased back to original size */
+            width: 200px; /* Reverted to fixed width for circular shape */
+            height: 200px; /* Kept height fixed as requested */
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            margin: 0 auto;
+            margin: 0 auto; /* Centered horizontally */
             position: relative;
             overflow: hidden;
             font-size: 1.5rem; /* Adjusted text size */
@@ -236,6 +251,7 @@
             transition: background-color 0.3s ease;
             text-align: center;
             line-height: 1.2;
+            box-sizing: border-box; /* Ensure padding/border don't increase size */
         }
 
         .long-press-base:active {
@@ -280,12 +296,26 @@
             display: none;
         }
 
+        /* Instructions section specific styles */
+        .instructions-section {
+            width: 100%;
+            flex-grow: 1; /* Make this section take up all available vertical space dynamically */
+            margin-top: 10px; /* Small margin above instructions */
+            padding-bottom: 10px; /* Add some padding at the bottom for content */
+            box-sizing: border-box;
+        }
+
+        .instructions-section h2 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+
         /* Intermediate Screen specific flex setup */
         #intermediateScreen {
             display: flex;
             flex-direction: column;
             min-height: 100%; /* Changed to min-height to allow content to push */
-            justify-content: space-between; /* Distribute space between top content and bottom button */
+            /* justify-content: space-between; REMOVED to allow closer stacking */
             width: 100%; /* Ensure it spans the full width of app-container */
             box-sizing: border-box;
         }
@@ -296,23 +326,24 @@
         }
 
         #dynamicContentContainer {
-            flex-grow: 1; /* This container fills remaining vertical space */
+            /* flex-grow: 1; REMOVED to reduce space when instructions are short */
             display: flex;
             flex-direction: column;
             width: 100%;
-            min-height: 0;
+            min-height: 0; /* Important for nested flex children to shrink properly */
             box-sizing: border-box;
-            min-height: 0;
+            margin-top: 20px; /* Added margin-top to separate from content above */
         }
         
         #instructionsButtonOnlyContainer {
             flex-shrink: 0; /* Do not allow this to shrink */
-            margin-top: 40px; /* Added vertical spacing here */
+            width: 100%; /* Ensure it takes full width of its parent */
         }
         
         #startMeasurementBtnContainer { /* New container for the button for specific styling */
-            margin-top: 15px; /* Added margin-top for spacing */
+            margin-top: 10px; /* Adjusted margin-top for tighter spacing */
             flex-shrink: 0; /* Do not allow this to shrink */
+            width: 100%; /* Ensure it takes full width of its parent */
         }
 
 
@@ -355,7 +386,7 @@
                 <div id="instructionsDetailedSection" class="instructions-section hidden">
                     <p class="body-text" style="color: red;">הפסיקו מיד אם אתם חשים חוסר יציבות או סחרחורת.</p>
                     <ol>
-                        <li>לחצו על ״התחל הליכה״.</li>
+                        <li>לחצו על ״התחל מדידה״.</li>
                         <li>הניחו את הטלפון בכיס הקדמי של המכנסיים והתיישבו על הכיסא.
                             <br/>
                             <img src="phone_in_pocket.png" alt="phone in pocket illustration" class="illustration-image" height="140px">
@@ -369,7 +400,7 @@
 
             <!-- Start Measurement button - ALWAYS at the bottom of the intermediate screen -->
             <div class="button-group" id="startMeasurementBtnContainer">
-                 <button id="startMeasurementBtn" class="button primary">התחל הליכה ⏱️</button>
+                 <button id="startMeasurementBtn" class="button primary">התחל מדידה ⏱️</button>
             </div>
         </div>
 
