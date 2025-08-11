@@ -366,7 +366,7 @@
 
         let image = new Image();
         let isImageLoaded = false;
-        let currentImageIndex = generateNextNumber();
+        let currentImageIndex = 0;
         let currentProgressBarLevel = 0;
         let canAdvanceStep = true;
         let pinchEvents = [];
@@ -473,17 +473,19 @@
             return today.getTime();
         }
 
-        function generateNextNumber() {
+        function generateNextNumber(p) {
             currentLcgState = getCookie(CURRENT_STATE_COOKIE_NAME);
             if (currentLcgState == null) {
                 currentLcgState = getDaySeed();
             }
             currentLcgState = (a * currentLcgState + c) % m;
             setCookie(CURRENT_STATE_COOKIE_NAME, currentLcgState.toString());
-            const randomNumber = currentLcgState % imageSources.length;
+            const randomNumber = currentLcgState % p;
 
             return randomNumber;
         }
+
+        let currentImageIndex = generateNextNumber(imageSources.length);
         
 
         // --- General Helper Functions ---
@@ -679,7 +681,7 @@
          * Initializes a new game by loading the next image.
          */
         function startNewGame() {
-            currentImageIndex = generateNextNumber();
+            currentImageIndex = generateNextNumber(imageSources.length);
             pinchEvents = [];
             isImageLoaded = false;
             
