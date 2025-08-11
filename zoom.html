@@ -68,10 +68,15 @@
 
         /* Welcome text styling */
         .welcome-text {
-            font-size: 1.2rem;
+            font-size: 24px; /* Applied from instructionTextContainer */
             line-height: 1.6;
             color: #4b5563; /* text-gray-600 */
             margin-bottom: 0.5rem; /* Added margin to separate from the content */
+            min-height: 3rem; /* Applied from instructionTextContainer */
+            display: flex; /* Applied from instructionTextContainer */
+            align-items: center; /* Applied from instructionTextContainer */
+            justify-content: center; /* Applied from instructionTextContainer */
+            text-align: center; /* Ensures centering */
         }
         
         /* Canvas for the 3D animation */
@@ -280,7 +285,7 @@
     <!-- Welcome Screen Container -->
     <div id="welcomeScreen" class="screen-container welcome-container">
         <h1 class="main-heading">הוקוס פוקוס</h1>
-        <p class="welcome-text">
+        <p class="welcome-text" style="font-size: 24px; color: #4b5563; text-align: center; margin-bottom: 0.5rem; min-height: 3rem; display: flex; align-items: center; justify-content: center;">
             במסך הבא תוצג לכם תמונה מוגדלת מאוד. השתמשו ביד המושפעת ביותר מהמחלה. "צבטו" את המסך מהר ככל שניתן 10 פעמים, כדי להקטין את התמונה עד שתוצג במלואה.
         </p>
         
