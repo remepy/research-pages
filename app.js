@@ -47,17 +47,9 @@ function notifyClientToDisableMotionSensors() {
                      data: 'true' }));
 }
 
-function notifyClientToNavigateTo(
-  shouldCloseCurrentStep = true,
-  screenName = ''
-) {
+function notifyClientToBackToFirst() {
   sendMessage(
     JSON.stringify({
-      type: 'navigateTo',
-      data: {
-        routeTo: screenName,
-        shouldCloseCurrentStep: shouldCloseCurrentStep,
-      },
-    })
-  );
+      type: 'backToFirst',
+      data: 'true' }));
 }
