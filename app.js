@@ -46,3 +46,18 @@ function notifyClientToDisableMotionSensors() {
                      type: 'disableMotionSensors',
                      data: 'true' }));
 }
+
+function notifyClientToNavigateTo(
+  shouldCloseCurrentStep = true,
+  screenName = 'topics'
+) {
+  sendMessage(
+    JSON.stringify({
+      type: 'navigateTo',
+      data: {
+        routeTo: screenName,
+        shouldCloseCurrentStep: shouldCloseCurrentStep,
+      },
+    })
+  );
+}
