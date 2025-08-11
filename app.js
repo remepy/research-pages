@@ -4,7 +4,7 @@ function sendMessage(message) {
     else
       CallInApp.postMessage(message);
   }
-
+ 
 function notifyClientToSendPayload(payload) {
     const message = {
       type: 'sendData',
