@@ -58,4 +58,13 @@
       Disable Motion Sensors
     </button>
   </body>
+  <button onclick="sendMessage(JSON.stringify({ 
+    type: 'navigateTo',
+    data: {
+        routeTo: 'settings',
+        shouldCloseCurrentStep: 'true'
+    }
+    }))">
+      Close step and navigate to settings step
+  </button>
 </html>
