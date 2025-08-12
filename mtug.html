@@ -157,15 +157,15 @@
             transform: scale(0.98);
         }
 
-        /* Small link button style */
-        .link-button {
-            color: #4b0082;
-            background: none;
-            border: none;
-            font-size: 1.1rem; /* Adjusted font size */
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 15px;
+        /* Styling for the back button specifically */
+        .button.back {
+            position: absolute;
+            top: 50px; /* Aligned with padding-top of app-container */
+            right: 2.5vw; /* Aligned with screen's horizontal padding */
+            width: auto; /* Allow button width to be content-based */
+            padding: 8px 16px; /* Smaller padding for back button */
+            font-size: 1.1rem; /* Smaller font size */
+            z-index: 10; /* Ensure it's above other content if needed */
         }
         
         .link-button.back {
@@ -367,7 +367,7 @@
 
         <!-- New Intermediate Screen -->
         <div id="intermediateScreen" class="screen hidden">
-            <button id="backFromIntermediateBtn" class="link-button back">חזרה</button>
+            <button id="backFromIntermediateBtn" class="button secondary back">חזרה</button>
             <div class="content">
                 <h1>צעד-צעד</h1>
                 <!-- Subtitle for instructions will be toggled here -->
