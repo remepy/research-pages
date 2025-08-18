@@ -614,16 +614,6 @@
 
         const handleBack = () => {
             selectedOption = null;
-            // Only delete the current page's answer if it's a direct question page
-            // For accordion pages, we want to preserve the main selection if we go back
-            if (!pages[currentPage].requiresSubSelection) {
-                 delete userAnswers[currentPage];
-            } else {
-                // For accordion pages, clear the sub-selection but keep main for easier navigation back
-                userAnswers[currentPage] = undefined; 
-            }
-            
-
             switch (currentPage) {
                 case 'onOffQuestion':
                     renderPage('welcome');
