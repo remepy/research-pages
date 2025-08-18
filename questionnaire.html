@@ -565,12 +565,16 @@
                     const generateJsonSummary = () => {
                         const summary = {};
 
-                        summary.gameName = 'questionnaire'
+                        summary.gameName = 'questionnaire';
                         
                         // Likert Scale Question
                         if (userAnswers.onOffQuestion) {
                             summary.onOffFeeling = parseInt(userAnswers.onOffQuestion);
                         }
+
+                        console.log(userAnswers.levodopaQuestion_1)
+                        console.log(userAnswers.levodopaQuestion_2_less)
+                        console.log(userAnswers.levodopaQuestion_2_more)
 
                         // Levodopa Time Questions
                         if (userAnswers.levodopaQuestion_1 === 'lessThanHour') {
@@ -583,6 +587,10 @@
                             }
                         }
 
+                        console.log(userAnswers.eatingQuestion_1)
+                        console.log(userAnswers.eatingQuestion_2_less)
+                        console.log(userAnswers.eatingQuestion_2_more)
+                        
                         // Eating Time Questions
                         if (userAnswers.eatingQuestion_1 === 'lessThanHour') {
                             if (userAnswers.eatingQuestion_2_less) {
