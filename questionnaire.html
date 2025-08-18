@@ -349,7 +349,6 @@
         };
 
         let currentPage = 'welcome';
-        let selectedOption = null;
         let userAnswers = {};
         const appContainer = document.getElementById('app');
         let currentOpenAccordion = null; // To track the currently open accordion section
@@ -429,6 +428,23 @@
                             </div>
                         `;
                     }
+
+                    setTimeout(() => {
+                        const prevSelectedValue = userAnswers[currentPage];
+                        const nextBtnOnPage = document.getElementById('next-button');
+                        if (prevSelectedValue) {
+                            const selectedButton = document.querySelector(`.option-button[data-value="${prevSelectedValue}"]`);
+                            if (selectedButton) {
+                                selectedButton.classList.add('active');
+                            }
+                            // Re-enable next button if a selection was found
+                            if (nextBtnOnPage) {
+                                nextBtnOnPage.disabled = false;
+                            }
+                        }
+                    }, 0);
+
+                    
                     break;
                 case 'levodopaQuestion':
                 case 'eatingQuestion':
@@ -491,7 +507,6 @@
                                 if (subButton) {
                                     subButton.classList.add('active');
                                 }
-                                selectedOption = subSelectionValue;
                                 if (nextBtn) nextBtn.disabled = false;
                             }
                         }
@@ -533,16 +548,7 @@
             addEventListeners();
         };
 
-        const handleNext = () => {
-            if (!pages[currentPage].requiresSubSelection && selectedOption) {
-                userAnswers[currentPage] = selectedOption;
-            } else if (pages[currentPage].requiresSubSelection && selectedOption === null) {
-                // If it's an accordion page and selectedOption is still null, a sub-option wasn't picked
-                return; // Prevent proceeding without sub-selection
-            }
-            
-            selectedOption = null;
-
+        const handleNext = () => {            
             switch (currentPage) {
                 case 'welcome':
                     renderPage('onOffQuestion');
@@ -613,27 +619,22 @@
         };
 
         const handleBack = () => {
-            selectedOption = null;
             switch (currentPage) {
                 case 'onOffQuestion':
                     renderPage('welcome');
                     break;
                 case 'levodopaQuestion':
-                    selectedOption = userAnswers.onOffQuestion; // Restore previous selection
                     renderPage('onOffQuestion');
                     break;
                 case 'eatingQuestion':
-                    selectedOption = userAnswers.levodopaQuestion; // Restore previous selection
                     userAnswers.levodopaQuestion_main = userAnswers.levodopaQuestion_main; // Keep main selection for accordions
                     renderPage('levodopaQuestion');
                     break;
                 case 'gettingUpQuestion':
-                    selectedOption = userAnswers.eatingQuestion; // Restore previous selection
                     userAnswers.eatingQuestion_main = userAnswers.eatingQuestion_main; // Keep main selection for accordions
                     renderPage('eatingQuestion');
                     break;
                 case 'debug':
-                    selectedOption = userAnswers.gettingUpQuestion; // Restore previous selection
                     renderPage('gettingUpQuestion');
                     break;
                 default:
@@ -685,7 +686,6 @@
 
                     // Reset selected sub-option for this accordion section and disable next button
                     if (!userAnswers[currentPage]) {
-                        selectedOption = null;
                         if (nextBtn) nextBtn.disabled = true;
                     }
 
@@ -704,7 +704,6 @@
                 subContainer.addEventListener('click', (event) => {
                     if (event.target.tagName === 'BUTTON' && event.target.dataset.type === 'sub') {
                         const subValue = event.target.dataset.value;
-                        selectedOption = subValue;
                         userAnswers[currentPage] = subValue;
 
                         // Update sub button styles
@@ -732,7 +731,7 @@
                     button.addEventListener('click', (event) => {
                         const value = event.target.dataset.value;
                         
-                        selectedOption = value;
+                        userAnswers[currentPage] = value;
 
                         optionsContainer.querySelectorAll('.option-button').forEach(btn => {
                             btn.classList.remove('active');
