@@ -534,14 +534,13 @@
         };
 
         const handleNext = () => {
-            if (pages[currentPage].requiresSubSelection) {
-                if (selectedOption === null) {
-                    return; // Do not proceed if sub-option not selected for accordion page
-                }
-                userAnswers[currentPage] = selectedOption; // Save the final selected sub-option
-            } else if (pages[currentPage].options && selectedOption) {
+            if (!pages[currentPage].requiresSubSelection && selectedOption) {
                 userAnswers[currentPage] = selectedOption;
+            } else if (pages[currentPage].requiresSubSelection && selectedOption === null) {
+                // If it's an accordion page and selectedOption is still null, a sub-option wasn't picked
+                return; // Prevent proceeding without sub-selection
             }
+            
             selectedOption = null;
 
             switch (currentPage) {
@@ -572,10 +571,6 @@
                             summary.onOffFeeling = parseInt(userAnswers.onOffQuestion);
                         }
 
-                        console.log(userAnswers.levodopaQuestion_1)
-                        console.log(userAnswers.levodopaQuestion_2_less)
-                        console.log(userAnswers.levodopaQuestion_2_more)
-
                         // Levodopa Time Questions
                         if (userAnswers.levodopaQuestion_1 === 'lessThanHour') {
                             if (userAnswers.levodopaQuestion_2_less) {
@@ -587,10 +582,6 @@
                             }
                         }
 
-                        console.log(userAnswers.eatingQuestion_1)
-                        console.log(userAnswers.eatingQuestion_2_less)
-                        console.log(userAnswers.eatingQuestion_2_more)
-                        
                         // Eating Time Questions
                         if (userAnswers.eatingQuestion_1 === 'lessThanHour') {
                             if (userAnswers.eatingQuestion_2_less) {
@@ -702,8 +693,10 @@
                     currentOpenAccordion = targetSubContainer.classList.contains('is-open') ? targetSubContainer : null;
 
                     // Reset selected sub-option for this accordion section and disable next button
-                    selectedOption = null;
-                    if (nextBtn) nextBtn.disabled = true;
+                    if (!userAnswers[currentPage]) {
+                        selectedOption = null;
+                        if (nextBtn) nextBtn.disabled = true;
+                    }
 
                     // Store main selection (for back button navigation)
                     userAnswers[currentPage + '_main'] = mainValue;
@@ -721,6 +714,7 @@
                     if (event.target.tagName === 'BUTTON' && event.target.dataset.type === 'sub') {
                         const subValue = event.target.dataset.value;
                         selectedOption = subValue;
+                        userAnswers[currentPage] = subValue;
 
                         // Update sub button styles
                         subContainer.querySelectorAll('button[data-type="sub"]').forEach(btn => {
