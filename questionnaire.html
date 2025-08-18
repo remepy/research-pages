@@ -573,24 +573,24 @@
                         }
 
                         // Levodopa Time Questions
-                        if (userAnswers.levodopaQuestion_1 === 'lessThanHour') {
-                            if (userAnswers.levodopaQuestion_2_less) {
-                                summary.timeSinceLevodopaMinutes = parseInt(userAnswers.levodopaQuestion_2_less);
+                        if (userAnswers.levodopaQuestion_main === 'lessThanHour') {
+                            if (userAnswers.levodopaQuestion) {
+                                summary.timeSinceLevodopaMinutes = parseInt(userAnswers.levodopaQuestion);
                             }
-                        } else if (userAnswers.levodopaQuestion_1 === 'moreThanHour') {
-                            if (userAnswers.levodopaQuestion_2_more) {
-                                summary.timeSinceLevodopaMinutes = parseInt(userAnswers.levodopaQuestion_2_more);
+                        } else if (userAnswers.levodopaQuestion_main === 'moreThanHour') {
+                            if (userAnswers.levodopaQuestion) {
+                                summary.timeSinceLevodopaMinutes = parseInt(userAnswers.levodopaQuestion);
                             }
                         }
 
                         // Eating Time Questions
-                        if (userAnswers.eatingQuestion_1 === 'lessThanHour') {
-                            if (userAnswers.eatingQuestion_2_less) {
-                                summary.timeSinceEatingMinutes = parseInt(userAnswers.eatingQuestion_2_less);
+                        if (userAnswers.eatingQuestion_main === 'lessThanHour') {
+                            if (userAnswers.eatingQuestion) {
+                                summary.timeSinceEatingMinutes = parseInt(userAnswers.eatingQuestion);
                             }
-                        } else if (userAnswers.eatingQuestion_1 === 'moreThanHour') {
-                            if (userAnswers.eatingQuestion_2_more) {
-                                summary.timeSinceEatingMinutes = parseInt(userAnswers.eatingQuestion_2_more);
+                        } else if (userAnswers.eatingQuestion_main === 'moreThanHour') {
+                            if (userAnswers.eatingQuestion) {
+                                summary.timeSinceEatingMinutes = parseInt(userAnswers.eatingQuestion);
                             }
                         }
 
