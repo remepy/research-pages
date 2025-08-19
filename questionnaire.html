@@ -566,8 +566,8 @@
                     renderPage('debug');
                     break;
                 case 'debug':
-                    // This function generates the JSON summary. 
-                    const generateJsonSummary = () => {
+                    // This function generates the summary. 
+                    const generateSummary = () => {
                         console.log(userAnswers);
                         const summary = {};
 
@@ -605,11 +605,11 @@
                             summary.gettingUpDifficulty = userAnswers.gettingUpQuestion === 'True' ? true : false;
                         }
 
-                        return JSON.stringify(summary, null, 2);
+                        return summary;
                     };
 
-                    const jsonSummary = generateJsonSummary();
-                    notifyClientToSendPayload(jsonSummary);
+                    const summary = generateSummary();
+                    notifyClientToSendPayload(summary);
                     // Finished with quiz
                     notifyClientToNext();
                     break;
