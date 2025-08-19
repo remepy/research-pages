@@ -543,12 +543,11 @@
                 console.log('No pinch data');
                 return;
             }
-            const jsonPinchData = JSON.stringify(pinchEvents, null, 2);
 
             const payload = {
                 gameName: 'zoom',
                 time: (Date.now() - startTaskTime) / 1000,
-                pinchData: jsonPinchData
+                pinchData: pinchEvents
             }
             notifyClientToSendPayload(payload);
         }
