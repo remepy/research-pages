@@ -605,6 +605,8 @@
                             summary.gettingUpDifficulty = userAnswers.gettingUpQuestion === 'True' ? true : false;
                         }
 
+                        summary.date = Date.now();
+
                         return summary;
                     };
 
